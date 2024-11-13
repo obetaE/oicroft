@@ -1,0 +1,39 @@
+.container{
+    height: 22vh;
+    overflow: hidden;
+    background: #000;
+    contain: layout;
+    position: relative;
+    margin: 2rem 7.8rem;
+    /* width: 100vw; */
+}
+
+.arrowContainer{
+    position: absolute;
+    width: 10%;
+    margin: auto;
+    top: 0;
+    bottom: 0;
+    cursor: pointer;
+    z-index: 2;
+    /* background: blue; */
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    height: 100%;
+    
+
+}
+
+.wrapper{
+    width: 500vw;
+    height: 100%;
+    display: flex;
+    transition: 1.5s  ease-in-out;
+}
+
+.imgContainer{
+    width: 100vw;
+    position: relative;
+    height: 100%;
+}

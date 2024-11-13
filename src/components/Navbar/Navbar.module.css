@@ -1,0 +1,144 @@
+.container{
+    display: flex;
+    justify-content: space-between;
+    position: fixed;
+    width: 100%;
+    z-index: 1000;
+    top: 1rem;
+    left: 0;
+    padding: 0 1.5rem;
+}
+
+.logocontainer{
+    background: white;
+    border-radius: 3rem;
+    width: 11rem;
+    height: 4.5rem;
+    display: flex;
+    align-items: center;
+    /* justify-content: center; */
+    padding-left: .5rem; 
+}
+
+.logo{
+    position: relative; 
+    /* justify-content: center; */
+    align-items: center;  
+    width: 10rem;
+    height: 10rem;
+}
+
+.logoimg{
+    object-fit: contain;
+}
+
+.linkscontainer{
+    background: white;
+    display: flex;
+    border-radius: 3rem;
+    gap: 1rem;
+    /* justify-content: center; */
+    align-items: center;
+}
+
+.links{
+    position: relative;
+    padding: .7rem;
+}
+
+.adminbutton{
+    color: var(--bg);
+    font-weight: 600;
+    font-size: 25px;
+}
+
+.admincontainer{
+    background: white;
+    display: flex;
+    border-radius: 3rem;
+    gap: 1rem;
+    /* justify-content: center; */
+    align-items: center;
+    padding: .3rem;
+    width: 7rem;
+    align-items: center;
+    justify-content: center;
+}
+
+.logout{
+    font-weight: bold;
+    color: white;
+    background-color: var(--bg);
+    border-radius: 1.5rem;
+    padding: 1rem;
+    margin: 0 0.8rem;
+}
+
+
+ .sidenavcontainer{
+    position: fixed;
+    z-index: 1000;
+    width: 100%;
+    display: none;
+}
+
+.header{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 1rem;
+    height: 6rem;
+}
+
+.navlinks{
+    background-color: var(--bg);
+    color: white;
+    position: absolute;
+    left: 0;
+    top: 6rem;
+    height: calc(100vh);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4rem;
+    width: 100%;
+    font-size: 1.5rem;
+    z-index: 10;
+}
+
+.hamburger{
+    cursor: pointer;
+}
+
+.hamburgerbg{
+    background-color: white;
+    border-radius: 50%;
+    width: 3rem;
+    height: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+}
+
+.imgcontainer:nth-child(1){
+    position: relative;
+    width: 3rem;
+    height: 2rem;
+}
+.imgcontainer2{
+    position: relative;
+    width: 2rem;
+    height: 2rem;
+} 
+
+@media (max-width: 768px) {
+   .container{
+    display: none;
+   }    
+
+   .sidenavcontainer{
+    display: block;
+   }
+}

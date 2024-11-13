@@ -1,0 +1,44 @@
+.container {
+  min-height: 100vh; /* Allows content to expand the container */
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.cartbg {
+  padding-top: 6rem;
+  background-image: url("/Oicroft wallpaper.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: 100vh; /* Allow bg to expand with content */
+  display: flex;
+  flex-direction: column; /* Stack content vertically */
+}
+
+.section {
+  width: 90%;
+  margin: 0 auto;
+  background: white;
+  opacity: 0.9;
+  display: flex;
+  padding: 2rem;
+  margin-bottom: 8rem;
+  border-radius: 15px;
+}
+
+
+.imgContainer {
+  position: absolute;
+  bottom: 0; /* Position 10rem above the bottom */
+  left: 0;
+  z-index: 1000;
+}
+
+
+/* Styling for the image */
+.imgContainer img {
+  max-width: 200px; /* Adjust the size as needed */
+  height: auto;
+}
+

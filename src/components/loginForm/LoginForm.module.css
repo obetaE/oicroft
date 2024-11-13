@@ -1,0 +1,138 @@
+.container {
+  background: var(--bg);
+  position: relative;
+  margin: 0;
+  padding: 0;
+  
+}
+
+.Loginbackground {
+  position: relative;
+  height: 100vh; /*Full Viewport Height*/
+  width: 100%; /*Full Viewport Width*/
+  background-image: url("/background.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: 1;
+}
+
+.loginbox {
+  background: white;
+  width: 20rem;
+  height: 25rem;
+  position: absolute;
+  top: 5rem;
+  left: 30rem;
+  max-width: 400px;
+  margin: 50px auto;
+  padding: 20px;
+  border-radius: 20px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  
+}
+
+.loginbox form {
+  display: flex;
+  flex-direction: column;
+}
+
+.loginbox h2 {
+  color: black;
+  margin-bottom: .5rem;
+  font-weight: 600;
+  font-size: larger;
+}
+
+.username, .password{
+  width: 15.9rem;
+  padding: 1px;
+  font-size: 16px;
+  border: 1px solid black;
+  border-radius: 4px;
+
+}
+
+.label {
+  display: block;
+  margin-bottom: 2px;
+  color: black;
+  font-weight: 400;
+}
+
+
+.signin-form {
+  max-width: 300px;
+  margin: 0 auto;
+}
+
+.usersection , .passwordsection {
+  margin-bottom: 20px;
+  border-radius: 1rem;
+}
+
+
+.login {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  color: #fff;
+  background: var(--bg);
+  border: none;
+  border-radius: 3rem;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.login:hover {
+  background-color: #13bb19;
+}
+
+
+.formfooter {
+  text-align: center;
+  padding-top: 1rem;
+}
+
+.formfooter Link {
+  text-decoration: none;
+  color: #666;
+  font-size: 14px;
+}
+
+.formfooter Link:hover {
+  text-decoration: underline;
+  color: #333;
+}
+
+.formfooter span {
+  margin: 0 5px;
+  color: #666;
+}
+
+.googleform{
+    margin-top: 18px;
+    border-radius: 1rem;
+    padding: 8px 0;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: center;
+}
+
+.googleform:hover{
+    border: 1px solid #666;
+}
+
+.googlelogin{
+    display: flex;
+    justify-content: center;
+    /* align-content: center; */
+    gap: 6px;
+}
+
+.imgContainer{
+    position: relative;
+    width: 1.6rem;
+    height: 1.6rem;
+   
+}

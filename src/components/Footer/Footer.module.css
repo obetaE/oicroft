@@ -1,0 +1,44 @@
+.container{
+    background: #19831c;
+    width: 100%;
+    /* height: calc(100vh - 10px); */
+    position: relative;
+    display: flex;
+    justify-content: center;
+    padding: 1rem 2rem;
+    color: white;
+    align-items: center;
+    bottom: 0;
+    height: 4rem;
+    /* right: 0; */
+    z-index: 999;
+}
+
+.textbox{
+    display: flex;
+    width: 50%;
+    justify-content: space-between;
+}
+
+.linkbox{
+    display: flex;
+    width: 50%;
+    justify-content: end;
+    align-items: center;
+}
+
+.links{
+    position: relative;
+    height: 3rem;
+    width: 3rem;
+}
+
+.twitterlinks{
+    position: relative;
+    height: 1.8rem;
+    width: 1.8rem;
+}
+
+.linksimg{
+    object-fit: contain;
+}
