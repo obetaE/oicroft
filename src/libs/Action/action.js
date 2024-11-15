@@ -149,11 +149,11 @@ export const register = async (previousState, formData) => {
 
 //ACTION HANDLING LOGIN
 export const login = async (previousState, formData) => {
-  const { username, password } = Object.fromEntries(formData);
+  const { email, password } = Object.fromEntries(formData);
 
   try {
     //We are signing in using next auth credentials
-    await signIn("credentials", { username, password });
+    await signIn("credentials", { email, password });
   } catch (err) {
     console.log(err);
 

@@ -5,11 +5,6 @@ import Navbar from "@/components/Navbar/Navbar";
 
 export default function loginPage(){
 
-    // const session = await auth()
-    // console.log(session)
-    // const user = session?.user
-
-
     return (
       <div className={styles.container}>
         <div className={styles.Loginbackground}>

@@ -10,10 +10,10 @@ import { authConfig } from "./libs/config/auth.config";
 const login = async (credentials) => {
   try {
     ConnectDB();
-    const user = await UserModel.findOne({ username: credentials.username });
+    const user = await UserModel.findOne({ email: credentials.email });
 
     if (!user) {
-      throw new Error("Username not found");
+      throw new Error("Email not found");
     }
 
     // Replace bcrypt with Argon2 password verification

@@ -22,15 +22,15 @@ export default function LoginForm() {
         <form action={formAction}>
           <h2>Sign In to Your Account</h2>
           <div className={styles.usersection}>
-            <label className={styles.label} htmlFor="username">
-              UserName :
+            <label className={styles.label} htmlFor="email">
+              Email :
             </label>
 
             <input
-              type="text"
-              placeholder="Username"
-              name="username"
-              id="username"
+              type="email"
+              placeholder="Email"
+              name="email"
+              id="email"
               className={styles.username}
             />
           </div>
