@@ -2,13 +2,13 @@ import React from "react";
 import SecondLinks from "./SecondLinks";
 import { auth } from "@/auth";
 
-export default function secondnav() {
-  // const session = await auth();
+export default async function secondnav() {
+  const session = await auth();
 
   return (
     <div>
-      {/* <SecondLinks session={session} /> */}
-      Old Links
+      <SecondLinks session={session} />
+
     </div>
   );
 }

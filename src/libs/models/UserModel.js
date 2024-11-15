@@ -1,4 +1,4 @@
-import mongoose from "mongoose"
+import mongoose from "mongoose";
 
 const Schema = new mongoose.Schema(
   {
@@ -17,7 +17,7 @@ const Schema = new mongoose.Schema(
       unique: true,
       max: 25,
     },
-    image:{
+    image: {
       type: String,
     },
     password: {
@@ -27,11 +27,15 @@ const Schema = new mongoose.Schema(
     isAdmin: {
       type: Boolean,
       default: false,
-    }
+    },
+    isWorker: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );
 
-const UserModel = mongoose.models?.user ||  mongoose.model('user', Schema );
+const UserModel = mongoose.models?.user || mongoose.model("user", Schema);
 
-export default UserModel 
+export default UserModel;

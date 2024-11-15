@@ -3,7 +3,7 @@ import Google from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { ConnectDB } from "./libs/config/db";
 import UserModel from "./libs/models/UserModel";
-import bcrypt from "bcryptjs";
+import argon2 from "argon2";
 import { authConfig } from "./libs/config/auth.config";
 
 //Creating a function that'll handle the retrieval and collecting of the credentials
@@ -16,9 +16,10 @@ const login = async (credentials) => {
       throw new Error("Username not found");
     }
 
-    const isPasswordCorrect = await bcrypt.compare(
-      credentials.password,
-      user.password
+    // Replace bcrypt with Argon2 password verification
+    const isPasswordCorrect = await argon2.verify(
+      user.password,
+      credentials.password
     );
 
     if (!isPasswordCorrect) {

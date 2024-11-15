@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+
 
 export const authConfig = {
   pages: {
@@ -10,6 +10,7 @@ export const authConfig = {
       if (user) {
         token.id = user.id;
         token.isAdmin = user.isAdmin;
+        token.isWorker = user.isWorker;
       }
       return token;
     },
@@ -17,13 +18,14 @@ export const authConfig = {
       if (token) {
         session.user.id = token.id;
         session.user.isAdmin = token.isAdmin;
+        session.user.isWorker = token.isWorker;
       }
       return session;
     },
     authorized({ auth, request }) {
       const user = auth?.user;
       const isOnAdminPanel = request.nextUrl?.pathname.startsWith("/admin");
-    //   const isOnOrderPage = request.nextUrl?.pathname.startsWith("/order");
+      const isOnOrderPage = request.nextUrl?.pathname.startsWith("/order");
       const isOnCartPage = request.nextUrl?.pathname.startsWith("/cart");
       const isOnLoginPage = request.nextUrl?.pathname.startsWith("/login");
 
@@ -34,9 +36,9 @@ export const authConfig = {
 
       //ONLY AUTHENTICATED USERS CAN REACH THE ORDER AND CART PAGE
 
-    //   if (isOnOrderPage && !user) {
-    //     return false;
-    //   }
+       if (isOnOrderPage && !user) {
+         return false;
+       }
 
       if (isOnCartPage && !user) {
         return false;
