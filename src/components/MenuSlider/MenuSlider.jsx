@@ -38,13 +38,13 @@ export default function MenuSlider() {
   return (
     <div className={styles.container}>
       {/* Left arrow */}
-      <div
+      {/* <div
         className={styles.arrowContainer}
         style={{ left: 0 }}
         onClick={() => handleArrow("l")}
       >
         <Image src="/wright.png" alt="arrow button" fill objectFit="contain" />
-      </div>
+      </div> */}
 
       {/* Wrapper for images */}
       <div
@@ -64,13 +64,13 @@ export default function MenuSlider() {
       </div>
 
       {/* Right arrow */}
-      <div
+      {/* <div
         className={styles.arrowContainer}
         style={{ right: 0 }}
         onClick={() => handleArrow("r")}
       >
         <Image src="/wleft.png" alt="arrow button" fill objectFit="contain" />
-      </div>
+      </div> */}
     </div>
   );
 }

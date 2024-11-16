@@ -1,0 +1,26 @@
+.container{
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 50rem;
+    padding: 2rem;
+}
+
+.container h2{
+    font-weight: 600;
+    text-align: center;
+    text-decoration: underline;
+    margin-bottom: 1rem;
+}
+
+.notificationForm{
+    display: flex;
+    gap: 10px;
+}
+
+.inputGroup{
+    display:flex;
+    align-items: flex-start;
+    justify-content: center;
+}

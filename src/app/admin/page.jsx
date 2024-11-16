@@ -1,11 +1,14 @@
 import React from 'react'
-import Image from "next/image";
-import SideNav from "@/components/SideNav/SideNav";
+import styles from "./admin.module.css"
+import Navbar from "@/components/Navbar/Navbar";
+import NotificationForm from "@/components/NotificationForm/NotificationForm";
 
 const adminpage = () => {
   return (
-    <div>
-      <SideNav/>
+    <div className={styles.container} >
+      <Navbar/>
+      Admin Page
+      <NotificationForm/>
     </div>
   )
 }

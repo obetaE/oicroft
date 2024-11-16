@@ -1,6 +1,7 @@
 .container{
     display: flex;
     justify-content: space-between;
+    align-items: center;
     position: fixed;
     width: 100%;
     z-index: 1000;
@@ -49,18 +50,17 @@
 .adminbutton{
     color: var(--bg);
     font-weight: 600;
-    font-size: 25px;
+    font-size: 20px;
 }
 
 .admincontainer{
     background: white;
     display: flex;
-    border-radius: 3rem;
-    gap: 1rem;
+    border-radius: 2rem;
+    height: 3rem;
     /* justify-content: center; */
     align-items: center;
-    padding: .3rem;
-    width: 7rem;
+    width: 9rem;
     align-items: center;
     justify-content: center;
 }

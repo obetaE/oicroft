@@ -30,6 +30,10 @@ const router = useRouter()
   router.push('/order')
  }
 
+ const admin = () =>{
+  router.push('/admin')
+ }
+
 
 
 const handleUser = () =>{
@@ -64,7 +68,7 @@ const handleUser = () =>{
       {session ? (
         session.user?.isAdmin && (
           <div className={styles.admincontainer}>
-            <button className={styles.adminbutton}> Admin </button>
+            <button onClick={admin}  className={styles.adminbutton}> Admin </button>
           </div>
         )
       ) : (

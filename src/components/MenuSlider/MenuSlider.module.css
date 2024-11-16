@@ -1,11 +1,12 @@
 .container{
-    height: 22vh;
+    height: 25vh;
     overflow: hidden;
     background: #000;
     contain: layout;
     position: relative;
     margin: 2rem 7.8rem;
     /* width: 100vw; */
+    border-radius: 1.5rem;
 }
 
 .arrowContainer{

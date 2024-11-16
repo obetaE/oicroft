@@ -6,6 +6,7 @@ import UserModel from "../models/UserModel";
 import argon2 from "argon2";
 import { Product } from "../models/Product";
 import { revalidatePath } from "next/cache";
+import NotificationModel from "../models/Notification";
 
 // Server function to handle the form submission for product creation
 export const addProduct = async (previousState, formData) => {
@@ -44,6 +45,39 @@ export const deleteProduct = async (formData) => {
     await Product.findByIdAndDelete(id);
     console.log("Deleted from the Database")
     revalidatePath("/order");
+    revalidatePath("/admin");
+  }catch(err){
+    console.log(err);
+    return { error: "Failed to Delete Post" };
+  }
+}
+
+//ACTION FOR ADDING A NOTICATION
+export const addNotification = async (formData) =>{
+  const {title, desc}= Object.fromEntries(formData);
+
+  try{
+    ConnectDB();
+    const newNotification = new NotificationModel({title, desc})
+
+    await newNotification.save();
+    console.log("Notification Successfully Uploaded to DB")
+  }catch(err){
+    console.log(err)
+    return {error: "Failed to upload Notification"}
+  }
+} 
+
+//DELETING NOTIFICATION
+export const deleteNotification = async (formData) => {
+  const {id} = Object.fromEntries(formData);
+
+  try{
+    ConnectDB();
+
+    await NotificationModel.findByIdAndDelete(id);
+    console.log("Deleted from the Database")
+    revalidatePath("/notifications");
     revalidatePath("/admin");
   }catch(err){
     console.log(err);
