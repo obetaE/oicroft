@@ -25,6 +25,10 @@ const SecondLinks = ({session}) => {
          router.push("/order");
        };
 
+       const profile = () =>{
+        router.push(`/profile/${profile._id}`);
+       }
+
 
   return (
     <>
@@ -126,11 +130,13 @@ const SecondLinks = ({session}) => {
               HomePage
             </Link>
             {session ? (
-                session.user?.isAdmin &&(<Link href="/admin" onClick={() => setOpen(false)}>
-              Admin
-            </Link>)
-            ):(
-                <div className='hidden' ></div>
+              session.user?.isAdmin && (
+                <Link href="/admin" onClick={() => setOpen(false)}>
+                  Admin
+                </Link>
+              )
+            ) : (
+              <div className="hidden"></div>
             )}
             <Link href="/support" onClick={() => setOpen(false)}>
               Support
@@ -145,6 +151,13 @@ const SecondLinks = ({session}) => {
               </Link>
             ) : (
               <div>
+                <Link
+                  href={`/profile/${profile._id}`}
+                  onClick={() => setOpen(false)}
+                >
+                  Profile
+                </Link>
+
                 <button onClick={() => setOpen(false)}>LogOut</button>
                 <Link href="/cart" onClick={() => setOpen(false)}>
                   Cart

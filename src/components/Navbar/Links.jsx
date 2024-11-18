@@ -1,118 +1,100 @@
-"use client"
-import React from 'react'
-import styles from './Navbar.module.css'
-import Image from 'next/image'
-import { redirect, useRouter} from 'next/navigation'
-import { handleLogout } from '@/libs/Action/action'
+"use client";
+import React from "react";
+import styles from "./Navbar.module.css";
+import Image from "next/image";
+import { redirect, useRouter } from "next/navigation";
+import { handleLogout } from "@/libs/Action/action";
 import { useState } from "react";
 import Link from "next/link";
 
-
-
-
-const Links = ({session}) => {
-
-
-  
-
-const [open, setOpen] = useState(false);  
-const router = useRouter()
+const Links = ({ session , id }) => {
+  const [open, setOpen] = useState(false);
+  const router = useRouter();
 
   const homepage = () => {
-    router.push('/');
-  }
+    router.push("/");
+  };
 
- const support = () => {
-  router.push('/support');
- }
+  const support = () => {
+    router.push("/support");
+  };
 
- const order = () => {
-  router.push('/order')
- }
+  const order = () => {
+    router.push("/order");
+  };
 
- const admin = () =>{
-  router.push('/admin')
- }
+  const admin = () => {
+    router.push("/admin");
+  };
 
-
-
-const handleUser = () =>{
-  {session ? (
-        router.push("/profile")
-      ) : (
-        router.push("/login")
-      )}
-}
-
-
-
-
-
-
+  const handleUser = () => {
+    if (session) {
+        router.push(`/profile/${id}`);
+      
+    } else {
+      router.push("/login");
+    }
+  };
 
   return (
     <div>
+      <div className={styles.container}>
+        <div className={styles.logocontainer}>
+          <button onClick={homepage} className={styles.logo}>
+            <Image src="/Oicroft logo.png" alt="Logo Icon" fill />
+          </button>
+        </div>
 
-    <div className={styles.container}>
-      <div className={styles.logocontainer}>
-        <button onClick={homepage} className={styles.logo}>
-          <Image
-            src="/Oicroft logo.png"
-            alt="Logo"
-            className={styles.logoimg}
-            fill
-          />
-        </button>
-      </div>
-
-      {session ? (
-        session.user?.isAdmin && (
-          <div className={styles.admincontainer}>
-            <button onClick={admin}  className={styles.adminbutton}> Admin </button>
-          </div>
-        )
-      ) : (
-        <div className="hidden"></div>
-      )}
-
-      <div className={styles.linkscontainer}>
-        <button onClick={support} className={styles.links}>
-          <Image
-            alt="Support icon"
-            src="/Support.png"
-            className={styles.linkimage}
-            width={50}
-            height={50}
-          />
-        </button>
-        <button onClick={order} className={styles.links}>
-          <Image
-            alt="Order icon"
-            src="/Shop icon.png"
-            className={styles.linkimage}
-            width={40}
-            height={40}
-          />
-        </button>
-        <button onClick={handleUser} className={styles.links}>
-          <Image
-            alt="Profile icon"
-            src="/Profile icon.png"
-            className={styles.linkimage}
-            width={40}
-            height={40}
-          />
-        </button>
         {session ? (
-          <form action={handleLogout}>
-            <button className={styles.logout}>Logout</button>
-          </form>
+          session.user?.isAdmin && (
+            <div className={styles.admincontainer}>
+              <button onClick={admin} className={styles.adminbutton}>
+                {" "}
+                Admin{" "}
+              </button>
+            </div>
+          )
         ) : (
           <div className="hidden"></div>
         )}
-      </div>
 
-    </div>
+        <div className={styles.linkscontainer}>
+          <button onClick={support} className={styles.links}>
+            <Image
+              alt="Support icon"
+              src="/Support.png"
+              className={styles.linkimage}
+              width={50}
+              height={50}
+            />
+          </button>
+          <button onClick={order} className={styles.links}>
+            <Image
+              alt="Order icon"
+              src="/Shop icon.png"
+              className={styles.linkimage}
+              width={40}
+              height={40}
+            />
+          </button>
+          <button onClick={handleUser} className={styles.links}>
+            <Image
+              alt="Profile icon"
+              src="/Profile icon.png"
+              className={styles.linkimage}
+              width={40}
+              height={40}
+            />
+          </button>
+          {session ? (
+            <form action={handleLogout}>
+              <button className={styles.logout}>Logout</button>
+            </form>
+          ) : (
+            <div className="hidden"></div>
+          )}
+        </div>
+      </div>
       {/* MOBILE VIEW */}
       <div className={styles.sidenavcontainer}>
         <div className={styles.header}>
@@ -155,7 +137,7 @@ const handleUser = () =>{
         {open && (
           <div className={styles.navlinks}>
             <Link href="/" onClick={() => setOpen(false)}>
-            HomePage
+              HomePage
             </Link>
             <Link href="/admin" onClick={() => setOpen(false)}>
               Admin
@@ -173,6 +155,10 @@ const handleUser = () =>{
               </Link>
             ) : (
               <div>
+                <Link href={`/profile/${id}`} onClick={() => setOpen(false)}>
+                  Profile
+                </Link>
+
                 <button onClick={() => setOpen(false)}>LogOut</button>
                 <Link href="/cart" onClick={() => setOpen(false)}>
                   Cart
@@ -182,9 +168,8 @@ const handleUser = () =>{
           </div>
         )}
       </div>
-
-      </div>
+    </div>
   );
-}
+};
 
-export default Links
+export default Links;

@@ -1,8 +1,10 @@
 import UserModel from '../models/UserModel';
 import NotificationModel from "../models/Notification";
 import { ConnectDB } from "../config/db";
+import { unstable_noStore as noStore } from "next/cache";
 
 export const getUser = async (id) =>{
+    noStore();
     try{
         ConnectDB();
 
@@ -16,15 +18,16 @@ export const getUser = async (id) =>{
 }
 
 export const getUsers = async () =>{
+    
     try{
         ConnectDB();
 
-        const users = await UserModel.find()
-        return users 
+        const users = await UserModel.find();
+        return users;
 
     }catch(err){
         console.log(err)
-        throw new Error("Failed to Fetch User")
+        throw new Error("Failed to Fetch Users")
     }
 }
 

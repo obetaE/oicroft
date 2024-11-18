@@ -1,0 +1,54 @@
+The `process.env` object is a built-in feature of Node.js that allows you to access environment variables in your application. These are key-value pairs stored outside your application code, often used to store sensitive information like API keys, database credentials, or email credentials.
+
+### What are `process.env.EMAIL_USER` and `process.env.EMAIL_PASS`?
+They are environment variables that:
+1. `EMAIL_USER`: Stores the email address or username of the email account you'll use to send emails.
+2. `EMAIL_PASS`: Stores the password or application-specific password (if required) for the email account.
+
+---
+
+### How to Set These Up?
+
+#### 1. **Using a `.env` File**
+   - Create a `.env` file in the root of your project.
+   - Add your credentials to the file:
+     ```plaintext
+     EMAIL_USER=your-email@example.com
+     EMAIL_PASS=your-email-password
+     ```
+   - **Important**: Never commit `.env` files to version control (e.g., GitHub) because they contain sensitive information. Use a `.gitignore` file to exclude it.
+
+#### 2. **Accessing in Your Code**
+   - Install the `dotenv` package to load the `.env` variables into `process.env`.
+     ```bash
+     npm install dotenv
+     ```
+   - Load the `.env` file at the beginning of your project (e.g., in `next.config.js` or the main entry point):
+     ```javascript
+     require('dotenv').config();
+     ```
+
+#### 3. **Secure Your Credentials**
+   - For production, store these variables securely in the environment configuration of your hosting platform:
+     - **Vercel**: Add `EMAIL_USER` and `EMAIL_PASS` in the "Environment Variables" section of your Vercel dashboard.
+     - **Heroku**: Use the `heroku config:set` command:
+       ```bash
+       heroku config:set EMAIL_USER=your-email@example.com EMAIL_PASS=your-email-password
+       ```
+
+---
+
+### Example `.env` File
+```plaintext
+EMAIL_USER=your-email@gmail.com
+EMAIL_PASS=your-secure-password
+```
+
+---
+
+### Why Use Environment Variables?
+- **Security**: Keeps sensitive information out of your source code.
+- **Flexibility**: Makes it easy to change credentials without modifying your code.
+- **Portability**: Allows different configurations for development, staging, and production environments.
+
+Let me know if you need further clarification!

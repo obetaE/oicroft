@@ -88,7 +88,7 @@ export const deleteNotification = async (formData) => {
 //ACTION TO ADD USERS
 export const addUser = async (previousState, formData) => {
 
-  const { username, email, password, image } = Object.fromEntries(formData);
+  const { username, email, password, image, isAdmin, isWorker } = Object.fromEntries(formData);
 
   try {
     ConnectDB();
@@ -112,6 +112,25 @@ export const addUser = async (previousState, formData) => {
   } catch (err) {
     console.log(err);
     return { error: "Failed to Upload User" };
+  }
+};
+
+
+//ACTION TO UPDATE USER INFO
+export const updateUser = async (id, updatedData) => {
+  try {
+    ConnectDB();
+
+    // Find user by ID and update fields
+    const updatedUser = await UserModel.findByIdAndUpdate(id, updatedData, {
+      new: true, // Return the updated document
+    });
+
+    console.log("User successfully updated", updatedUser);
+    return updatedUser;
+  } catch (err) {
+    console.log(err);
+    return { error: "Failed to update user" };
   }
 };
 
