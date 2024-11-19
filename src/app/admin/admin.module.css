@@ -1,11 +1,93 @@
 .container{
-    min-height:100vh;
-    padding: 6rem 2rem;
+   min-height: calc(100vh - 4rem);
     background-color: var(--bg);
     display: flex;
     flex-direction: column;
     gap: 100px;
+    overflow: hidden;
+    position: relative;
 }
+
+.Adminusercontainer{
+   min-height: calc(100vh - 4rem);
+    background-color: var(--bg);
+
+}
+
+.adminbg{
+   padding: 7rem 2rem;
+  position: relative;
+  min-height: 100vh; /*Full Viewport Height*/
+  /*width: 100vw;/*Full Viewport Width*/
+  background-image: url('/background.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.section{
+  margin-top: 2.5rem;
+  width: 90%;
+  margin: 0 auto;
+  background: white;
+  opacity: 0.9;
+  display: flex;
+  padding: 2rem;
+  margin-bottom: 8rem;
+  border-radius: 15px;
+  flex-direction: column;
+}
+
+.usersection{
+  margin-top: 2.5rem;
+  margin-bottom: 2.5rem;
+  min-height: 80vh;
+  width: 90%;
+  margin: 0 auto;
+  background: white;
+  opacity: 0.9;
+  display: flex;
+  padding: 2rem;
+  margin-bottom: 8rem;
+  border-radius: 15px;
+  flex-direction: column;
+}
+
+.userTitle{
+  text-align: center;
+  text-transform: uppercase;
+  font-size: 2rem;
+  text-decoration: underline;
+  color: var(--bg);
+  font-weight: bold;
+}
+
+.adminTitle{
+  font-size: 2rem;
+  text-align: center;
+  text-decoration: underline;
+  font-weight: bold;
+  color: var(--bglight);
+}
+
+.links{
+  margin-top: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.singleLink{
+ background-color: var(--bg);
+ padding: 2rem;
+ border-radius: 1.2rem;
+ font-size: 18px;
+ color: white;
+ cursor: pointer;
+}
+
 
 .row {
   display: flex;

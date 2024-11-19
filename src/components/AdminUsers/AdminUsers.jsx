@@ -11,8 +11,8 @@ const AdminUsers = async () =>{
 
 
     return(
-        <div>
-          <h1>Users</h1>
+        <div className={styles.container} >
+          <h1 className={styles.title} >Users</h1>
       {users.map((user)=>(
         <div className={styles.user} key={user.id} >
             <div className={styles.details} >

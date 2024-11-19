@@ -1,47 +1,34 @@
 import React from "react";
 import styles from "./admin.module.css";
 import Navbar from "@/components/Navbar/Navbar";
-import NotificationForm from "@/components/NotificationForm/NotificationForm";
-import AdminUserForm from "@/components/AdminUserForm/AdminUserForm";
-import AdminUsers from "@/components/AdminUsers/AdminUsers";
-import { Suspense } from "react";
-import AdminNotification from "@/components/AdminNotification/AdminNotification";
+import Link from "next/link";
 import {auth} from "@/auth";
 
-
-const adminpage = async () => {
-
+const AdminPage = async () => {
   const session = await auth();
   const user = session?.user;
   const isWorker = user?.isWorker;
-
-
   return (
     <div className={styles.container}>
-      <Navbar />
-      <div className={styles.row}>
-        <div className={styles.col}>
-          <Suspense fallback={<div>Loading...</div>}>
-            <AdminNotification />
-          </Suspense>
-        </div>
-        <div className={styles.col}>
-            <NotificationForm />
+      <div className={styles.adminbg}>
+        <div className={styles.section}>
+          <Navbar />
+          <h1 className={styles.adminTitle}>Admin Dashboard</h1>
+          <div className={styles.links}>
+            {!isWorker && (<div className={styles.singleLink}>
+              <Link href="/admin/users">Manage Users</Link>
+            </div>)}
+            <div className={styles.singleLink}>
+              <Link href="/admin/notifications">Manage Notifications</Link>
+            </div>
+            <div className={styles.singleLink}>
+              <Link href="/admin/orders">Manage Orders</Link>
+            </div>
+          </div>
         </div>
       </div>
-
-      {!isWorker && (<div className={styles.row}>
-        <div className={styles.col}>
-          <Suspense fallback={<div>Loading...</div>}>
-            <AdminUsers />
-          </Suspense>
-        </div>
-        <div className={styles.col}>
-            <AdminUserForm />
-        </div>
-      </div>)}
     </div>
   );
 };
 
-export default adminpage;
+export default AdminPage;

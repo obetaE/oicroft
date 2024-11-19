@@ -1,0 +1,28 @@
+.container{
+    height: 100%;
+    width: 100%;
+    margin-top: 3rem;
+}
+
+.title{
+  text-align: center;
+  font-size: .8rem;
+  text-decoration: underline;
+  color: var(--bg);
+  font-weight: 600;
+}
+
+.user{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2rem;
+}
+
+.delete{
+    background-color: red;
+    padding: .5rem;
+    font-weight: bold;
+    color: white;
+    border-radius: 1rem;
+}

@@ -52,6 +52,62 @@ export const deleteProduct = async (formData) => {
   }
 }
 
+//action.js file where you handle product or order submissions.
+export const addOrder = async (formData) => {
+  const { productId, quantity, unit, totalPrice, deliveryDate } =
+    Object.fromEntries(formData);
+
+  // Get the current valid order period
+  const getOrderPeriod = () => {
+    const now = new Date();
+    const currentDay = now.getDay();
+
+    // Determine this week's Thursday
+    const daysToThursday =
+      currentDay <= 4 ? 4 - currentDay : 4 + (7 - currentDay);
+    const thursday = new Date(now);
+    thursday.setDate(now.getDate() + daysToThursday);
+    thursday.setHours(0, 0, 0, 0);
+
+    // Determine next week's Wednesday
+    const wednesday = new Date(thursday);
+    wednesday.setDate(thursday.getDate() + 6);
+    wednesday.setHours(23, 59, 59, 999);
+
+    return { thursday, wednesday };
+  };
+
+  const { thursday, wednesday } = getOrderPeriod();
+  const orderDate = new Date();
+
+  // Validate the order date
+  if (orderDate < thursday || orderDate > wednesday) {
+    throw new Error(
+      "Orders can only be placed for the current Thursday-Wednesday period."
+    );
+  }
+
+  try {
+    ConnectDB();
+
+    const newOrder = new Order({
+      productId,
+      quantity,
+      unit,
+      totalPrice,
+      orderDate,
+      deliveryDate,
+    });
+
+    await newOrder.save();
+    console.log("Order successfully created");
+    return { success: true };
+  } catch (err) {
+    console.log(err);
+    return { error: "Failed to create order" };
+  }
+};
+
 //ACTION FOR ADDING A NOTICATION
 export const addNotification = async (formData) =>{
   const {title, desc}= Object.fromEntries(formData);
