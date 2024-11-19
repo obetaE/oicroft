@@ -1,9 +1,17 @@
+"use client"
 import React from 'react'
 import styles from "./meals.module.css"
 import Image from 'next/image'
 import { featuredProducts } from '@/temp'
+import { useRouter } from 'next/navigation'
 
 const Meals = () => {
+
+    const router = useRouter();
+    const moveToOrderPage = () => {
+        router.push("/order")
+    }
+
   return (
     <div className={styles.container} >
         <div className={styles.wrapper} >
@@ -17,8 +25,7 @@ const Meals = () => {
                 <div className={styles.textContainer} >
                     <h1>{item.title}</h1>
                     <p>{item.desc}</p>
-                    <span>{item.price}</span>
-                    <button>Add to Cart</button>
+                    <button onClick={moveToOrderPage} >See More</button>
                 </div>
             </div>
             ))}

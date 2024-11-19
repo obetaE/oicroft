@@ -159,10 +159,13 @@ const Links = ({ session , id }) => {
                   Profile
                 </Link>
 
-                <button onClick={() => setOpen(false)}>LogOut</button>
                 <Link href="/cart" onClick={() => setOpen(false)}>
                   Cart
                 </Link>
+
+                <form action={handleLogout}>
+                  <button >LogOut</button>
+                </form>
               </div>
             )}
           </div>

@@ -3,12 +3,11 @@ import SecondLinks from "./SecondLinks";
 import { auth } from "@/auth";
 
 export default async function secondnav() {
-  const session = await auth();
+   const session = await auth();
 
-  return (
-    <div>
-      <SecondLinks session={session} />
-
-    </div>
-  );
+   return (
+     <div>
+       <SecondLinks session={session} id={session?.user?.id || null} />
+     </div>
+   );
 }

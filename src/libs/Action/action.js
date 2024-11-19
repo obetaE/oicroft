@@ -102,10 +102,12 @@ export const addUser = async (previousState, formData) => {
       email,
       password: hashedPassword,
       image,
+      isAdmin,
+      isWorker,
     });
 
     await newUser.save();
-    console.log("Product Successfully Uploaded");
+    console.log("User Successfully Uploaded From Admin Panel");
     revalidatePath("/admin");
 
     return { success: true };

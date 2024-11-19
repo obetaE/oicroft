@@ -7,7 +7,7 @@ import { handleLogout } from '@/libs/Action/action';
 import {useState} from "react";
 import Link from 'next/link';
 
-const SecondLinks = ({session}) => {
+const SecondLinks = ({session, id}) => {
 
     const [open, setOpen] = useState(false);  
 
@@ -26,7 +26,7 @@ const SecondLinks = ({session}) => {
        };
 
        const profile = () =>{
-        router.push(`/profile/${profile._id}`);
+        router.push(`/profile/${id}`);
        }
 
 
@@ -151,17 +151,17 @@ const SecondLinks = ({session}) => {
               </Link>
             ) : (
               <div>
-                <Link
-                  href={`/profile/${profile._id}`}
-                  onClick={() => setOpen(false)}
-                >
+                <Link href={`/profile/${id}`} onClick={() => setOpen(false)}>
                   Profile
                 </Link>
 
-                <button onClick={() => setOpen(false)}>LogOut</button>
                 <Link href="/cart" onClick={() => setOpen(false)}>
                   Cart
                 </Link>
+
+                <form action={handleLogout}>
+                  <button >LogOut</button>
+                </form>
               </div>
             )}
           </div>

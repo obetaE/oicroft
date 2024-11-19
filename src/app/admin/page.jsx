@@ -6,8 +6,16 @@ import AdminUserForm from "@/components/AdminUserForm/AdminUserForm";
 import AdminUsers from "@/components/AdminUsers/AdminUsers";
 import { Suspense } from "react";
 import AdminNotification from "@/components/AdminNotification/AdminNotification";
+import {auth} from "@/auth";
 
-const adminpage = () => {
+
+const adminpage = async () => {
+
+  const session = await auth();
+  const user = session?.user;
+  const isWorker = user?.isWorker;
+
+
   return (
     <div className={styles.container}>
       <Navbar />
@@ -22,7 +30,7 @@ const adminpage = () => {
         </div>
       </div>
 
-      <div className={styles.row}>
+      {!isWorker && (<div className={styles.row}>
         <div className={styles.col}>
           <Suspense fallback={<div>Loading...</div>}>
             <AdminUsers />
@@ -31,7 +39,7 @@ const adminpage = () => {
         <div className={styles.col}>
             <AdminUserForm />
         </div>
-      </div>
+      </div>)}
     </div>
   );
 };
