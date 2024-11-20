@@ -19,20 +19,37 @@ const ProductSchema = new mongoose.Schema(
     prices: {
       type: [
         {
-          unit: { type: String, required: true }, // Flexible measurement (e.g., kg, liter, big, medium, small)
-          price: { type: Number, required: true }, // Price per unit
+          unit: { type: String, required: false }, // e.g., kg, liter, big, medium, small
+          price: { type: Number, required: false }, // Price per unit
+          stock: { type: Number, default: 0 }, // Stock for this entry
+          minQuantity: { type: Number, required: false }, // Minimum units for counter-based pricing
+          pricePerUnit: { type: Number, required: false }, // Price for 1 unit in counter-based pricing
         },
       ],
-      validate: [(arr) => arr.length > 0, "Prices array cannot be empty"],
+      validate: {
+        validator: function (arr) {
+          // Each entry must have either `unit` + `price` or `minQuantity` + `pricePerUnit`
+          return arr.every(
+            (item) =>
+              (item.unit &&
+                item.price &&
+                !item.minQuantity &&
+                !item.pricePerUnit) ||
+              (!item.unit &&
+                !item.price &&
+                item.minQuantity &&
+                item.pricePerUnit)
+          );
+        },
+        message:
+          "Each price entry must include either `unit` and `price` OR `minQuantity` and `pricePerUnit`, but not both.",
+      },
+      required: false,
     },
     productId: {
       type: String,
       unique: true,
-      default: () => new mongoose.Types.ObjectId().toString(), // Auto-generate unique ID
-    },
-    counter: {
-      minQuantity: { type: Number, required: false }, // Minimum units to order
-      pricePerUnit: { type: Number, required: false }, // Price for 1 unit
+      default: () => new mongoose.Types.ObjectId().toString(),
     },
     discounts: {
       regularDiscount: { type: Number, default: 0 }, // Percentage or flat value
@@ -52,33 +69,3 @@ const ProductSchema = new mongoose.Schema(
 
 export const Product =
   mongoose.models?.Product || mongoose.model("Product", ProductSchema);
-
-
-{
-  /* 
-  AN EXPLANATION OF ALL THAT'S HERE EXCEPT THE OBVIOUS ONES
-  Key Adjustments:
-Prices Array:
-
-Each entry includes unit and price, allowing the admin to define as many units and their prices as needed (e.g., "25L, $20", "50L, $40").
-Flexible for all unit types: liters, kg, big, small, etc.
-Product ID:
-
-Defaults to an auto-generated value but can be manually set if needed.
-No need to overcomplicate unless there's a specific reason for manual IDs.
-Counter Field:
-
-Optional. Holds minQuantity and pricePerUnit for counter-based products.
-Provides a baseline for calculations outside the schema.
-Discounts:
-
-regularDiscount for static discounts set by the admin.
-promoCodes as an array of promo codes and their discount values.
-Totals and Order Tracking:
-
-This doesn’t belong in the product schema. Instead:
-Orders Schema: Create a separate schema to log orders, quantities, and timestamps.
-This decouples product definition from transactional data, simplifying maintenance and reporting.
-
-  */
-}

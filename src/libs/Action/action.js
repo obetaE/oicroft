@@ -52,12 +52,12 @@ export const deleteProduct = async (formData) => {
   }
 }
 
-//action.js file where you handle product or order submissions.
+//ACTION where you handle product or order submissions.
 export const addOrder = async (formData) => {
   const { productId, quantity, unit, totalPrice, deliveryDate } =
     Object.fromEntries(formData);
 
-  // Get the current valid order period
+  // Helper to determine order validity period
   const getOrderPeriod = () => {
     const now = new Date();
     const currentDay = now.getDay();
@@ -90,6 +90,57 @@ export const addOrder = async (formData) => {
   try {
     ConnectDB();
 
+    // Find the product
+    const product = await Product.findById(productId);
+    if (!product) {
+      throw new Error("Product not found");
+    }
+
+    // Handle stock update for unit-based or counter-based products
+    if (unit) {
+      // Unit-based product logic
+      const selectedUnit = product.prices.find((item) => item.unit === unit);
+      if (!selectedUnit) {
+        throw new Error(`Unit '${unit}' not found for this product`);
+      }
+
+      if (selectedUnit.stock < quantity) {
+        throw new Error(
+          `Insufficient stock for unit '${unit}'. Available: ${selectedUnit.stock}`
+        );
+      }
+
+      // Deduct stock
+      selectedUnit.stock -= quantity;
+    } else {
+      // Counter-based product logic
+      if (!product.counter) {
+        throw new Error("Counter-based product not configured");
+      }
+
+      if (product.counter.stock < quantity) {
+        throw new Error(
+          `Insufficient stock. Available: ${product.counter.stock}`
+        );
+      }
+
+      if (
+        product.counter.minQuantity &&
+        quantity < product.counter.minQuantity
+      ) {
+        throw new Error(
+          `Minimum order quantity is ${product.counter.minQuantity}`
+        );
+      }
+
+      // Deduct stock
+      product.counter.stock -= quantity;
+    }
+
+    // Save updated product stock
+    await product.save();
+
+    // Create and save the order
     const newOrder = new Order({
       productId,
       quantity,
@@ -107,6 +158,31 @@ export const addOrder = async (formData) => {
     return { error: "Failed to create order" };
   }
 };
+
+
+
+//ACTION TO HANDLE OUT OF STOCK
+const placeOrder = async (productId, selectedUnit, quantity) => {
+  try {
+    // Fetch product
+    const product = await Product.findById(productId);
+    const unit = product.prices.find(item => item.unit === selectedUnit);
+
+    // Validate stock
+    if (!unit || unit.stock < quantity) {
+      throw new Error("Insufficient stock for the selected unit.");
+    }
+
+    // Deduct stock
+    unit.stock -= quantity;
+    await product.save();
+
+    console.log(`Order placed for ${quantity} ${selectedUnit}(s). Remaining stock: ${unit.stock}`);
+  } catch (err) {
+    console.error(err.message);
+  }
+};
+
 
 //ACTION FOR ADDING A NOTICATION
 export const addNotification = async (formData) =>{

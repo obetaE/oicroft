@@ -1,24 +1,28 @@
 import { ConnectDB } from "@/libs/config/db";
+import { Product } from "@/libs/models/Product";
 
-export default async function handler(req, res) {
-  await ConnectDB(); // Ensure the database connection is established on each request
-
-  const { method } = req;
-
-  if (method === "GET") {
-    // Handle GET request
+export async function GET(req) {
+  try {
+    await ConnectDB();
+    const products = await Product.find();
+    return new Response(JSON.stringify(products), { status: 200 });
+  } catch (err) {
+    return new Response(
+      JSON.stringify({ message: "Error fetching products" }),
+      { status: 500 }
+    );
   }
+}
 
-  if (method === "POST") {
-    try {
-      // Handle POST request
-      req.body
-    } catch (err) {
-      console.log(err);
-      res.status(500).json({ message: "Something went wrong" });
-    }
-  } else {
-    res.setHeader("Allow", ["GET", "POST"]);
-    res.status(405).end(`Method ${method} Not Allowed`);
+export async function POST(req) {
+  try {
+    await ConnectDB();
+    const data = await req.json(); // Parse request body
+    const product = await Product.create(data);
+    return new Response(JSON.stringify(product), { status: 201 });
+  } catch (err) {
+    return new Response(JSON.stringify({ message: "Error creating product" }), {
+      status: 500,
+    });
   }
 }
