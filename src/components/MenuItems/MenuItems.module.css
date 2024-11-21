@@ -1,3 +1,51 @@
+.load-btn-container {
+  display: flex;
+  gap: 10px; /* Adjust as needed for spacing */
+  overflow: hidden;
+}
+
+.loading-button {
+  width: 20px;
+  height: 20px;
+  background-color: green;
+  border-radius: 50%;
+  animation: move 2s linear infinite;
+  opacity: 1;
+}
+
+@keyframes move {
+  0% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+.loading-button:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.loading-button:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.loading-button:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+.loading-button:nth-child(4) {
+  animation-delay: 0.6s;
+}
+
+.loading-button:nth-child(5) {
+  animation-delay: 0.8s;
+}
 
 
 .wrapper {

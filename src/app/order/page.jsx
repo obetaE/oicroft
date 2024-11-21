@@ -15,12 +15,12 @@ export default async function order() {
       <Secondnav />
       <div className={styles.container}>
         <div className={styles.cartbg}>
-            <MenuSlider />
-            <div className={styles.backdrop} >
-          <div className={styles.section}>
-            <MenuItems />
-          </div>
+          <MenuSlider />
+          <div className={styles.backdrop}>
+            <div className={styles.section}>
+              <MenuItems />
             </div>
+          </div>
         </div>
       </div>
     </>

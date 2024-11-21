@@ -3,11 +3,22 @@
 import React, { useState } from "react";
 import styles from "./ProductInfo.module.css";
 import Image from "next/image";
-import { singleProduct } from "@/temp"; // Update the path accordingly
 
-const ProductInfo = () => {
-  // Initialize state for the selected size
-  const [size, setSize] = useState(0);
+const ProductInfo = ({ product }) => {
+  const [selectedSizeIndex, setSelectedSizeIndex] = useState(0); // For unit-based products
+  const [quantity, setQuantity] = useState(1); // Quantity for both pricing types
+
+  // Determine if the product uses unit-based pricing or counter-based pricing
+  const isUnitBased = product.prices.some((price) => price.unit);
+  const selectedPrice = isUnitBased
+    ? product.prices[selectedSizeIndex].price
+    : product.prices[0].pricePerUnit;
+
+  const minQuantity = isUnitBased
+    ? 1
+    : product.prices[0].minQuantity || 1; // Default to 1 if no minQuantity is specified
+
+  const totalPrice = quantity * selectedPrice;
 
   return (
     <div className={styles.container}>
@@ -16,8 +27,8 @@ const ProductInfo = () => {
           <div className={styles.left}>
             <div className={styles.imgContainer}>
               <Image
-                src={singleProduct.img}
-                alt={singleProduct.title}
+                src={product.img}
+                alt={product.title}
                 fill
                 className={styles.img}
                 objectFit="contain"
@@ -25,71 +36,44 @@ const ProductInfo = () => {
             </div>
           </div>
           <div className={styles.right}>
-            <h1 className={styles.title}>{singleProduct.title}</h1>
-            <span className={styles.price}>
-              $
-              {singleProduct.price +
-                singleProduct.options[size].additionalPrice}
-            </span>
-            <p className={styles.desc}>{singleProduct.desc}</p>
-            <h2 className={styles.choose}>Choose the size</h2>
-            <div className={styles.sizes}>
-              {singleProduct.options.map((option, index) => (
-                <div
-                  key={index}
-                  className={`${styles.size} ${
-                    size === index ? styles.active : ""
-                  }`}
-                  onClick={() => setSize(index)} // Update the state to the selected index
-                >
-                  <span className={styles.number}>{option.title}</span>
-                </div>
-              ))}
-            </div>
+            <h1 className={styles.title}>{product.title}</h1>
+            <span className={styles.price}>₦{totalPrice.toFixed(2)}</span>
+            <p className={styles.desc}>{product.desc}</p>
 
-            <h3 className={styles.choose}>Choose Additional Ingredients</h3>
-            <div className={styles.ingredients}>
-              <div className={styles.option}>
-                <input
-                  type="checkbox"
-                  name="double"
-                  id="double"
-                  className={styles.checkbox}
-                />
-                <label htmlFor="double">Double Ingredients</label>
-              </div>
-              <div className={styles.option}>
-                <input
-                  type="checkbox"
-                  name="cheese"
-                  id="cheese"
-                  className={styles.checkbox}
-                />
-                <label htmlFor="cheese">Extra Cheese</label>
-              </div>
-              <div className={styles.option}>
-                <input
-                  type="checkbox"
-                  name="spicy"
-                  id="spicy"
-                  className={styles.checkbox}
-                />
-                <label htmlFor="spicy">Spicy Sauce</label>
-              </div>
-              <div className={styles.option}>
-                <input
-                  type="checkbox"
-                  name="garlic"
-                  id="garlic"
-                  className={styles.checkbox}
-                />
-                <label htmlFor="garlic">Garlic Sauce</label>
-              </div>
-            </div>
+            {isUnitBased ? (
+              <>
+                <h2 className={styles.choose}>Choose the size</h2>
+                <div className={styles.sizes}>
+                  {product.prices.map((option, index) => (
+                    <div
+                      key={index}
+                      className={`${styles.size} ${
+                        selectedSizeIndex === index ? styles.active : ""
+                      }`}
+                      onClick={() => {
+                        setSelectedSizeIndex(index); // Update the selected size
+                        setQuantity(1); // Reset quantity
+                      }}
+                    >
+                      <span className={styles.number}>{option.unit}</span>
+                    </div>
+                  ))}
+                </div>
+              </>
+            ) : (
+              <h2 className={styles.choose}>
+                Minimum Quantity: {minQuantity}
+              </h2>
+            )}
+
             <div className={styles.add}>
               <input
                 type="number"
-                defaultValue={1}
+                min={minQuantity}
+                value={quantity}
+                onChange={(e) =>
+                  setQuantity(Math.max(minQuantity, parseInt(e.target.value) || 1))
+                }
                 className={styles.quantity}
               />
               <button className={styles.button}>Add to Cart</button>

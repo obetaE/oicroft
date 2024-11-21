@@ -1,8 +1,9 @@
 import { ConnectDB } from "@/libs/config/db";
 import { Product } from "@/libs/models/Product";
 
-export async function GET(req, { params }) {
-  const { id } = params;
+export async function GET(req, context) {
+  const {params} = context;
+  const { id } = await params;
 
   try {
     await ConnectDB();
