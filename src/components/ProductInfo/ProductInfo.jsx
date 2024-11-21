@@ -1,12 +1,21 @@
 "use client";
 
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import styles from "./ProductInfo.module.css";
 import Image from "next/image";
+import { useDispatch } from "react-redux";
+import { addProductToCart } from "@/redux/cartSlice";
 
 const ProductInfo = ({ product }) => {
+ const router = useRouter();
+const order = () => {
+  router.push("/order");
+};
+
   const [selectedSizeIndex, setSelectedSizeIndex] = useState(0); // For unit-based products
   const [quantity, setQuantity] = useState(1); // Quantity for both pricing types
+  const dispatch = useDispatch(); //Calling the useDispatch redux hook
 
   // Determine if the product uses unit-based pricing or counter-based pricing
   const isUnitBased = product.prices.some((price) => price.unit);
@@ -14,16 +23,37 @@ const ProductInfo = ({ product }) => {
     ? product.prices[selectedSizeIndex].price
     : product.prices[0].pricePerUnit;
 
-  const minQuantity = isUnitBased
-    ? 1
-    : product.prices[0].minQuantity || 1; // Default to 1 if no minQuantity is specified
+  const minQuantity = isUnitBased ? 1 : product.prices[0].minQuantity || 1; // Default to 1 if no minQuantity is specified
 
   const totalPrice = quantity * selectedPrice;
+
+  // Const to add items to cart
+  const handleClick = () => {
+    // Dispatch the action to add the product to the cart
+    dispatch(
+      addProductToCart({
+        id: product.id, // Product ID
+        title: product.title, // Product title
+        img: product.img, // Product image
+        price: totalPrice, // Total price based on quantity and selected size/unit
+        quantity, // Quantity selected by the user
+        unit: isUnitBased ? product.prices[selectedSizeIndex].unit : null, // Selected unit (only for unit-based products)
+      })
+    );
+  };
 
   return (
     <div className={styles.container}>
       <div className={styles.productbg}>
         <div className={styles.backdrop}>
+          <div onClick={order} className={styles.backbutton}>
+             <Image
+                src="/Back Button.png"
+                alt='Back button'
+                width={50}
+                height={50}
+              />
+            <button className={styles.orderpage} >Order Page</button></div>
           <div className={styles.left}>
             <div className={styles.imgContainer}>
               <Image
@@ -61,9 +91,7 @@ const ProductInfo = ({ product }) => {
                 </div>
               </>
             ) : (
-              <h2 className={styles.choose}>
-                Minimum Quantity: {minQuantity}
-              </h2>
+              <h2 className={styles.choose}>Minimum Quantity: {minQuantity}</h2>
             )}
 
             <div className={styles.add}>
@@ -72,11 +100,15 @@ const ProductInfo = ({ product }) => {
                 min={minQuantity}
                 value={quantity}
                 onChange={(e) =>
-                  setQuantity(Math.max(minQuantity, parseInt(e.target.value) || 1))
+                  setQuantity(
+                    Math.max(minQuantity, parseInt(e.target.value) || 1)
+                  )
                 }
                 className={styles.quantity}
               />
-              <button className={styles.button}>Add to Cart</button>
+              <button onClick={handleClick} className={styles.button}>
+                Add to Cart
+              </button>
             </div>
           </div>
         </div>

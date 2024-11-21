@@ -10,19 +10,26 @@ const cartSlice = createSlice({
   name: "cart",
   initialState,
   reducers: {
-    addProductToCart: (state, action) => {
-      // Add product to the cart
-      state.products.push(action.payload);
+    //OLD CODE INCASE I JAM ERROR
+    // addProductToCart: (state, action) => {
+    //   // Add product to the cart
+    //   state.products.push(action.payload);
       
-      //Increasing the quantity when we add a new product
-      state.quantity += 1;
+    //   //Increasing the quantity when we add a new product
+    //   state.quantity += 1;
 
-      // Update the total price
-      state.total += action.payload.price * action.payload.quantity;
+    //   // Update the total price
+    //   state.total += action.payload.price * action.payload.quantity;
 
-      // Update the total quantity
-      state.quantity += action.payload.quantity;
-    },
+    //   // Update the total quantity
+    //   state.quantity += action.payload.quantity;
+    // },
+
+    addProductToCart: (state, action) => {
+  state.products.push(action.payload); // Add the new product to the cart
+  state.total += action.payload.price * action.payload.quantity; // Update total price
+  state.quantity += action.payload.quantity; // Correctly update the cart icon counter
+},
     reset: () => initialState, // Reset the cart to its initial state
   },
 });

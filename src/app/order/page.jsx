@@ -2,7 +2,7 @@ import React from "react";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import styles from "./menu.module.css"
-import Secondnav from "@/components/secondnav/Secondnav";
+import ProductIdNav from "@/components/ProductIdNav/ProductIdNav";
 import MenuItems from "@/components/MenuItems/MenuItems";
 import MenuSlider from "@/components/MenuSlider/MenuSlider";
 
@@ -12,7 +12,7 @@ export default async function order() {
 
   return (
     <>
-      <Secondnav />
+      <ProductIdNav />
       <div className={styles.container}>
         <div className={styles.cartbg}>
           <MenuSlider />

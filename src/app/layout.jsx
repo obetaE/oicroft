@@ -1,8 +1,7 @@
 import localFont from "next/font/local";
 import "./globals.css";
-import Footer from "@/components/Footer/Footer"
-
-
+import Footer from "@/components/Footer/Footer";
+import ReduxProvider from "./ReduxProvider";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -17,7 +16,8 @@ const geistMono = localFont({
 
 export const metadata = {
   title: "Oicroft",
-  description: "Farm-to-Table Excellence. Fresh, Local, Reliable. Order now and experience the convenience of quality food, delivered",
+  description:
+    "Farm-to-Table Excellence. Fresh, Local, Reliable. Order now and experience the convenience of quality food, delivered",
 };
 
 export default function RootLayout({ children }) {
@@ -26,9 +26,8 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-
-          {children}
-          <Footer />
+        <ReduxProvider>{children}</ReduxProvider>
+        <Footer />
       </body>
     </html>
   );

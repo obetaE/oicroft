@@ -8,7 +8,7 @@ import {useState} from "react";
 import Link from 'next/link';
 import {useSelector} from "react-redux";
 
-const SecondLinks = ({session, id}) => {
+const ProductIdLinks = ({session, id}) => {
     const quantity = useSelector(state=>state.cart.quantity)
 
     const [open, setOpen] = useState(false);  
@@ -27,6 +27,10 @@ const SecondLinks = ({session, id}) => {
          router.push("/order");
        };
 
+       const cart = () => {
+         router.push("/cart");
+       };
+
        const profile = () =>{
         router.push(`/profile/${id}`);
        }
@@ -36,7 +40,7 @@ const SecondLinks = ({session, id}) => {
     <>
       <div className={styles.container}>
         <div className={styles.right}>
-          <button className={styles.links}>
+          <button onClick={profile} className={styles.links}>
             <Image
               alt="Profile icon"
               src="/Profile icon.png"
@@ -69,7 +73,7 @@ const SecondLinks = ({session, id}) => {
           </div>
         </div>
         <div className={styles.left}>
-          <button onClick={order} className={styles.links}>
+          <button onClick={cart} className={styles.links}>
             <h2>{quantity}</h2>
             <Image
               alt="Order icon"
@@ -173,4 +177,4 @@ const SecondLinks = ({session, id}) => {
   );
 }
 
-export default SecondLinks
+export default ProductIdLinks

@@ -1,7 +1,7 @@
 import React from "react";
 import styles from "@/app/order/product.module.css";
-import Secondnav from "@/components/secondnav/Secondnav";
 import ProductInfo from "@/components/ProductInfo/ProductInfo";
+import ProductIdNav from "@/components/ProductIdNav/ProductIdNav";
 
 async function fetchProduct(id) {
   const res = await fetch(`http://localhost:3000/api/order/${id}`, { cache: "no-store" });
@@ -17,7 +17,7 @@ const product = async ({params}) => {
   const product = await fetchProduct(id);
   return (
     <div className={styles.container}>
-      <Secondnav />
+      <ProductIdNav />
       <ProductInfo product={product}  />
     </div>
   );

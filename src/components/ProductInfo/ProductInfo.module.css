@@ -27,6 +27,28 @@
   opacity: 0.9;
 }
 
+.backbutton{
+    background-color: var(--bg);
+    padding: 0.5rem;
+    color: white;
+    font-weight: 600;
+    display: flex;
+    gap:6px;
+    padding: 0 10px;
+    border-radius: 2rem;
+    position: absolute;
+    top: 0;
+    left: 3;
+    margin-top: 2rem;
+    margin-left: 2rem;
+    cursor: pointer;
+         transition: background-color 0.3s ease;
+}
+
+.backbutton:hover {
+  background-color: #0f9e15; /* Optional hover color */
+}
+
 .left{
     flex: 1;
     display: flex;
