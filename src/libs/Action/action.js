@@ -7,6 +7,9 @@ import argon2 from "argon2";
 import { Product } from "../models/Product";
 import { revalidatePath } from "next/cache";
 import NotificationModel from "../models/Notification";
+import SupportModel from "../models/Support";
+import nodemailer from "nodemailer"
+
 
 // Server function to handle the form submission for product creation
 export const addProduct = async (previousState, formData) => {
@@ -217,6 +220,41 @@ export const deleteNotification = async (formData) => {
   }
 }
 
+
+
+//ACTION FOR ADDING A SUPPORT TOPIC AND ANSWER
+export const addSupport = async (formData) =>{
+  const {title, desc}= Object.fromEntries(formData);
+
+  try{
+    ConnectDB();
+    const newSupport = new SupportModel({title, desc})
+
+    await newSupport.save();
+    console.log("Support Topic Successfully Uploaded to DB")
+  }catch(err){
+    console.log(err)
+    return {error: "Failed to upload Support Topic"}
+  }
+} 
+
+//DELETING A SUPPORT TOPIC AND ANSWER
+export const deleteSupport = async (formData) => {
+  const {id} = Object.fromEntries(formData);
+
+  try{
+    ConnectDB();
+
+    await SupportModel.findByIdAndDelete(id);
+    console.log("Deleted from the Database")
+    revalidatePath("/support");
+    revalidatePath("/admin");
+  }catch(err){
+    console.log(err);
+    return { error: "Failed to Delete Support Topic" };
+  }
+}
+
 //ACTION TO ADD USERS
 export const addUser = async (previousState, formData) => {
 
@@ -326,6 +364,25 @@ export const register = async (previousState, formData) => {
 
     await newUser.save();
     console.log("Saved to Database");
+
+    // Configure Nodemailer
+    const transporter = nodemailer.createTransport({
+      service: "gmail", // or another email service
+      auth: {
+        user: process.env.EMAIL_USER, // Your email
+        pass: process.env.EMAIL_PASS, // Your email password
+      },
+    });
+
+        const verificationLink = `${process.env.BASE_URL}/verify?token=${newUser.verificationToken}`;
+        await transporter.sendMail({
+          from: `"Oicroft" <${process.env.EMAIL_USER}>`,
+          to: newUser.email,
+          subject: "Verify Your Email",
+          html: `<br><h1>Please Verify Your Email Address<h1></br><p>Click <a href="${verificationLink}">here</a> to verify your email.</p>`,
+        });
+
+        console.log("Verification email sent");
 
     return { success: true };
   } catch (err) {

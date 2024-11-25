@@ -1,22 +1,22 @@
 import React from "react";
 import Navbar from "@/components/Navbar/Navbar";
-import NotificationForm from "@/components/NotificationForm/NotificationForm";
-import AdminNotification from "@/components/AdminNotification/AdminNotification";
+import SupportForm from "@/components/SupportForm/SupportForm";
+import AdminSupport from "@/components/AdminSupport/AdminSupport";
 import styles from "../admin.module.css";
 
-const NotificationsPage = async () => {
+const supportPage = () => {
   return (
     <div className={styles.container}>
       <div className={styles.adminbg}>
-        <div className={styles.usersection}>
+        <div className={styles.section}>
           <Navbar />
-          <h1 className={styles.userTitle} >Notification Management</h1>
+          <h1 className={styles.userTitle} >Support Management</h1>
           <div className={styles.row}>
             <div className={styles.col}>
-              <AdminNotification />
+              <AdminSupport />
             </div>
             <div className={styles.col}>
-              <NotificationForm />
+              <SupportForm />
             </div>
           </div>
         </div>
@@ -25,4 +25,4 @@ const NotificationsPage = async () => {
   );
 };
 
-export default NotificationsPage;
+export default supportPage;

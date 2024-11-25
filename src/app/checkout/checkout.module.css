@@ -1,0 +1,124 @@
+.container{
+    display: flex;
+    min-height: 100vh; /* Allows content to expand the container */
+  flex-direction: column;
+  position: relative;
+}
+
+.checkoutbg {
+  padding-top: 6rem;
+  background-image: url("/Oicroft wallpaper.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: 100vh; /* Allow bg to expand with content */
+  display: flex;
+  flex-direction: column; /* Stack content vertically */
+}
+
+.section {
+  width: 90%;
+  margin: 0 auto;
+  background: white;
+  opacity: 0.9;
+  display: flex;
+  padding: 2rem;
+  margin-bottom: 8rem;
+  border-radius: 15px;
+}
+
+.left{
+    flex: 2;
+}
+
+.right{
+    flex: 1;
+}
+
+
+.wrapper{
+    width: 90%;
+    max-height: 300px;
+    background: #333;
+    padding: 50px;
+    padding-top: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    color: white;
+}
+
+.totalTextTitle{
+    margin-right: 10px;
+}
+
+.button{
+    background-color: white;
+    height: 30px;
+    color: teal;
+    font-weight: bold;
+    margin-top: 20px;
+    cursor: not-allowed;
+}
+
+.table{
+    width: 100%;
+    text-align: left;
+    margin-bottom: 50px;
+}
+
+.row:last-child{
+    display: flex;
+    justify-content: space-between;
+    width: 80%;
+}
+
+.done{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.inProgress{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    animation: inProgress 1s ease infinte alternate;
+}
+
+@keyframes inProgress {
+    from {
+        opacity: 0;
+    }
+    to{
+        opacity: 1;
+    }
+}
+
+.undone{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    opacity: 0.3;
+}
+
+.undone .checked, .inProgress .checked{
+    display: none;
+}
+
+
+
+.imgContainer {
+  position: absolute;
+  bottom: 0; /* Position 10rem above the bottom */
+  left: 0;
+  z-index: 1000;
+}
+
+
+/* Styling for the image */
+.imgContainer img {
+  max-width: 200px; /* Adjust the size as needed */
+  height: auto;
+}
+
+

@@ -1,18 +1,42 @@
 .container {
-  padding-top: 80px;
-  min-height: 100vh; /* Allows content to expand the container */
+  height: 100vh; /* Allows content to expand the container */
   display: flex;
   flex-direction: column;
   position: relative;
+  padding-top: 6rem 0;
+ 
 }
 
 .supportbg {
-  padding-top: 1rem;
-  background-image: url("/Oicroft wallpaper.png");
+  padding-top: 6rem;
+  background-image: url("/Support Wallpaper.png");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  min-height: 100vh; /* Allow bg to expand with content */
+  height: 100vh; /* Allow bg to expand with content */
   display: flex;
   flex-direction: column; /* Stack content vertically */
+}
+
+.section {
+  position: absolute;
+  top: 9.6rem;
+  left: 26rem;
+  width: 32rem;
+  margin: 0 auto;
+  background: white;
+  display: flex;
+  padding: 2rem;
+  margin-bottom: 8rem;
+  border-radius: 15px;
+  height: 28rem;
+  overflow: hidden;
+  flex-direction: column;
+}
+
+.title{
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 1.5rem;
+    
 }

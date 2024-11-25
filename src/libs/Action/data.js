@@ -2,6 +2,7 @@ import UserModel from '../models/UserModel';
 import NotificationModel from "../models/Notification";
 import { ConnectDB } from "../config/db";
 import { unstable_noStore as noStore } from "next/cache";
+import SupportModel from '../models/Support';
 
 export const getUser = async (id) =>{
     noStore();
@@ -57,5 +58,38 @@ export const getNotifications = async () =>{
         throw new Error("Failed to Fetch Notifications")
     }
 }
+
+
+export const getSupport = async (id) =>{
+    try{
+        ConnectDB();
+
+        const support = await SupportModel.findById(id);
+        return support 
+
+    }catch(err){
+        console.log(err)
+        throw new Error("Failed to Fetch Support Topic")
+    }
+}
+
+export const getSupports = async () => {
+  try {
+    ConnectDB();
+
+    const supports = await SupportModel.find({}).lean();
+
+    // Ensure _id is converted to a string
+    return supports.map((support) => ({
+      ...support,
+      id: support._id.toString(), // Convert ObjectId to string
+      _id: undefined, // Optionally remove the original _id field if not needed
+    }));
+  } catch (err) {
+    console.log(err);
+    throw new Error("Failed to fetch all the support topics");
+  }
+};
+
 
 

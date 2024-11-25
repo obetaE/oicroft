@@ -11,7 +11,7 @@ export default function RegisterForm() {
   const [state, formAction] = useActionState(register, undefined);
   const router = useRouter();
   useEffect(() => {
-    state?.success && router.push("/login");
+    state?.success && router.push("/verifyPage");
   }, [state?.success, router]);
 
   return (

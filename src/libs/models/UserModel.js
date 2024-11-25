@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import crypto from "crypto"
 
 const Schema = new mongoose.Schema(
   {
@@ -23,6 +24,14 @@ const Schema = new mongoose.Schema(
     password: {
       type: String,
       // required: true,
+    },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
+    verificationToken: {
+      type: String,
+      default: () => crypto.randomBytes(32).toString("hex"),
     },
     isAdmin: {
       type: Boolean,

@@ -70,7 +70,6 @@ const SecondLinks = ({session, id}) => {
         </div>
         <div className={styles.left}>
           <button onClick={order} className={styles.links}>
-            <h2>{quantity}</h2>
             <Image
               alt="Order icon"
               src="/Shop icon.png"

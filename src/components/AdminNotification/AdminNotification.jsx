@@ -8,8 +8,8 @@ const AdminNotification = async () => {
 
 
   return (
-    <div>
-      <h1>Notifications</h1>
+    <div className={styles.container} >
+      <h1 className={styles.title} >Notifications</h1>
       {notifications.map((notification) => (
         <div className={styles.notification} key={notification.id}>
           <div className={styles.details}>
@@ -17,9 +17,9 @@ const AdminNotification = async () => {
             <p>{notification.body}</p>
             <span>{new Date(notification.uploadedAt).toLocaleString()}</span>
           </div>
-          <form action={deleteNotification}  className={styles.Delete} >
+          <form action={deleteNotification}  >
             <input type="hidden" name="id" value={notification.id}/>
-            <button>Delete</button>
+            <button className={styles.delete} >Delete</button>
           </form>
         </div>
       ))}
