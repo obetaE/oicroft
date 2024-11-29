@@ -1,23 +1,31 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styles from "./RegisterForm.module.css";
 import { register } from "@/libs/Action/action";
 import { useActionState } from "react";
 import Link from "next/link";
-import { useEffect } from "react";
-import { useRouter} from "next/navigation";
+import { useRouter } from "next/navigation";
 
 export default function RegisterForm() {
   const [state, formAction] = useActionState(register, undefined);
+  const [status, setStatus] = useState(""); // For status message
   const router = useRouter();
+
   useEffect(() => {
-    state?.success && router.push("/verifyPage");
+    if (state?.success) {
+      setStatus(
+        "Registration successful! Please check your email inbox or spam folder for a verification link to activate your account."
+      );
+      router.push("/verifyPage");
+    }
   }, [state?.success, router]);
 
   return (
     <div className={styles.container}>
       <form action={formAction} className={styles.registerform}>
         <h2>Create Your Account</h2>
+        {status && <p className={styles.statusMessage}>{status}</p>}{" "}
+        {/* Show status here */}
         <div className={styles.formgroup}>
           <label htmlFor="name">UserName:</label>
           <input
@@ -69,9 +77,21 @@ export default function RegisterForm() {
             required
           />
         </div>
+        <div className={styles.agree}>
+          <input type="checkbox" id="agreement" required />
+          <label htmlFor="agreement">
+            Agree with our{" "}
+            <Link className={styles.TOC} href="/termsandconditions">
+              Terms and Conditions
+            </Link>
+          </label>
+        </div>
         <div className={styles.formgroup}>
           <div className={styles.button}>
-            {state?.error}
+            {state?.error && (
+              <p className={styles.errorMessage}>{state.error}</p>
+            )}{" "}
+            {/* Show error */}
             <button className={styles.signup}>Sign Up</button>
           </div>
         </div>

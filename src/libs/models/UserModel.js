@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import crypto from "crypto"
+import crypto from "crypto";
 
 const Schema = new mongoose.Schema(
   {
@@ -40,6 +40,14 @@ const Schema = new mongoose.Schema(
     isWorker: {
       type: Boolean,
       default: false,
+    },
+    resetToken: {
+      type: String,
+      default: null, // Reset token for password reset
+    },
+    resetTokenExpiry: {
+      type: Date, // Expiry time for the reset token
+      default: null,
     },
   },
   { timestamps: true }

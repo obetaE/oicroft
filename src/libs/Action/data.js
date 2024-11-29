@@ -4,19 +4,30 @@ import { ConnectDB } from "../config/db";
 import { unstable_noStore as noStore } from "next/cache";
 import SupportModel from '../models/Support';
 
-export const getUser = async (id) =>{
-    noStore();
-    try{
-        ConnectDB();
 
-        const user = await UserModel.findById(id)
-        return user 
+export const getUser = async (id) => {
+  try {
+    ConnectDB();
 
-    }catch(err){
-        console.log(err)
-        throw new Error("Failed to Fetch User")
+    // Use `lean()` to get a plain JavaScript object
+    const user = await UserModel.findById(id).lean();
+
+    if (!user) {
+      throw new Error("User not found");
     }
-}
+
+    // Convert `_id` to a string for compatibility with React props
+    return {
+      ...user,
+      id: user._id.toString(), // Convert ObjectId to string
+      _id: undefined, // Optionally remove `_id` if not needed
+    };
+  } catch (err) {
+    console.error(err);
+    throw new Error("Failed to fetch user");
+  }
+};
+
 
 export const getUsers = async () =>{
     

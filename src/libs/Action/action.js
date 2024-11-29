@@ -289,22 +289,63 @@ export const addUser = async (previousState, formData) => {
 
 
 //ACTION TO UPDATE USER INFO
-export const updateUser = async (id, updatedData) => {
+export const updateUser = async (id, formData) => {
+  console.log("Updating user with ID:", id); // Debugging ID
+  console.log("FormData:", formData);
+
+  if (!formData) {
+    console.error("formData is undefined");
+    return { error: "Form data is missing" };
+  }
+
+  const { username, email, password, image, passwordRepeat, number } = formData;
+
+  if (password !== passwordRepeat) {
+    return { error: "Passwords don't match" };
+  }
+
   try {
     ConnectDB();
 
-    // Find user by ID and update fields
-    const updatedUser = await UserModel.findByIdAndUpdate(id, updatedData, {
-      new: true, // Return the updated document
-    });
+    // Check if the user exists
+    const existingUser = await UserModel.findById(id);
+    if (!existingUser) {
+      console.error(`No user found with ID: ${id}`);
+      return { error: "User not found" };
+    }
 
-    console.log("User successfully updated", updatedUser);
+    // Dynamically build the updated data object
+    const updatedData = {};
+    if (username) updatedData.username = username;
+    if (email) updatedData.email = email;
+    if (number) updatedData.number = number;
+    if (image) updatedData.image = image;
+    if (password) updatedData.password = await argon2.hash(password);
+
+    console.log("Updating user with data:", updatedData); // Debugging data
+
+    // Attempt the update
+    const updatedUser = await UserModel.findByIdAndUpdate(
+      id,
+      updatedData,
+      { new: true } // Return the updated document
+    );
+
+    if (!updatedUser) {
+      console.error(`Failed to update user with ID: ${id}`);
+      return { error: "Failed to update user" };
+    }
+
+    console.log("User successfully updated:", updatedUser);
     return updatedUser;
   } catch (err) {
-    console.log(err);
+    console.error("Error in updateUser:", err);
     return { error: "Failed to update user" };
   }
 };
+
+
+
 
 
 //DELETING USERS
@@ -379,12 +420,66 @@ export const register = async (previousState, formData) => {
           from: `"Oicroft" <${process.env.EMAIL_USER}>`,
           to: newUser.email,
           subject: "Verify Your Email",
-          html: `<br><h1>Please Verify Your Email Address<h1></br><p>Click <a href="${verificationLink}">here</a> to verify your email.</p>`,
+          html: `
+    <div style="font-family: Arial, sans-serif;">
+      <!-- Header -->
+      <img src="cid:headerImage" alt="Oicroft Header" style="width: 100%; min-width: 600px;" />
+
+      <!-- Content -->
+      <div style="padding: 1rem;">
+        <h1>Verify Your Email Address</h1>
+        <p>Click the link below to verify your email address and activate your account:</p>
+        <a href="${verificationLink}" style="color: #19831c; font-weight: bold;">Verify Email</a>
+      </div>
+
+      <!-- Footer -->
+      <div style="
+        background-color: #19831c; 
+        color: white; 
+        text-align: center; 
+        padding: 1rem; 
+        margin-top: 1rem;
+      ">
+        <p>Follow us on social media:</p>
+        <a href="mailto:oicroftco@gmail.com"><img src="cid:Email" alt="Email" style="width: 32px; margin: 0 5px;" /></a>
+        <a href="https://www.facebook.com/profile.php?id=61558022143571"><img src="cid:Facebook" alt="Facebook" style="width: 32px; margin: 0 5px;" /></a>
+        <a href="https://x.com/Oicroft?t=xAfAW9Gz0kkdsk7pzjOcxQ&s=09"><img src="cid:Twitter" alt="Twitter" style="width: 32px; margin: 0 5px;" /></a>
+        <a href="https://www.instagram.com/oicroft?igsh=MWY5a3Z2emt3eXBuZQ=="><img src="cid:Instagram" alt="Instagram" style="width: 32px; margin: 0 5px;" /></a>
+      </div>
+    </div>
+  `,
+          attachments: [
+            {
+              filename: "Email Header.png",
+              path: "./public/Email Header.png",
+              cid: "headerImage", // Same CID for referencing in the HTML
+            },
+            {
+              filename: "Email.png",
+              path: "./public/Email.png",
+              cid: "Email", // Same CID for referencing in the HTML
+            },
+            {
+              filename: "Facebook.png",
+              path: "./public/Facebook.png",
+              cid: "Facebook", // Same CID for referencing in the HTML
+            },
+            {
+              filename: "Twitter.png",
+              path: "./public/Twitter.png",
+              cid: "Twitter", // Same CID for referencing in the HTML
+            },
+            {
+              filename: "Instagram.png",
+              path: "./public/Instagram.png",
+              cid: "Instagram", // Same CID for referencing in the HTML
+            },
+          ],
         });
 
         console.log("Verification email sent");
 
-    return { success: true };
+    return { success: true  };
   } catch (err) {
     console.log(err);
     return { error: "Failed to Register User" };

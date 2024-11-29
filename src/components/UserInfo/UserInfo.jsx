@@ -1,40 +1,85 @@
-import React from "react";
-import styles from "./UserInfo.module.css";
-import Image from "next/image";
+"use client";
 
-const UserInfo = ({ user }) => {
+import React, { useState } from "react";
+import styles from "./UserInfo.module.css";
+
+const UserInfo = ({ user, handleUpdate }) => {
+  const [editingField, setEditingField] = useState(null); // Track which field is being edited
+  const [formData, setFormData] = useState({
+    username: user.username,
+    email: user.email,
+    number: user.number,
+    password: "",
+    passwordRepeat: "",
+  });
+
+  // Handle input changes
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  // Toggle editing mode
+  const startEditing = (field) => {
+    setEditingField(field);
+  };
+
+  const cancelEditing = () => {
+    setEditingField(null);
+    setFormData({
+      ...formData,
+      password: "",
+      passwordRepeat: "",
+    }); // Reset password fields on cancel
+  };
+
+  // Render form dynamically
+  const renderField = (field) => {
+    if (editingField === field) {
+      return (
+        <>
+          <input
+            name={field}
+            value={formData[field]}
+            onChange={handleChange}
+            className={styles.input}
+            placeholder={`Update ${field}`}
+          />
+          {field === "password" && (
+            <input
+              name="passwordRepeat"
+              value={formData.passwordRepeat}
+              onChange={handleChange}
+              className={styles.input}
+              placeholder="Repeat Password"
+              type="password"
+            />
+          )}
+          <button onClick={() => handleUpdate(formData)}>Save</button>
+          <button onClick={cancelEditing}>Cancel</button>
+        </>
+      );
+    } else {
+      return (
+        <>
+          <span className={styles.detailValue}>{user[field]}</span>
+          <button onClick={() => startEditing(field)}>Update</button>
+        </>
+      );
+    }
+  };
+
   return (
     <div className={styles.container}>
-      <div className={styles.informationcontainer}>
-        <span className={styles.detailTitle}>UserName:</span>
-        <span className={styles.detailValue}>{user.username}</span>
-        <button>Update</button>
-      </div>
-      <div>
-        <span>Image:</span>
-        <Image
-          src={user.image || "/noAvatar.png"}
-          alt="Profile Image"
-          width={50}
-          height={50}
-        />
-        <button>Update</button>
-      </div>
-      <div className={styles.informationcontainer}>
-        <span className={styles.detailTitle}>Email:</span>
-        <span className={styles.detailValue}>{user.email}</span>
-        <button>Update</button>
-      </div>
-      <div className={styles.informationcontainer}>
-        <span className={styles.detailTitle}>Phone Number:</span>
-        <span className={styles.detailValue}>{user.number}</span>
-        <button>Update</button>
-      </div>
-      <div className={styles.informationcontainer}>
-        <span className={styles.detailTitle}>Password</span>
-        <span className={styles.detailValue}>{user.password}</span>
-        <button>Update</button>
-      </div>
+      {["username", "email", "number", "password"].map((field) => (
+        <div key={field} className={styles.informationcontainer}>
+          <div className={styles.info}>
+            <span className={styles.detailTitle}>
+              {field.charAt(0).toUpperCase() + field.slice(1)}:
+            </span>
+            {renderField(field)}
+          </div>
+        </div>
+      ))}
     </div>
   );
 };

@@ -90,10 +90,10 @@ const checkout = () => {
               </div>
               <div className={statusClass(2)}>
                 <Image
-                  src="/bike.png"
+                  src="/truck-kun.png"
                   alt=" Progress Icon"
-                  width={30}
-                  height={30}
+                  width={55}
+                  height={55}
                 />
                 <span>Logistics</span>
                 <div className={styles.checkedIcon}>

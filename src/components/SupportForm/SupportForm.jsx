@@ -1,11 +1,9 @@
 "use client";
-import React, { useState } from "react";
+import React from "react";
 import styles from "./SupportForm.module.css";
-
 import { addSupport } from "@/libs/Action/action"; // Ensure this path matches your project structure.
 
 export default function SupportForm() {
-
   return (
     <div className={styles.container}>
         <h2>Add A New Support Question and Its Answer</h2>

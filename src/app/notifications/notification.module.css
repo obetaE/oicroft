@@ -1,0 +1,31 @@
+.container {
+  background: var(--bg);
+  position: relative;
+  margin: 0;
+  padding: 0;
+  
+}
+
+.notificationbg {
+  position: relative;
+  height: calc(100vh - 4rem); /*Full Viewport Height*/
+  width: 100%; /*Full Viewport Width*/
+  background-image: url("/background.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: 1;
+}
+
+.section{
+    background-color: white;
+    width: 50rem;
+  min-height: 15rem;
+  position: absolute;
+  top: 5rem;
+  left: 0;
+  margin: 50px auto;
+  padding: 20px;
+  border-radius: 20px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}

@@ -1,20 +1,42 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import styles from "./LoginForm.module.css";
 import { login } from "@/libs/Action/action";
 import { useActionState } from "react";
 import Link from "next/link";
-import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { googleLogin } from "@/libs/Action/action";
 import Image from "next/image";
+import ResendVerification from "../ResendVerification/ResendVerification";
 
 export default function LoginForm() {
   const [state, formAction] = useActionState(login, undefined);
   const router = useRouter();
-//   useEffect(() => {
-//     state?.success && router.push("/login");
-//   }, [state?.success, router]);
+
+  // State for forgot password
+  const [resetEmail, setResetEmail] = useState("");
+  const [resetMessage, setResetMessage] = useState("");
+
+  const handleForgotPassword = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await fetch("/api/sendResetLink", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: resetEmail }),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        setResetMessage("Password reset link sent! Check your email.");
+      } else {
+        setResetMessage(data.error || "Failed to send reset link.");
+      }
+    } catch (error) {
+      console.error(error);
+      setResetMessage("An error occurred while sending the reset link.");
+    }
+  };
 
   return (
     <div className={styles.container}>
@@ -32,6 +54,8 @@ export default function LoginForm() {
               name="email"
               id="email"
               className={styles.username}
+              value={resetEmail}
+              onChange={(e) => setResetEmail(e.target.value)}
             />
           </div>
 
@@ -67,11 +91,15 @@ export default function LoginForm() {
         </form>
 
         <div className={styles.formfooter}>
-          <Link href="/forgotpassword">Forgot password?</Link>
+          <button onClick={handleForgotPassword} className={styles.resetLink}>
+            Forgot password?
+          </button>
           <span>|</span>
           <Link href="/register">Create an account</Link>
         </div>
+        <span>Havent gotten a Verfication Link? <ResendVerification/> </span>
       </div>
+      {resetMessage && <p className={styles.resetMessage}>{resetMessage}</p>}
     </div>
   );
 }

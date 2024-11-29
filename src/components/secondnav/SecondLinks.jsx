@@ -36,7 +36,7 @@ const SecondLinks = ({session, id}) => {
     <>
       <div className={styles.container}>
         <div className={styles.right}>
-          <button className={styles.links}>
+          <button onClick={profile}  className={styles.links}>
             <Image
               alt="Profile icon"
               src="/Profile icon.png"

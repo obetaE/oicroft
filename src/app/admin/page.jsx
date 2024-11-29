@@ -27,6 +27,12 @@ const AdminPage = async () => {
             <div className={styles.singleLink}>
               <Link href="/admin/supportpage">Manage Support</Link>
             </div>
+            <div className={styles.singleLink}>
+              <Link href="/admin/emailMessage">Send an Email to Your Users</Link>
+            </div>
+            <div className={styles.singleLink}>
+              <Link href="/admin/termspage">Edit the Terms and Conditions</Link>
+            </div>
           </div>
         </div>
       </div>

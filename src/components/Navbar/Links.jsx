@@ -19,6 +19,11 @@ const Links = ({ session , id }) => {
     router.push("/support");
   };
 
+
+  const notification = () => {
+    router.push("/notifications");
+  };
+
   const order = () => {
     router.push("/order");
   };
@@ -68,6 +73,7 @@ const Links = ({ session , id }) => {
               height={50}
             />
           </button>
+
           <button onClick={order} className={styles.links}>
             <Image
               alt="Order icon"
@@ -86,10 +92,22 @@ const Links = ({ session , id }) => {
               height={40}
             />
           </button>
+
           {session ? (
-            <form action={handleLogout}>
-              <button className={styles.logout}>Logout</button>
-            </form>
+            <div className="flex">
+              <button onClick={notification} className={styles.links}>
+                <Image
+                  alt="Notification Icon"
+                  src="/notification.png"
+                  className={styles.linkimage}
+                  width={40}
+                  height={40}
+                />
+              </button>
+              <form action={handleLogout}>
+                <button className={styles.logout}>Logout</button>
+              </form>
+            </div>
           ) : (
             <div className="hidden"></div>
           )}
@@ -164,7 +182,7 @@ const Links = ({ session , id }) => {
                 </Link>
 
                 <form action={handleLogout}>
-                  <button >LogOut</button>
+                  <button>LogOut</button>
                 </form>
               </div>
             )}

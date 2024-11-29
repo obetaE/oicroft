@@ -21,7 +21,9 @@ export default function SupportContent({ supports }) {
               <Image src="/open.png" alt="Open Button" width={20} height={20} />
               {support.title}
             </div>
-            {openId === support.id && <div className={styles.desc} >{support.desc}</div>}
+            <div className={styles.answer} >
+              {openId === support.id && <div className={styles.desc} >{support.desc}</div>}
+              </div>
           </div>
         </div>
       ))}

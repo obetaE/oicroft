@@ -10,6 +10,7 @@ export default function loginPage(){
         <div className={styles.Loginbackground}>
           <Navbar />
           <LoginForm />
+          
         </div>
       </div>
     );

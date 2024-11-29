@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import styles from "./verify.module.css"
 
 export default function VerifyPage() {
   const router = useRouter();
@@ -11,18 +12,15 @@ export default function VerifyPage() {
   useEffect(() => {
     if (token) {
       fetch(`/api/verify?token=${token}`)
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.error) {
-            setStatus(data.error);
-          } else {
-            setStatus("Email successfully verified!");
-            setTimeout(() => {
-              router.push("/login");
-            }, 3000);
-          }
+        .then((res) => {
+          if (!res.ok) throw new Error("Verification failed");
+          return res.json();
         })
-        .catch(() => setStatus("Failed to verify email"));
+        .then((data) => {
+          setStatus(data.message);
+          setTimeout(() => router.push("/login"), 3000);
+        })
+        .catch(() => setStatus("Failed to verify email. Please try again."));
     }
   }, [token, router]);
 

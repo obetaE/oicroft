@@ -1,0 +1,17 @@
+.informationcontainer{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.info{
+    display: flex;
+}
+
+.detailValuepassword{
+   background-color: rgba(128, 128, 128, 0.2);
+   width: 8rem;
+   height: 1.5rem;
+   border-radius: 10px;
+
+}

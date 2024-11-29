@@ -1,0 +1,68 @@
+.resetbox {
+  background: white;
+  width: 20rem;
+  min-height: 15rem;
+  position: absolute;
+  top: 5rem;
+  left: 30rem;
+  max-width: 400px;
+  margin: 50px auto;
+  padding: 20px;
+  border-radius: 20px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  
+}
+
+.resetbox form {
+  display: flex;
+  flex-direction: column;
+}
+
+.resetbox h2 {
+  color: black;
+  margin-bottom: .5rem;
+  font-weight: 600;
+  font-size: larger;
+}
+
+.email, .password{
+  width: 15.9rem;
+  padding: 1px;
+  font-size: 16px;
+  border: 1px solid black;
+  border-radius: 4px;
+
+}
+
+.label {
+  display: block;
+  margin-bottom: 2px;
+  color: black;
+  font-weight: 400;
+}
+
+.reset {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  color: #fff;
+  background: var(--bg);
+  border: none;
+  border-radius: 3rem;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.reset:hover {
+  background-color: #13bb19;
+}
+
+.emailsection , .passwordsection {
+  margin-bottom: 20px;
+  border-radius: 1rem;
+}
+
+.message{
+  text-align: center;
+  font-weight: bold;
+}

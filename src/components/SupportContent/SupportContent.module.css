@@ -5,20 +5,25 @@
 .details{
     display: flex;
     flex-direction: column;
-    gap: 13px;
+    gap: 0.3rem;
+    justify-content: center;
 }
 
 .open{
     display: flex;
     align-items: center;
     cursor: pointer;
-    font-size: 1.2rem;
-    text-transform: uppercase;
+    font-size: 1.4rem;
     font-weight: bold;
     gap: 12px;
-
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    
 }
 
 .desc{
-    padding-left: 10px;
+    padding-left: 1.8rem;
+}
+
+.answer{
+  border: 1px solid rgba(0, 0, 0, 0.1);
 }
