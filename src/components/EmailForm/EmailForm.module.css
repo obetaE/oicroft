@@ -1,4 +1,30 @@
 .container{
     display: flex;
     flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.container textarea{
+     border-radius: 20px;
+     width: 100%;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+  margin: 1rem 0;
+}
+
+.container button{
+    display: block;
+  width: 50%;
+  padding: 12px;
+  color: #fff;
+  background: var(--bg);
+  border: none;
+  border-radius: 3rem;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.container button:hover{
+    background-color: #13bb19;
 }

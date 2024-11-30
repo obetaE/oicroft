@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import styles from "./EmailForm.module.css"
 
 export default function EmailForm() {
   const [emailContent, setEmailContent] = useState("");
@@ -28,12 +29,12 @@ export default function EmailForm() {
   };
 
   return (
-    <form className="styles.container" onSubmit={handleSubmit}>
+    <form className={styles.container} onSubmit={handleSubmit}>
       <textarea
         value={emailContent}
         onChange={(e) => setEmailContent(e.target.value)}
         placeholder="Type your message here"
-        rows={30} // Fixed the typo from "row" to "rows"
+        rows={15} // Fixed the typo from "row" to "rows"
       />
       <button type="submit">Send Email</button>
     </form>

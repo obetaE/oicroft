@@ -2,7 +2,7 @@
 import React, { useRef, useState } from "react";
 import "quill/dist/quill.snow.css";
 
-const TermsEditor = () => {
+const PrivacyEditor = () => {
   const editorRef = useRef(null);
   const [content, setContent] = useState("");
   const [message, setMessage] = useState(""); // To display user-friendly messages
@@ -42,14 +42,14 @@ const TermsEditor = () => {
     }
 
     try {
-      const response = await fetch("/api/toc", {
+      const response = await fetch("/api/privacy", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ content }),
       });
 
       if (response.ok) {
-        displayMessage("Terms and Conditions saved successfully!", "success");
+        displayMessage("Privacy Policy saved successfully!", "success");
       } else {
         displayMessage("Failed to save. Please try again.", "error");
       }
@@ -83,7 +83,7 @@ const TermsEditor = () => {
 
   return (
     <div>
-      <h1>Terms and Conditions Editor</h1>
+      <h1>Privacy Policy Editor</h1>
       {message && (
         <div
           style={{
@@ -124,5 +124,5 @@ const TermsEditor = () => {
   );
 };
 
-export default TermsEditor;
+export default PrivacyEditor;
 

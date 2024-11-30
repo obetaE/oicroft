@@ -15,9 +15,11 @@ const AdminPage = async () => {
           <Navbar />
           <h1 className={styles.adminTitle}>Admin Dashboard</h1>
           <div className={styles.links}>
-            {!isWorker && (<div className={styles.singleLink}>
-              <Link href="/admin/users">Manage Users</Link>
-            </div>)}
+            {!isWorker && (
+              <div className={styles.singleLink}>
+                <Link href="/admin/users">Manage Users</Link>
+              </div>
+            )}
             <div className={styles.singleLink}>
               <Link href="/admin/notifications">Manage Notifications</Link>
             </div>
@@ -28,11 +30,25 @@ const AdminPage = async () => {
               <Link href="/admin/supportpage">Manage Support</Link>
             </div>
             <div className={styles.singleLink}>
-              <Link href="/admin/emailMessage">Send an Email to Your Users</Link>
+              <Link href="/admin/emailMessage">
+                Send an Email to Your Users
+              </Link>
             </div>
-            <div className={styles.singleLink}>
-              <Link href="/admin/termspage">Edit the Terms and Conditions</Link>
-            </div>
+            {!isWorker && (
+              <div className={styles.singleLink}>
+                <Link href="/admin/termspage">
+                  Edit the Terms and Conditions
+                </Link>
+              </div>
+            )}
+            {!isWorker && (
+              <div className={styles.singleLink}>
+                <Link href="/admin/privacypage">
+                  Edit the Privacy Policy
+                </Link>
+              </div>
+            )}
+            
           </div>
         </div>
       </div>
