@@ -41,7 +41,7 @@ const handlePaystackCheckout = async (orderData, dispatch) => {
   try {
     // Call the Paystack API to initialize the transaction
     const response = await axios.post("/api/paystack/initialize", {
-      email: "oicroftco.com", // Replace with the actual user's email
+      email: "oicroftco@gmail.com", // Replace with the actual user's email
       amount: orderData.total * 100, // Paystack expects the amount in kobo (for NGN)
       metadata: {
         custom_fields: orderData.products.map((product) => ({

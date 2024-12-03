@@ -83,7 +83,6 @@ const TermsEditor = () => {
 
   return (
     <div>
-      <h1>Terms and Conditions Editor</h1>
       {message && (
         <div
           style={{
@@ -116,10 +115,10 @@ const TermsEditor = () => {
           marginBottom: "10px",
         }}
       ></div>
-      <button onClick={handleSave} style={{ marginRight: "10px" }}>
+      <button className={styles.button} onClick={handleSave} style={{ marginRight: "10px" }}>
         Save
       </button>
-      <button onClick={clearEditor}>Clear</button>
+      <button className={styles.button} onClick={clearEditor}>Clear</button>
     </div>
   );
 };

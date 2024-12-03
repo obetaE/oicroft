@@ -1,8 +1,7 @@
 .container {
-  height: 100vh;
+  min-height: 100vh;
   position: relative;
   width: 100%;
-  overflow: hidden;
   display:flex;
   flex-direction: column;
 
@@ -19,6 +18,14 @@
   font-size: 3rem;
   text-align: center;
   margin-top: 6rem;
+  text-decoration: underline;
+}
+.topbg h2{
+  color: white;
+  font-weight: 600;
+  font-size: 1rem;
+  text-align: center;
+  margin-top: 7px;
   text-decoration: underline;
 }
 

@@ -83,7 +83,7 @@ const PrivacyEditor = () => {
 
   return (
     <div>
-      <h1>Privacy Policy Editor</h1>
+      
       {message && (
         <div
           style={{
@@ -116,10 +116,10 @@ const PrivacyEditor = () => {
           marginBottom: "10px",
         }}
       ></div>
-      <button onClick={handleSave} style={{ marginRight: "10px" }}>
+      <button className={styles.button} onClick={handleSave} style={{ marginRight: "10px" }}>
         Save
       </button>
-      <button onClick={clearEditor}>Clear</button>
+      <button className={styles.button} onClick={clearEditor}>Clear</button>
     </div>
   );
 };

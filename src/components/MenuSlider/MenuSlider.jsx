@@ -7,7 +7,7 @@ export default function MenuSlider() {
   const [index, setIndex] = useState(0);
 
   const images = [
-    { id: 1, image: "/Slider1.png" },
+    { id: 1, image: "/Combo design .png" },
     { id: 2, image: "/Slider2.png" },
     { id: 3, image: "/Slider3.png" },
     { id: 4, image: "/Slider4.png" },

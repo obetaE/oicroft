@@ -15,6 +15,10 @@ const SecondLinks = ({session, id}) => {
 
     const router = useRouter();
 
+     const notification = () => {
+       router.push("/notifications");
+     };
+
       const homepage = () => {
         router.push("/");
       };
@@ -36,20 +40,30 @@ const SecondLinks = ({session, id}) => {
     <>
       <div className={styles.container}>
         <div className={styles.right}>
-          <button onClick={profile}  className={styles.links}>
+          <button onClick={profile} className={styles.links}>
             <Image
               alt="Profile icon"
-              src="/Profile icon.png"
+              src="https://res.cloudinary.com/dudlxsoui/image/upload/v1733053568/Profile_icon_mcjw7m.png"
               className={styles.linkimage}
               width={50}
               height={50}
             />
           </button>
 
+          <button onClick={notification} className={styles.links}>
+            <Image
+              alt="Notification Icon"
+              src="https://res.cloudinary.com/dudlxsoui/image/upload/v1733053568/notification_sb8sqk.png"
+              className={styles.linkimage}
+              width={40}
+              height={40}
+            />
+          </button>
+
           <button onClick={support} className={styles.links}>
             <Image
               alt="Support icon"
-              src="/Support.png"
+              src="https://res.cloudinary.com/dudlxsoui/image/upload/v1733053569/Support_rtcrq2.png"
               className={styles.linkimage}
               width={75}
               height={75}
@@ -60,7 +74,7 @@ const SecondLinks = ({session, id}) => {
           <div className={styles.logocontainer}>
             <button onClick={homepage} className={styles.logo}>
               <Image
-                src="/Oicroft logo.png"
+                src="https://res.cloudinary.com/dudlxsoui/image/upload/v1733053569/Oicroft_logo_gr0qpv.png"
                 alt="Logo"
                 className={styles.logoimg}
                 fill
@@ -72,7 +86,7 @@ const SecondLinks = ({session, id}) => {
           <button onClick={order} className={styles.links}>
             <Image
               alt="Order icon"
-              src="/Shop icon.png"
+              src="https://res.cloudinary.com/dudlxsoui/image/upload/v1733053568/Shop_icon_ulfhcd.png"
               className={styles.linkimage}
               width={50}
               height={50}

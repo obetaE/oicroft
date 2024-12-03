@@ -46,7 +46,11 @@ const Links = ({ session , id }) => {
       <div className={styles.container}>
         <div className={styles.logocontainer}>
           <button onClick={homepage} className={styles.logo}>
-            <Image src="/Oicroft logo.png" alt="Logo Icon" fill />
+            <Image
+              src="https://res.cloudinary.com/dudlxsoui/image/upload/v1733053569/Oicroft_logo_gr0qpv.png"
+              alt="Logo Icon"
+              fill
+            />
           </button>
         </div>
 
@@ -67,7 +71,7 @@ const Links = ({ session , id }) => {
           <button onClick={support} className={styles.links}>
             <Image
               alt="Support icon"
-              src="/Support.png"
+              src="https://res.cloudinary.com/dudlxsoui/image/upload/v1733053569/Support_rtcrq2.png"
               className={styles.linkimage}
               width={50}
               height={50}
@@ -77,7 +81,7 @@ const Links = ({ session , id }) => {
           <button onClick={order} className={styles.links}>
             <Image
               alt="Order icon"
-              src="/Shop icon.png"
+              src="https://res.cloudinary.com/dudlxsoui/image/upload/v1733053568/Shop_icon_ulfhcd.png"
               className={styles.linkimage}
               width={40}
               height={40}
@@ -86,7 +90,7 @@ const Links = ({ session , id }) => {
           <button onClick={handleUser} className={styles.links}>
             <Image
               alt="Profile icon"
-              src="/Profile icon.png"
+              src="https://res.cloudinary.com/dudlxsoui/image/upload/v1733053568/Profile_icon_mcjw7m.png"
               className={styles.linkimage}
               width={40}
               height={40}
@@ -98,7 +102,7 @@ const Links = ({ session , id }) => {
               <button onClick={notification} className={styles.links}>
                 <Image
                   alt="Notification Icon"
-                  src="/notification.png"
+                  src="https://res.cloudinary.com/dudlxsoui/image/upload/v1733053568/notification_sb8sqk.png"
                   className={styles.linkimage}
                   width={40}
                   height={40}
@@ -119,7 +123,7 @@ const Links = ({ session , id }) => {
           <div className={styles.logocontainer}>
             <Image
               alt="Oicroft Logo"
-              src="/Oicroft logo.png"
+              src="https://res.cloudinary.com/dudlxsoui/image/upload/v1733053570/Website_Page_piux2z.png"
               width={150}
               height={150}
             />
@@ -130,7 +134,7 @@ const Links = ({ session , id }) => {
                 <Image
                   className={styles.hamburger}
                   alt="hamburger icon"
-                  src="/hamburger.png"
+                  src="https://res.cloudinary.com/dudlxsoui/image/upload/v1733053568/hamburger_j7g5gz.png"
                   fill
                   objectFit="contain"
                   onClick={() => setOpen(true)}
@@ -143,7 +147,7 @@ const Links = ({ session , id }) => {
                 <Image
                   className={styles.hamburger}
                   alt="hamburger icon"
-                  src="/close.png"
+                  src="https://res.cloudinary.com/dudlxsoui/image/upload/v1733053569/close_v01sqf.png"
                   fill
                   onClick={() => setOpen(false)}
                 />

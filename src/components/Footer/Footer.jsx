@@ -30,7 +30,7 @@ const Footer = () => {
           className={styles.links}
         >
           <Image
-            src="/Email.png"
+            src="https://res.cloudinary.com/dudlxsoui/image/upload/v1733071562/Email_covdet.png"
             className={styles.linksimg}
             alt="Social Media"
             fill
@@ -42,7 +42,7 @@ const Footer = () => {
           className={styles.links}
         >
           <Image
-            src="/Facebook.png"
+            src="https://res.cloudinary.com/dudlxsoui/image/upload/v1733071562/Facebook_hdstbv.png"
             className={styles.linksimg}
             alt="Social Media"
             fill
@@ -54,7 +54,7 @@ const Footer = () => {
           className={styles.twitterlinks}
         >
           <Image
-            src="/Twitter.png"
+            src="https://res.cloudinary.com/dudlxsoui/image/upload/v1733071562/Twitter_nk36mk.png"
             className={styles.linksimg}
             alt="Social Media"
             fill
@@ -66,7 +66,7 @@ const Footer = () => {
           className={styles.links}
         >
           <Image
-            src="/Instagram.png"
+            src="https://res.cloudinary.com/dudlxsoui/image/upload/v1733071562/Instagram_iccqog.png"
             className={styles.linksimg}
             alt="Social Media"
             fill

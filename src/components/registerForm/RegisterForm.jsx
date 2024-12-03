@@ -5,10 +5,13 @@ import { register } from "@/libs/Action/action";
 import { useActionState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import PhoneInput from "react-phone-number-input";
+import "react-phone-number-input/style.css";
 
 export default function RegisterForm() {
   const [state, formAction] = useActionState(register, undefined);
   const [status, setStatus] = useState(""); // For status message
+  const [phone, setPhone] = useState(""); // To handle phone input
   const router = useRouter();
 
   useEffect(() => {
@@ -16,7 +19,7 @@ export default function RegisterForm() {
       setStatus(
         "Registration successful! Please check your email inbox or spam folder for a verification link to activate your account."
       );
-      router.push("/verifyPage");
+      router.push("/login");
     }
   }, [state?.success, router]);
 
@@ -49,11 +52,12 @@ export default function RegisterForm() {
         </div>
         <div className={styles.formgroup}>
           <label htmlFor="number">Phone Number:</label>
-          <input
-            type="text"
+          <PhoneInput
             id="number"
             name="number"
-            placeholder="Start with your country code(i.e +234)"
+            placeholder="Enter phone number"
+            value={phone}
+            onChange={setPhone}
             required
           />
         </div>
