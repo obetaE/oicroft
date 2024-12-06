@@ -20,6 +20,6 @@ const Schema = new mongoose.Schema(
 );
 
 const NotificationModel =
-  mongoose.models?.notification || mongoose.model("notification", Schema);
+  mongoose.models?.Notification || mongoose.model("Notification", Schema);
 
 export default NotificationModel;

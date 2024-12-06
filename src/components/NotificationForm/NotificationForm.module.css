@@ -1,34 +1,41 @@
 .container{
-    background-color: rgba(255, 255, 255, 0.808);
+    height: 100%;
+    width: 100%;
+    margin-top: 1rem;
+}
+
+.title{
+  text-align: center;
+  font-size: 1rem;
+  text-decoration: underline;
+  color: var(--bg);
+  font-weight: 700;
+}
+
+.registerform{
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    width: 50rem;
-    padding: 2rem;
+    justify-content: flex-start;
+    padding: 0.6rem;
+    gap: 9px;
 }
 
-.container h2{
-    font-weight: 600;
-    text-align: center;
-    text-decoration: underline;
-    margin-bottom: 1rem;
+.formgroup input{
+    border: 1px solid rgba(0,0,0,0.5);
+    border-radius: 8px;
+    width: 100%;
 }
 
-.notificationForm{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: end;
-    gap: 10px;
+.formgroup textarea{
+    border: 1px solid rgba(0,0,0,0.5);
+    border-radius: 8px;
+    width: 100%;
 }
 
-.inputGroup{
-    display:flex;
-    align-items: flex-start;
-    justify-content: center;
-}
-
-.submitButton{
+.button{
     background-color: var(--bg);
+    padding: .5rem;
+    font-weight: bold;
+    color: white;
     border-radius: 1rem;
 }

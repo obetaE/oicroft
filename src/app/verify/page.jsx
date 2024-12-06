@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import styles from "./verify.module.css"
+import Image from "next/image"
 
 export default function VerifyPage() {
   const router = useRouter();
@@ -25,9 +26,26 @@ export default function VerifyPage() {
   }, [token, router]);
 
   return (
-    <div>
-      <h1>Email Verification</h1>
-      <p>{status || "Verifying your email..."}</p>
+    <div className={styles.loadingcontainer}>
+      <div className={styles.loadimgcontainer}>
+        <Image
+          src="/Website page.png"
+          alt="loading image"
+          width={200}
+          height={200}
+        />
+        <div className={styles.status}>
+          <h1 className={styles.header}>Email Verification</h1>
+          <div className={styles.loadbtncontainer}>
+            <div className={styles.loadingbutton}></div>
+            <div className={styles.loadingbutton}></div>
+            <div className={styles.loadingbutton}></div>
+            <div className={styles.loadingbutton}></div>
+            <div className={styles.loadingbutton}></div>
+          </div>
+          <p className={styles.para}>{status || "Verifying your email..."}</p>
+        </div>
+      </div>
     </div>
   );
 }

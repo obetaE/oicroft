@@ -1,7 +1,9 @@
+import { NextResponse } from "next/server";
 import { ConnectDB } from "@/libs/config/db";
 import { Order } from "@/libs/models/Order";
 import { Product } from "@/libs/models/Product";
 
+// Helper function to calculate delivery date
 const calculateDeliveryDate = () => {
   const now = new Date();
   const currentDay = now.getDay();
@@ -29,64 +31,70 @@ const calculateDeliveryDate = () => {
   return saturday;
 };
 
-export default async function handler(req, res) {
-  if (req.method === "POST") {
-    try {
-      await ConnectDB();
+// API Route
+export async function POST(request) {
+  await ConnectDB();
+  try {
+    const { products, total } = await request.json();
+    const deliveryDate = calculateDeliveryDate();
 
-      const { products, total } = req.body;
-      const deliveryDate = calculateDeliveryDate();
-
-      // Loop through products to validate and update stock
-      for (const product of products) {
-        const existingProduct = await Product.findById(product.productId);
-        if (!existingProduct) {
-          return res
-            .status(404)
-            .json({ message: `Product ${product.productId} not found` });
-        }
-
-        const selectedUnit = existingProduct.prices.find(
-          (item) => item.unit === product.unit
+    for (const product of products) {
+      const existingProduct = await Product.findById(product.productId);
+      if (!existingProduct) {
+        return NextResponse.json(
+          { message: `Product ${product.productId} not found` },
+          { status: 404 }
         );
-
-        if (!selectedUnit) {
-          return res.status(400).json({
-            message: `Unit '${product.unit}' does not exist for ${existingProduct.title}`,
-          });
-        }
-
-        if (selectedUnit.stock < product.quantity) {
-          return res.status(400).json({
-            message: `Insufficient stock for ${existingProduct.title} (${product.unit}). Available: ${selectedUnit.stock}`,
-          });
-        }
-
-        // Deduct stock for the specific unit
-        selectedUnit.stock -= product.quantity;
-        await existingProduct.save();
       }
 
-      // Create the order
-      const newOrder = await Order.create({
-        products: products.map((product) => ({
-          ...product,
-          totalPrice: product.quantity * product.price,
-        })),
-        total,
-        deliveryDate,
-        status: "Pending",
-        date: new Date(),
-      });
+      const selectedUnit = existingProduct.prices.find(
+        (item) => item.unit === product.unit
+      );
 
-      res
-        .status(201)
-        .json({ message: "Order created successfully", order: newOrder });
-    } catch (error) {
-      console.error("Order creation error:", error);
-      res.status(500).json({ message: "Failed to create order" });
+      if (!selectedUnit) {
+        return NextResponse.json(
+          {
+            message: `Unit '${product.unit}' does not exist for ${existingProduct.title}`,
+          },
+          { status: 400 }
+        );
+      }
+
+      if (selectedUnit.stock < product.quantity) {
+        return NextResponse.json(
+          {
+            message: `Insufficient stock for ${existingProduct.title} (${product.unit}). Available: ${selectedUnit.stock}`,
+          },
+          { status: 400 }
+        );
+      }
+
+      // Deduct stock for the specific unit
+      selectedUnit.stock -= product.quantity;
+      await existingProduct.save();
     }
-  } else {
-    res.status(405).json({ message: "Method Not Allowed" });
+
+    // Create the order
+    const newOrder = await Order.create({
+      products: products.map((product) => ({
+        ...product,
+        totalPrice: product.quantity * product.price,
+      })),
+      total,
+      deliveryDate,
+      status: "Pending",
+      date: new Date(),
+    });
+
+    return NextResponse.json(
+      { message: "Order created successfully", order: newOrder },
+      { status: 201 }
+    );
+  } catch (error) {
+    console.error("Order creation error:", error);
+    return NextResponse.json(
+      { message: "Failed to create order", error: error.message },
+      { status: 500 }
+    );
   }
 }

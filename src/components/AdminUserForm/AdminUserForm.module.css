@@ -1,0 +1,35 @@
+.container{
+    height: 100%;
+    width: 100%;
+    margin-top: 1rem;
+}
+
+.title{
+  text-align: center;
+  font-size: .8rem;
+  text-decoration: underline;
+  color: var(--bg);
+  font-weight: 700;
+}
+
+.registerform{
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding: 0.6rem;
+    gap: 9px;
+}
+
+.formgroup input{
+    border: 1px solid rgba(0,0,0,0.5);
+    border-radius: 8px;
+    width: 100%;
+}
+
+.button{
+    background-color: var(--bg);
+    padding: .5rem;
+    font-weight: bold;
+    color: white;
+    border-radius: 1rem;
+}

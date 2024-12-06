@@ -6,10 +6,10 @@ import { addSupport } from "@/libs/Action/action"; // Ensure this path matches y
 export default function SupportForm() {
   return (
     <div className={styles.container}>
-        <h2>Add A New Support Question and Its Answer</h2>
+        <h2 className={styles.title} >Add A New Support Question and Its Answer</h2>
       <form action={addSupport} className={styles.supportForm}>
 
-        <div className={styles.inputGroup}>
+        <div className={styles.formgroup}>
           <label className={styles.label} htmlFor="title">
             The Question:
           </label>
@@ -22,7 +22,7 @@ export default function SupportForm() {
           />
         </div>
 
-        <div className={styles.inputGroup}>
+        <div className={styles.formgroup}>
           <label className={styles.label} htmlFor="desc">
             Its Answer:
           </label>
@@ -31,12 +31,15 @@ export default function SupportForm() {
             name="desc"
             className={styles.textarea}
             placeholder="Enter description"
+            rows="10"
           />
         </div>
 
-        <button className={styles.submitButton}>
-          Click to Upload
-        </button>
+        <div className={styles.formgroup}>
+          <div className={styles.button}>
+          <button>Click to Upload</button>
+        </div>
+        </div>
 
       </form>
     </div>

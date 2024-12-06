@@ -20,16 +20,16 @@
 
 .section {
   position: absolute;
-  top: 9.6rem;
-  left: 26rem;
-  width: 32rem;
+  top: 8.8rem;
+  left: 23rem;
+  width: 30rem;
   margin: 0 auto;
   background: white;
   display: flex;
   padding: 2rem;
   margin-bottom: 8rem;
   border-radius: 15px;
-  height: 28rem;
+  height: 26rem;
   overflow: hidden;
   flex-direction: column;
 }

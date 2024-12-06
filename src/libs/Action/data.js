@@ -1,5 +1,5 @@
 import UserModel from '../models/UserModel';
-import NotificationModel from "../models/Notification";
+import NotificationModel from '../models/Notification';
 import { ConnectDB } from "../config/db";
 import { unstable_noStore as noStore } from "next/cache";
 import SupportModel from '../models/Support';
@@ -57,18 +57,53 @@ export const getNotification = async (id) =>{
     }
 }
 
-export const getNotifications = async () =>{
-    try{
-        ConnectDB();
 
-        const notifications = await NotificationModel.find()
-        return notifications 
+export const getNotifications = async () => {
+  try {
+    ConnectDB();
 
-    }catch(err){
-        console.log(err)
-        throw new Error("Failed to Fetch Notifications")
+    const notifications = await NotificationModel.find();
+    // Serialize notifications by converting to plain objects
+    return notifications.map((notification) => ({
+      _id: notification._id.toString(), // Convert ObjectId to string
+      isRead: notification.isRead,
+      title: notification.title,
+      desc: notification.desc,
+      uploadedAt: notification.uploadedAt?.toISOString(), // Convert Date to string
+      createdAt: notification.createdAt?.toISOString(),
+      updatedAt: notification.updatedAt?.toISOString(),
+      __v: notification.__v,
+    }));
+  } catch (err) {
+    console.log(err);
+    throw new Error("Failed to fetch notifications");
+  }
+};
+
+
+export const markAsRead = async (id) => {
+  try {
+    await ConnectDB();
+
+    const updatedNotification = await NotificationModel.findByIdAndUpdate(
+      mongoose.Types.ObjectId(id), // Convert string to ObjectId
+      { isRead: true },
+      { new: true }
+    );
+
+    if (!updatedNotification) {
+      throw new Error("Notification not found");
     }
-}
+
+    console.log("Notification marked as read:", updatedNotification);
+    return updatedNotification;
+  } catch (err) {
+    console.error("Error marking notification as read:", err);
+    throw err;
+  }
+};
+
+
 
 
 export const getSupport = async (id) =>{

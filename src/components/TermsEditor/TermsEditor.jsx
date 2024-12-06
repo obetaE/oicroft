@@ -1,6 +1,7 @@
 "use client"
 import React, { useRef, useState } from "react";
 import "quill/dist/quill.snow.css";
+import styles from "./TermsEditor.module.css"
 
 const TermsEditor = () => {
   const editorRef = useRef(null);
@@ -115,10 +116,18 @@ const TermsEditor = () => {
           marginBottom: "10px",
         }}
       ></div>
-      <button className={styles.button} onClick={handleSave} style={{ marginRight: "10px" }}>
-        Save
-      </button>
-      <button className={styles.button} onClick={clearEditor}>Clear</button>
+      <div className={styles.buttoncontainer}>
+        <button
+          className={styles.button}
+          onClick={handleSave}
+          style={{ marginRight: "10px" }}
+        >
+          Save
+        </button>
+        <button className={styles.button} onClick={clearEditor}>
+          Clear
+        </button>
+      </div>
     </div>
   );
 };

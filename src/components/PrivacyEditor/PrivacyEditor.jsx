@@ -1,6 +1,7 @@
 "use client"
 import React, { useRef, useState } from "react";
 import "quill/dist/quill.snow.css";
+import styles from "./PrivacyEditor.module.css"
 
 const PrivacyEditor = () => {
   const editorRef = useRef(null);
@@ -83,7 +84,6 @@ const PrivacyEditor = () => {
 
   return (
     <div>
-      
       {message && (
         <div
           style={{
@@ -116,10 +116,18 @@ const PrivacyEditor = () => {
           marginBottom: "10px",
         }}
       ></div>
-      <button className={styles.button} onClick={handleSave} style={{ marginRight: "10px" }}>
-        Save
-      </button>
-      <button className={styles.button} onClick={clearEditor}>Clear</button>
+      <div className={styles.buttoncontainer}>
+        <button
+          className={styles.button}
+          onClick={handleSave}
+          style={{ marginRight: "10px" }}
+        >
+          Save
+        </button>
+        <button className={styles.button} onClick={clearEditor}>
+          Clear
+        </button>
+      </div>
     </div>
   );
 };

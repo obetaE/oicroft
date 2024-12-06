@@ -11,6 +11,7 @@ export const authConfig = {
         token.id = user.id;
         token.isAdmin = user.isAdmin;
         token.isWorker = user.isWorker;
+        token.isVerified = user.isVerified;
       }
       return token;
     },
@@ -19,6 +20,7 @@ export const authConfig = {
         session.user.id = token.id;
         session.user.isAdmin = token.isAdmin;
         session.user.isWorker = token.isWorker;
+        session.user.isVerified = token.isVerified;
       }
       return session;
     },
@@ -43,6 +45,16 @@ export const authConfig = {
       if (isOnCartPage && !user) {
         return false;
       }
+
+      //ONLY VERIFIED USERS CAN REACH THE ORDER AND CART PAGE
+if (isOnOrderPage && user?.isVerified) {
+  return Response.redirect(new URL("/resendotp", request.nextUrl));
+}
+
+if (isOnCartPage && user?.isVerified) {
+  return Response.redirect(new URL("/resendotp", request.nextUrl));
+}
+
 
       //ONLY UNAUTHENTICATED CAN REACH THE LOGIN PAGE
       if (isOnLoginPage && user) {

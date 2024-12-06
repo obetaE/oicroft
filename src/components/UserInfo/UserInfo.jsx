@@ -54,15 +54,36 @@ const UserInfo = ({ user, handleUpdate }) => {
               type="password"
             />
           )}
-          <button onClick={() => handleUpdate(formData)}>Save</button>
-          <button onClick={cancelEditing}>Cancel</button>
+
+          <div className={styles.buttoncontainer}>
+            <button
+              className={styles.button}
+              onClick={() => handleUpdate(formData)}
+            >
+              Save
+            </button>
+            <button className={styles.button} onClick={cancelEditing}>
+              Cancel
+            </button>
+          </div>
         </>
       );
     } else {
       return (
         <>
-          <span className={styles.detailValue}>{user[field]}</span>
-          <button onClick={() => startEditing(field)}>Update</button>
+          <div className={styles.maininfo}>
+            {field === "password" ? (
+              <div className={styles.detailValuepassword}></div>
+            ) : (
+              <span className={styles.detailValue}>{user[field]}</span>
+            )}
+            <button
+              className={styles.button}
+              onClick={() => startEditing(field)}
+            >
+              Update
+            </button>
+          </div>
         </>
       );
     }

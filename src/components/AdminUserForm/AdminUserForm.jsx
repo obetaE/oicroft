@@ -7,10 +7,9 @@ import styles from "./AdminUserForm.module.css"
 const AdminUserForm = () =>{
     const [state, formAction] = useActionState(addUser, undefined);
     return (
-      <div>
-        <h1>Create a User</h1>
+      <div className={styles.container}>
+        <h1 className={styles.title} >Create a User</h1>
         <form action={formAction} className={styles.registerform}>
-          <h2>Create Your Account</h2>
           <div className={styles.formgroup}>
             <label htmlFor="name">UserName:</label>
             <input
@@ -71,7 +70,7 @@ const AdminUserForm = () =>{
           </div>
           <div className={styles.formgroup}>
             <select name="isWorker">
-                <option value="false" >Do you want them to be a Worker?</option>
+                <option value="false" >Do you want them to be a Worker? (A worker must be an Admin)</option>
                 <option value="false" >No</option>
                 <option value="true" >Yes</option>
             </select>

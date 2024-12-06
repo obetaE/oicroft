@@ -8,10 +8,9 @@ export default function NotificationForm() {
 
   return (
     <div className={styles.container}>
-        <h2>Add A New Notification</h2>
+      <h2 className={styles.title}>Add A New Notification</h2>
       <form action={addNotification} className={styles.notificationForm}>
-
-        <div className={styles.inputGroup}>
+        <div className={styles.formgroup}>
           <label className={styles.label} htmlFor="title">
             Title:
           </label>
@@ -24,7 +23,7 @@ export default function NotificationForm() {
           />
         </div>
 
-        <div className={styles.inputGroup}>
+        <div className={styles.formgroup}>
           <label className={styles.label} htmlFor="desc">
             Description:
           </label>
@@ -33,13 +32,15 @@ export default function NotificationForm() {
             name="desc"
             className={styles.textarea}
             placeholder="Enter description"
+            rows="10"
           />
         </div>
 
-        <button className={styles.submitButton}>
-          Add Notification
-        </button>
-
+        <div className={styles.formgroup}>
+          <div className={styles.button}>
+            <button>Add Notification</button>
+          </div>
+        </div>
       </form>
     </div>
   );

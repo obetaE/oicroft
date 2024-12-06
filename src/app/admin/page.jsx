@@ -15,11 +15,16 @@ const AdminPage = async () => {
           <Navbar />
           <h1 className={styles.adminTitle}>Admin Dashboard</h1>
           <div className={styles.links}>
-            {!isWorker && (
-              <div className={styles.singleLink}>
-                <Link href="/admin/users">Manage Users</Link>
-              </div>
+            {session ? (
+              session.user.isWorker && (
+                <div className={styles.singleLink}>
+                  <Link href="/admin/users">Manage Users</Link>
+                </div>
+              )
+            ) : (
+              <div className="hidden"></div>
             )}
+
             <div className={styles.singleLink}>
               <Link href="/admin/notifications">Manage Notifications</Link>
             </div>
@@ -34,21 +39,27 @@ const AdminPage = async () => {
                 Send an Email to Your Users
               </Link>
             </div>
-            {!isWorker && (
-              <div className={styles.singleLink}>
-                <Link href="/admin/termspage">
-                  Edit the Terms and Conditions
-                </Link>
-              </div>
+            {session ? (
+              session.user.isWorker && (
+                <div className={styles.singleLink}>
+                  <Link href="/admin/termspage">
+                    Edit the Terms and Conditions
+                  </Link>
+                </div>
+              )
+            ) : (
+              <div className="hidden"></div>
             )}
-            {!isWorker && (
-              <div className={styles.singleLink}>
-                <Link href="/admin/privacypage">
-                  Edit the Privacy Policy
-                </Link>
-              </div>
+
+            {session ? (
+              session.user.isWorker && (
+                <div className={styles.singleLink}>
+                  <Link href="/admin/privacypage">Edit the Privacy Policy</Link>
+                </div>
+              )
+            ) : (
+              <div className="hidden"></div>
             )}
-            
           </div>
         </div>
       </div>
