@@ -1,8 +1,7 @@
-import { getServerSession } from "next-auth";
+import { auth } from "@/auth";
 import { NextResponse } from "next/server";
 import { ConnectDB } from "@/libs/config/db";
 import UserModel from "@/libs/models/UserModel";
-import { authOptions } from "@/libs/authOptions"; // Ensure you import your NextAuth config
 
 const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY;
 
@@ -10,8 +9,8 @@ export async function POST(request) {
   await ConnectDB();
 
   try {
-    // Retrieve the user session
-    const session = await getServerSession(authOptions);
+    // Retrieve the user session using `auth()`
+    const session = await auth();
 
     if (!session || !session.user || !session.user.email) {
       return NextResponse.json(
@@ -20,7 +19,7 @@ export async function POST(request) {
       );
     }
 
-    // Fetch the user details from the database using the email from the session
+    // Fetch user details from the database using the session email
     const user = await UserModel.findOne({ email: session.user.email });
 
     if (!user || !user.email) {
@@ -30,8 +29,10 @@ export async function POST(request) {
       );
     }
 
+    // Parse the request body for payment details
     const { amount, metadata } = await request.json();
 
+    // Initialize the Paystack payment
     const response = await fetch(
       "https://api.paystack.co/transaction/initialize",
       {

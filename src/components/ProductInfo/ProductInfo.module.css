@@ -41,6 +41,7 @@
     left: 3;
     margin-top: 2rem;
     margin-left: 2rem;
+    margin-bottom: 4rem;
     cursor: pointer;
          transition: background-color 0.3s ease;
 }
@@ -49,12 +50,20 @@
   background-color: #0f9e15; /* Optional hover color */
 }
 
+.productcontainer{
+    margin-top: 8px;
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
 .left{
     flex: 1;
     display: flex;
     height: 100%;
     align-items: center;
     justify-content: center;
+    
 }
 
 .right{

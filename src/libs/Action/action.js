@@ -11,32 +11,6 @@ import SupportModel from "../models/Support";
 import nodemailer from "nodemailer"
 
 
-// Server function to handle the form submission for product creation
-export const addProduct = async (previousState, formData) => {
-  // const title = formData.get("title");
-  // const desc = formData.get("desc");
-
-  // // Continue with other form data handling as needed
-  // //Be sure that the name of the input has their corresponding parameter name
-  // console.log(title, desc);
-  // //3:13
-
-  const { title, desc, prices, productId } = Object.fromEntries(formData);
-
-  try {
-    ConnectDB();
-    const newProduct = new Product({ title, desc, prices, productId });
-
-    await newProduct.save();
-    console.log("Product Successfully Uploaded");
-    revalidatePath("/order");
-    revalidatePath("/admin");
-  } catch (err) {
-    console.log(err);
-    return { error: "Failed to Upload Product" };
-  }
-};
-
 
 //DELETING PRODUCT
 export const deleteProduct = async (formData) => {
@@ -47,8 +21,6 @@ export const deleteProduct = async (formData) => {
 
     await Product.findByIdAndDelete(id);
     console.log("Deleted from the Database")
-    revalidatePath("/order");
-    revalidatePath("/admin");
   }catch(err){
     console.log(err);
     return { error: "Failed to Delete Post" };
@@ -163,28 +135,6 @@ export const addOrder = async (formData) => {
 };
 
 
-
-//ACTION TO HANDLE OUT OF STOCK
-const placeOrder = async (productId, selectedUnit, quantity) => {
-  try {
-    // Fetch product
-    const product = await Product.findById(productId);
-    const unit = product.prices.find(item => item.unit === selectedUnit);
-
-    // Validate stock
-    if (!unit || unit.stock < quantity) {
-      throw new Error("Insufficient stock for the selected unit.");
-    }
-
-    // Deduct stock
-    unit.stock -= quantity;
-    await product.save();
-
-    console.log(`Order placed for ${quantity} ${selectedUnit}(s). Remaining stock: ${unit.stock}`);
-  } catch (err) {
-    console.error(err.message);
-  }
-};
 
 
 //ACTION FOR ADDING A NOTICATION

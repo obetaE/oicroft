@@ -7,11 +7,10 @@ import Image from "next/image";
 import { useDispatch } from "react-redux";
 import { addProductToCart } from "@/redux/cartSlice";
 
-
-
 const ProductInfo = ({ product }) => {
+  console.log("Product data received:", product); // Debugging: Log incoming product data
   const router = useRouter();
-  const dispatch = useDispatch(); // Calling the useDispatch redux hook
+  const dispatch = useDispatch();
 
   const order = () => {
     router.push("/order");
@@ -23,65 +22,75 @@ const ProductInfo = ({ product }) => {
   const [promoError, setPromoError] = useState(""); // Error for invalid promo codes
   const [isPromoApplied, setIsPromoApplied] = useState(false); // Tracks if a promo code is already applied
   const [promoSuccess, setPromoSuccess] = useState(false); // Tracks successful promo code application
+  const [promoDiscountValue, setPromoDiscountValue] = useState(0); // Discount value of the applied promo code
 
-  // Determine if the product uses unit-based pricing or counter-based pricing
   const isUnitBased = product.prices.some((price) => price.unit);
   const selectedPrice = isUnitBased
     ? product.prices[selectedSizeIndex].price
     : product.prices[0].pricePerUnit;
 
-  const minQuantity = isUnitBased ? 1 : product.prices[0].minQuantity || 1; // Default to 1 if no minQuantity is specified
+  const minQuantity = isUnitBased ? 1 : product.prices[0].minQuantity || 1;
 
-  // Calculate the total price
   const totalPrice = useMemo(() => {
     let price = quantity * selectedPrice;
 
-    // Apply regular discount
     if (product.discounts?.regularDiscount) {
       price -= price * (product.discounts.regularDiscount / 100);
     }
 
+    if (promoDiscountValue > 0) {
+      price -= price * (promoDiscountValue / 100);
+    }
+
+    console.log("Total Price Calculated:", price); // Debugging: Log calculated total price
     return price;
-  }, [quantity, selectedPrice, product.discounts]);
+  }, [quantity, selectedPrice, product.discounts, promoDiscountValue]);
 
-const applyPromoCode = () => {
-  if (isPromoApplied) {
-    setPromoError("Code Already Used!"); // Error if code is reused
-    return;
-  }
-
-  const promo = product.discounts?.promoCodes?.find(
-    (promo) => promo.code === promoCode.trim()
-  );
-
-  if (promo) {
-    setPromoError(""); // Clear error
-    setPromoSuccess(true); // Show success message
-    setIsPromoApplied(true); // Mark promo code as applied
-  } else {
-    setPromoError("Invalid promo code!");
-    setPromoSuccess(false); // Clear success message on invalid code
-  }
-};
-
-
-  // Const to add items to cart
-  const handleClick = () => {
-    // Dispatch the action to add the product to the cart
-    dispatch(
-      addProductToCart({
-        id: product.id, // Product ID
-        title: product.title, // Product title
-        img: product.img, // Product image
-        price: totalPrice, // Total price based on quantity and selected size/unit
-        quantity, // Quantity selected by the user
-        unit: isUnitBased ? product.prices[selectedSizeIndex].unit : null, // Selected unit (only for unit-based products)
-      })
+  const totalStock = useMemo(() => {
+    const stock = product.prices.reduce(
+      (sum, price) => sum + (price.stock || 0),
+      0
     );
+    console.log("Total Stock Calculated:", stock); // Debugging: Log calculated stock
+    return stock;
+  }, [product.prices]);
+
+  const applyPromoCode = () => {
+    if (isPromoApplied) {
+      setPromoError("Promo code already used!");
+      return;
+    }
+
+    const promo = product.discounts?.promoCodes?.find(
+      (promo) => promo.code === promoCode.trim()
+    );
+
+    if (promo) {
+      console.log("Promo Code Applied:", promo); // Debugging: Log applied promo code
+      setPromoError("");
+      setPromoSuccess(true);
+      setIsPromoApplied(true);
+      setPromoDiscountValue(promo.discountValue);
+    } else {
+      console.log("Invalid Promo Code Entered:", promoCode); // Debugging: Log invalid promo attempt
+      setPromoError("Invalid promo code!");
+      setPromoSuccess(false);
+      setPromoDiscountValue(0);
+    }
   };
 
-  // If there's an unexpected "0", ensure it's tied to a meaningful variable
-  const stockCount = product.stock || null; // Example stock count, if relevant
+  const handleClick = () => {
+    const cartData = {
+      id: product._id || product.id,
+      title: product.title,
+      img: product.img,
+      price: totalPrice,
+      quantity,
+      unit: isUnitBased ? product.prices[selectedSizeIndex].unit : null,
+    };
+    console.log("Cart Data to Dispatch:", cartData); // Debugging: Log cart data before dispatch
+    dispatch(addProductToCart(cartData));
+  };
 
   return (
     <div className={styles.container}>
@@ -112,19 +121,19 @@ const applyPromoCode = () => {
             <span className={styles.price}>₦{totalPrice.toFixed(2)}</span>
             <p className={styles.desc}>{product.desc}</p>
 
-            {/* Stock count (only if relevant) */}
-            {product.stock !== undefined && (
-              <p className={styles.stock}>
-                {product.stock > 0 ? `Stock: ${product.stock}` : "Out of Stock"}
-              </p>
-            )}
+            {/* Stock Count */}
+            <p className={styles.stock}>
+              {totalStock > 0 ? `Stock: ${totalStock}` : "Out of Stock"}
+            </p>
 
-            {/* Discounts */}
-            {product.discounts?.regularDiscount && (
+            {/* Regular Discount */}
+            {product.discounts?.regularDiscount > 0 && (
               <p className={styles.discount}>
                 {product.discounts.regularDiscount}% OFF!!!
               </p>
             )}
+
+            {/* Promo Code Section */}
             {product.discounts?.promoCodes?.length > 0 && (
               <div className={styles.promoCode}>
                 <input
@@ -158,8 +167,8 @@ const applyPromoCode = () => {
                         selectedSizeIndex === index ? styles.active : ""
                       }`}
                       onClick={() => {
-                        setSelectedSizeIndex(index); // Update the selected size
-                        setQuantity(1); // Reset quantity
+                        setSelectedSizeIndex(index);
+                        setQuantity(1);
                       }}
                     >
                       <span className={styles.number}>{option.unit}</span>

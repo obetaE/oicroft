@@ -3,6 +3,9 @@ import styles from "./checkout.module.css";
 import Image from 'next/image'
 import Secondnav from "@/components/secondnav/Secondnav"
 
+
+//1:48:00
+
 const checkout = () => {
 
   const status = 0;

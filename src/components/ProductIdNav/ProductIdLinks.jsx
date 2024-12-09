@@ -64,7 +64,7 @@ const ProductIdLinks = ({session, id}) => {
           <div className={styles.logocontainer}>
             <button onClick={homepage} className={styles.logo}>
               <Image
-                src="/Oicroft logo.png"
+                src="https://res.cloudinary.com/dudlxsoui/image/upload/v1733053569/Oicroft_logo_gr0qpv.png"
                 alt="Logo"
                 className={styles.logoimg}
                 fill

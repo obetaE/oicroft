@@ -22,27 +22,21 @@ const ProductSchema = new mongoose.Schema(
           unit: { type: String, required: false }, // e.g., kg, liter, big, medium, small
           price: { type: Number, required: false }, // Price per unit
           stock: { type: Number, default: 0 }, // Stock for this entry
-          minQuantity: { type: Number, required: false }, // Minimum units for counter-based pricing
+          minQuantity: { type: Number, default: 1 }, // Minimum units for all types of pricing
           pricePerUnit: { type: Number, required: false }, // Price for 1 unit in counter-based pricing
         },
       ],
       validate: {
         validator: function (arr) {
-          // Each entry must have either `unit` + `price` or `minQuantity` + `pricePerUnit`
+          // Ensure each price entry has valid pricing logic
           return arr.every(
             (item) =>
-              (item.unit &&
-                item.price &&
-                !item.minQuantity &&
-                !item.pricePerUnit) ||
-              (!item.unit &&
-                !item.price &&
-                item.minQuantity &&
-                item.pricePerUnit)
+              (item.unit && item.price && !item.pricePerUnit) || // Valid unit-based pricing
+              (!item.unit && item.pricePerUnit) // Valid counter-based pricing
           );
         },
         message:
-          "Each price entry must include either `unit` and `price` OR `minQuantity` and `pricePerUnit`, but not both.",
+          "Each price entry must include either `unit` and `price` OR `pricePerUnit`, but not both.",
       },
       required: false,
     },
@@ -52,12 +46,12 @@ const ProductSchema = new mongoose.Schema(
       default: () => new mongoose.Types.ObjectId().toString(),
     },
     discounts: {
-      regularDiscount: { type: Number, default: 0 }, // Percentage or flat value
+      regularDiscount: { type: Number, default: 0 }, // Percentage-based discount
       promoCodes: {
         type: [
           {
             code: { type: String, required: true }, // Promo code string
-            discountValue: { type: Number, required: true }, // Discount associated with code
+            discountValue: { type: Number, required: true }, // Discount percentage or value
           },
         ],
         default: [],
@@ -70,8 +64,8 @@ const ProductSchema = new mongoose.Schema(
 export const Product =
   mongoose.models?.Product || mongoose.model("Product", ProductSchema);
 
-
-  {/* 
+{
+  /* 
     What's happening?
     Explanation
 Unified Field (prices):
@@ -133,4 +127,5 @@ Simplified Validation: All pricing logic is centralized, making it easier to deb
 Flexibility: You can define products with any combination of pricing options without overcomplicating the schema.
 Consistency: Developers only need to understand one structure (prices) instead of managing two (prices and counter).
 Let me know if you need further clarification, or feel free to test it out and share your thoughts
-    */}
+    */
+}

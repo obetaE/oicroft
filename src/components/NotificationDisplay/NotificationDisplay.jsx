@@ -7,26 +7,37 @@ import Link from "next/link";
 
 const NotificationDisplay = ({ initialNotifications }) => {
   const [notifications, setNotifications] = useState(initialNotifications);
+  const [error, setError] = useState(null); // For error feedback
 
-  const handleMarkAsRead = async (id) => {
+  const handleMarkAsRead = async (_id) => {
     try {
-      await markAsRead(id); // Mark the notification as read in the database
+      const updatedNotification = await markAsRead(id); // Mark notification as read in the database
 
-      // Update the local state to reflect the change
+      if (!updatedNotification || !updatedNotification.isRead) {
+        throw new Error(
+          "Failed to update notification status in the database."
+        );
+      }
+
+      // Update local state
       setNotifications((prevNotifications) =>
         prevNotifications.map((notification) =>
-          String(notification._id) === String(id) // Ensure IDs match correctly
+          String(notification._id) === String(id) // Ensure IDs match
             ? { ...notification, isRead: true }
             : notification
         )
       );
+      setError(null); // Clear any existing errors
     } catch (err) {
-      console.error("Failed to mark notification as read", err);
+      console.error("Error during markAsRead:", err.message || err);
+      setError("Failed to update notification. Please try again.");
     }
   };
 
   return (
     <div className={styles.section}>
+      {error && <div className={styles.error}>{error}</div>}{" "}
+      {/* Display errors */}
       {notifications.map((notification) => (
         <div
           key={notification._id}
@@ -34,7 +45,6 @@ const NotificationDisplay = ({ initialNotifications }) => {
           onClick={() => handleMarkAsRead(notification._id)} // Mark as read when clicked
         >
           <h1>{notification.title}</h1>
-          {/* <p>{notification.desc}</p>*/}
           <Link
             className={styles.link}
             href={`/notifications/${notification._id}`}

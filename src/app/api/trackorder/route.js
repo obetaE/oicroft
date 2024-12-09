@@ -3,44 +3,72 @@ import { ConnectDB } from "@/libs/config/db";
 import { Order } from "@/libs/models/Order";
 import { Product } from "@/libs/models/Product";
 
-// Helper function to calculate delivery date
 const calculateDeliveryDate = () => {
   const now = new Date();
-  const currentDay = now.getDay();
 
-  const daysToThursday =
-    currentDay <= 4 ? 4 - currentDay : 4 + (7 - currentDay);
-  const thursday = new Date(now);
-  thursday.setDate(now.getDate() + daysToThursday);
-  thursday.setHours(0, 0, 0, 0);
+  const currentThursday = new Date(now);
+  currentThursday.setDate(now.getDate() + ((4 - now.getDay() + 7) % 7));
+  currentThursday.setHours(0, 0, 0, 0);
 
-  const wednesday = new Date(thursday);
-  wednesday.setDate(thursday.getDate() + 6);
-  wednesday.setHours(23, 59, 59, 999);
+  const nextWednesday = new Date(currentThursday);
+  nextWednesday.setDate(currentThursday.getDate() + 6);
+  nextWednesday.setHours(23, 59, 59, 999);
 
-  const saturday = new Date(wednesday);
-  saturday.setDate(wednesday.getDate() + 3);
-  saturday.setHours(12, 0, 0, 0);
+  const deliverySaturday = new Date(nextWednesday);
+  deliverySaturday.setDate(nextWednesday.getDate() + 3);
+  deliverySaturday.setHours(12, 0, 0, 0);
 
-  if (now < thursday) {
-    saturday.setDate(saturday.getDate() - 7);
-  } else if (now > wednesday) {
-    saturday.setDate(saturday.getDate() + 7);
+  if (now >= currentThursday && now <= nextWednesday) {
+    return deliverySaturday;
   }
 
-  return saturday;
+  const nextBatchThursday = new Date(currentThursday);
+  nextBatchThursday.setDate(currentThursday.getDate() + 7);
+
+  const nextBatchWednesday = new Date(nextBatchThursday);
+  nextBatchWednesday.setDate(nextBatchThursday.getDate() + 6);
+
+  const nextBatchSaturday = new Date(nextBatchWednesday);
+  nextBatchSaturday.setDate(nextBatchWednesday.getDate() + 3);
+
+  return nextBatchSaturday;
 };
 
-// API Route
 export async function POST(request) {
   await ConnectDB();
+
   try {
-    const { products, total } = await request.json();
+    const requestData = await request.json();
+    console.log("Received request data:", requestData);
+
+    const { products, total, userId, reference } = requestData;
+
+    if (!products || !total || !userId || !reference) {
+      console.warn("Missing required fields:", {
+        products,
+        total,
+        userId,
+        reference,
+      });
+      return NextResponse.json(
+        { message: "Missing required fields" },
+        { status: 400 }
+      );
+    }
+
     const deliveryDate = calculateDeliveryDate();
+    console.log("Calculated delivery date:", deliveryDate);
 
     for (const product of products) {
-      const existingProduct = await Product.findById(product.productId);
+      console.log("Processing product:", product);
+
+      // Adjusted logic for finding the product
+      const existingProduct = await Product.findOne({
+        $or: [{ productId: product.productId }, { _id: product.productId }],
+      });
+
       if (!existingProduct) {
+        console.error(`Product ${product.productId} not found.`);
         return NextResponse.json(
           { message: `Product ${product.productId} not found` },
           { status: 404 }
@@ -52,6 +80,9 @@ export async function POST(request) {
       );
 
       if (!selectedUnit) {
+        console.error(
+          `Unit '${product.unit}' not found for product ${existingProduct.title}`
+        );
         return NextResponse.json(
           {
             message: `Unit '${product.unit}' does not exist for ${existingProduct.title}`,
@@ -61,6 +92,10 @@ export async function POST(request) {
       }
 
       if (selectedUnit.stock < product.quantity) {
+        console.error(`Insufficient stock for ${existingProduct.title}:`, {
+          requested: product.quantity,
+          available: selectedUnit.stock,
+        });
         return NextResponse.json(
           {
             message: `Insufficient stock for ${existingProduct.title} (${product.unit}). Available: ${selectedUnit.stock}`,
@@ -69,13 +104,18 @@ export async function POST(request) {
         );
       }
 
-      // Deduct stock for the specific unit
       selectedUnit.stock -= product.quantity;
       await existingProduct.save();
+      console.log(
+        `Updated stock for ${existingProduct.title}:`,
+        selectedUnit.stock
+      );
     }
 
-    // Create the order
+    console.log("Creating new order...");
     const newOrder = await Order.create({
+      userId,
+      reference,
       products: products.map((product) => ({
         ...product,
         totalPrice: product.quantity * product.price,
@@ -83,9 +123,10 @@ export async function POST(request) {
       total,
       deliveryDate,
       status: "Pending",
-      date: new Date(),
+      orderDate: new Date(),
     });
 
+    console.log("Order created successfully:", newOrder);
     return NextResponse.json(
       { message: "Order created successfully", order: newOrder },
       { status: 201 }
@@ -98,3 +139,5 @@ export async function POST(request) {
     );
   }
 }
+
+

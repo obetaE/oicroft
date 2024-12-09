@@ -10,47 +10,59 @@ const cartSlice = createSlice({
   name: "cart",
   initialState,
   reducers: {
-    // Updated method to handle adding a product to the cart
     addProductToCart: (state, action) => {
+      console.log(
+        "Action Payload Received in addProductToCart:",
+        action.payload
+      ); // Debugging: Log incoming action payload
       const { id, quantity, price } = action.payload;
+
       const existingProduct = state.products.find(
         (item) => item.id === id && item.unit === action.payload.unit
       );
 
       if (existingProduct) {
-        // If product already exists in the cart, update its quantity and total
-        state.total -= existingProduct.quantity * existingProduct.price; // Remove the old total for that product
-        existingProduct.quantity += quantity; // Update the quantity
-        state.total += existingProduct.quantity * existingProduct.price; // Add the new total for that product
+        console.log("Existing Product Found in Cart:", existingProduct); // Debugging
+        state.total -= existingProduct.quantity * existingProduct.price; // Remove old total
+        existingProduct.quantity += quantity; // Update quantity
+        state.total += existingProduct.quantity * existingProduct.price; // Add new total
       } else {
-        // If product is not in the cart, add it
+        console.log("Adding New Product to Cart:", action.payload); // Debugging
         state.products.push(action.payload);
         state.total += price * quantity;
       }
 
-      // Update the total quantity of all items
       state.quantity = state.products.reduce(
         (acc, product) => acc + product.quantity,
         0
       );
+
+      console.log("Updated Cart State After Add:", state); // Debugging
     },
 
-    // Update the quantity of a specific product
     updateProduct: (state, action) => {
+      console.log("Action Payload Received in updateProduct:", action.payload); // Debugging
       const { id, quantity } = action.payload;
       const product = state.products.find((item) => item.id === id);
+
       if (product) {
-        state.total -= product.quantity * product.price;
-        product.quantity = quantity;
-        state.total += quantity * product.price;
+        console.log("Updating Product Quantity:", product); // Debugging
+        state.total -= product.quantity * product.price; // Remove old total
+        product.quantity = quantity; // Update quantity
+        state.total += quantity * product.price; // Add new total
       }
     },
 
-    // Remove a product from the cart
     removeProduct: (state, action) => {
+      console.log("Action Payload Received in removeProduct:", action.payload); // Debugging
       const { id } = action.payload;
       const productIndex = state.products.findIndex((item) => item.id === id);
+
       if (productIndex !== -1) {
+        console.log(
+          "Removing Product from Cart:",
+          state.products[productIndex]
+        ); // Debugging
         state.total -=
           state.products[productIndex].price *
           state.products[productIndex].quantity;
@@ -59,8 +71,10 @@ const cartSlice = createSlice({
       }
     },
 
-    // Reset the cart to its initial state
-    reset: () => initialState,
+    reset: (state) => {
+      console.log("Resetting Cart to Initial State"); // Debugging
+      Object.assign(state, initialState);
+    },
   },
 });
 

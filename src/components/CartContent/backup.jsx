@@ -7,9 +7,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { reset } from "@/redux/cartSlice";
 import axios from "axios";
 
+// Function to create an order
 const createOrder = async (orderData, dispatch) => {
   try {
-    console.log("Creating order with data:", orderData);
     const response = await fetch("/api/trackorder", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -19,44 +19,46 @@ const createOrder = async (orderData, dispatch) => {
     if (!response.ok) throw new Error("Failed to create order");
 
     const data = await response.json();
-    console.log("Order creation successful. Response data:", data);
     dispatch(reset());
+    console.log("Order created:", data);
   } catch (err) {
     console.error("Error creating order:", err.message);
   }
 };
 
+// Function to handle Paystack payment initialization
 const handlePaystackCheckout = async (orderData, dispatch, user) => {
-  if (!user || !user.email || !user.id) {
-    alert("User details are missing. Please log in.");
-    console.log("Checkout halted: User details missing.");
+  if (!user || !user.email) {
+    alert("User is not logged in or email is missing.");
     return;
   }
 
-  console.log("Initializing Paystack checkout with orderData:", orderData);
-
   try {
-    const response = await axios.post("/api/paystack/initialize", {
-      amount: orderData.total * 100, // Convert to kobo
-      email: user.email, // Pass user email
-      metadata: {
-        userId: user.id,
-        custom_fields: orderData.products.map((product) => ({
-          display_name: product.title,
-          quantity: product.quantity,
-          unit: product.unit,
-          price: product.price,
-          id: product._id || product.id,
-        })),
+    const response = await axios.post(
+      "/api/paystack/initialize",
+      {
+        amount: orderData.total * 100,
+        metadata: {
+          custom_fields: orderData.products.map((product) => ({
+            display_name: product.title,
+            quantity: product.quantity,
+            unit: product.unit,
+            price: product.price,
+          })),
+        },
       },
-    });
-
-    console.log("Paystack initialization response:", response.data);
+      {
+        headers: {
+          Authorization: `Bearer ${user.email}`, // Pass the user's email in the headers
+        },
+      }
+    );
 
     const { authorization_url, reference } = response.data;
-    await createOrder({ ...orderData, reference, userId: user.id }, dispatch);
 
-    window.location.href = authorization_url;
+    await createOrder({ ...orderData, reference }, dispatch);
+
+    window.location.href = authorization_url; // Redirect to Paystack
   } catch (err) {
     console.error("Error initializing payment:", err.message);
     alert(`Payment failed: ${err.message}`);
@@ -71,12 +73,10 @@ const CartContent = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        console.log("Fetching user session...");
         const response = await fetch("/api/session");
         if (!response.ok) throw new Error("Failed to fetch session data");
 
         const data = await response.json();
-        console.log("User session fetched successfully:", data);
         setUser(data.user || null);
       } catch (err) {
         console.error("Error fetching session:", err.message);
@@ -88,7 +88,6 @@ const CartContent = () => {
   }, []);
 
   const aggregatedProducts = useMemo(() => {
-    console.log("Aggregating products in the cart...");
     const productMap = cart.products.reduce((acc, product) => {
       const key = `${product.title}-${product.unit}`;
       if (acc[key]) acc[key].quantity += product.quantity;
@@ -97,9 +96,6 @@ const CartContent = () => {
     }, {});
     return Object.values(productMap);
   }, [cart.products]);
-
-  console.log("Cart content rendered. Current user:", user);
-  console.log("Cart details:", cart);
 
   return (
     <div>
@@ -120,7 +116,7 @@ const CartContent = () => {
               </thead>
               <tbody>
                 {aggregatedProducts.map((product, index) => (
-                  <tr className={styles.td} key={product._id || index}>
+                  <tr className={styles.td} key={product.id || index}>
                     <td>{product.title}</td>
                     <td>
                       <Image
@@ -151,15 +147,12 @@ const CartContent = () => {
                 onClick={() => {
                   if (!cart.total || !aggregatedProducts.length) {
                     alert("Cart is empty or total is invalid.");
-                    console.log(
-                      "Checkout prevented: Empty cart or invalid total."
-                    );
                     return;
                   }
 
                   const orderData = {
                     products: aggregatedProducts.map((product) => ({
-                      productId: product._id || product.id,
+                      productId: product._id,
                       title: product.title,
                       quantity: product.quantity,
                       unit: product.unit,
@@ -168,10 +161,6 @@ const CartContent = () => {
                     total: cart.total,
                   };
 
-                  console.log(
-                    "Proceeding to checkout with orderData:",
-                    orderData
-                  );
                   handlePaystackCheckout(orderData, dispatch, user);
                 }}
               >
@@ -186,3 +175,5 @@ const CartContent = () => {
 };
 
 export default CartContent;
+
+

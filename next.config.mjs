@@ -5,7 +5,7 @@ const nextConfig = {
       {
         protocol: "https",
         hostname: "res.cloudinary.com",
-        pathname: "/**", // Matches all paths from Cloudinary
+        pathname: "/dudlxsoui/**", // Matches all paths specific to your account
       },
     ],
   },
