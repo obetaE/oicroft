@@ -3,13 +3,15 @@ import React, { useState } from "react";
 import styles from "./ProductForm.module.css";
 import axios from "axios";
 
-const ProductForm = () => {
+const ComboForm = () => {
   const [prices, setPrices] = useState([]);
   const [title, setTitle] = useState("");
   const [desc, setDesc] = useState("");
   const [file, setFile] = useState(null);
   const [regularDiscount, setRegularDiscount] = useState(0);
   const [promoCodes, setPromoCodes] = useState([]);
+  const [maxQuantity, setMaxQuantity] = useState(null);
+  const [orderCooldown, setOrderCooldown] = useState(null);
 
   const addPromoCode = () => {
     setPromoCodes([...promoCodes, { code: "", discountValue: "" }]);
@@ -30,11 +32,10 @@ const ProductForm = () => {
     setPrices([
       ...prices,
       {
-        type: "unit", // Default to unit-based
-        unit: "",
+        pricingType: "counter",
         price: "",
         stock: "",
-        minQuantity: "", // Added support for minQuantity in unit-based entries
+        minQuantity: "",
         pricePerUnit: "",
       },
     ]);
@@ -48,17 +49,6 @@ const ProductForm = () => {
   const handlePriceChange = (index, field, value) => {
     const updatedPrices = [...prices];
     updatedPrices[index][field] = value;
-    setPrices(updatedPrices);
-  };
-
-  const handleTypeToggle = (index) => {
-    const updatedPrices = [...prices];
-    updatedPrices[index].type =
-      updatedPrices[index].type === "unit" ? "counter" : "unit";
-    updatedPrices[index].unit = "";
-    updatedPrices[index].price = "";
-    updatedPrices[index].minQuantity = "";
-    updatedPrices[index].pricePerUnit = "";
     setPrices(updatedPrices);
   };
 
@@ -83,9 +73,7 @@ const ProductForm = () => {
         desc,
         img: secureUrl,
         prices: prices.filter(
-          (p) =>
-            (p.unit && p.price) || // Unit-based with optional minQuantity
-            (p.minQuantity && p.pricePerUnit)
+          (p) => (p.price && p.minQuantity) || (p.pricePerUnit && p.stock)
         ),
         discounts: {
           regularDiscount: parseFloat(regularDiscount),
@@ -94,29 +82,29 @@ const ProductForm = () => {
             discountValue: parseFloat(code.discountValue),
           })),
         },
+        maxQuantity: maxQuantity ? parseInt(maxQuantity) : null,
+        orderCooldown: orderCooldown ? parseInt(orderCooldown) : null,
       };
 
-      await axios.post("/api/order", productData);
+      await axios.post("/api/combo", productData);
 
-      alert("Product added successfully!");
+      alert("Combo added successfully!");
     } catch (error) {
       console.error(error);
-      alert("Failed to add product.");
+      alert("Failed to add Combo.");
     }
   };
 
   return (
     <form onSubmit={handleSubmit} className={styles.container}>
       <div className={styles.wrapper}>
-        <h1>Add a New Product</h1>
+        <h1>Add a New Combo</h1>
 
-        {/* File upload */}
         <div className={styles.item}>
           <label className={styles.label}>Choose an Image</label>
           <input type="file" onChange={(e) => setFile(e.target.files[0])} />
         </div>
 
-        {/* Title input */}
         <div className={styles.item}>
           <label className={styles.label}>Title</label>
           <input
@@ -126,7 +114,6 @@ const ProductForm = () => {
           />
         </div>
 
-        {/* Description input */}
         <div className={styles.item}>
           <label className={styles.label}>Description</label>
           <textarea
@@ -136,67 +123,26 @@ const ProductForm = () => {
           />
         </div>
 
-        {/* Pricing options */}
         <div className={styles.item}>
           <label className={styles.label}>Pricing Options</label>
           {prices.map((price, index) => (
             <div key={index} className={styles.priceEntry}>
-              <select
-                value={price.type}
-                onChange={() => handleTypeToggle(index)}
-              >
-                <option value="unit">Unit-Based</option>
-                <option value="counter">Counter-Based</option>
-              </select>
-
-              {price.type === "unit" ? (
-                <>
-                  <input
-                    type="text"
-                    placeholder="Unit (e.g., kg, tuber)"
-                    value={price.unit}
-                    onChange={(e) =>
-                      handlePriceChange(index, "unit", e.target.value)
-                    }
-                  />
-                  <input
-                    type="number"
-                    placeholder="Price"
-                    value={price.price}
-                    onChange={(e) =>
-                      handlePriceChange(index, "price", e.target.value)
-                    }
-                  />
-                  <input
-                    type="number"
-                    placeholder="Min Quantity (Optional)"
-                    value={price.minQuantity}
-                    onChange={(e) =>
-                      handlePriceChange(index, "minQuantity", e.target.value)
-                    }
-                  />
-                </>
-              ) : (
-                <>
-                  <input
-                    type="number"
-                    placeholder="Min Quantity"
-                    value={price.minQuantity}
-                    onChange={(e) =>
-                      handlePriceChange(index, "minQuantity", e.target.value)
-                    }
-                  />
-                  <input
-                    type="number"
-                    placeholder="Price per Unit"
-                    value={price.pricePerUnit}
-                    onChange={(e) =>
-                      handlePriceChange(index, "pricePerUnit", e.target.value)
-                    }
-                  />
-                </>
-              )}
-
+              <input
+                type="number"
+                placeholder="Min Quantity"
+                value={price.minQuantity}
+                onChange={(e) =>
+                  handlePriceChange(index, "minQuantity", e.target.value)
+                }
+              />
+              <input
+                type="number"
+                placeholder="Price per Unit"
+                value={price.pricePerUnit}
+                onChange={(e) =>
+                  handlePriceChange(index, "pricePerUnit", e.target.value)
+                }
+              />
               <input
                 type="number"
                 placeholder="Stock"
@@ -210,12 +156,13 @@ const ProductForm = () => {
               </button>
             </div>
           ))}
-          <button type="button" onClick={addPriceEntry}>
-            Add Price Entry
-          </button>
+          {prices.length === 0 && (
+            <button type="button" onClick={addPriceEntry}>
+              Add Price Entry
+            </button>
+          )}
         </div>
 
-        {/* Regular discount */}
         <div className={styles.item}>
           <label className={styles.label}>Regular Discount (%)</label>
           <input
@@ -225,7 +172,6 @@ const ProductForm = () => {
           />
         </div>
 
-        {/* Promo codes */}
         <div className={styles.item}>
           <label className={styles.label}>Promo Codes</label>
           {promoCodes.map((code, index) => (
@@ -256,6 +202,26 @@ const ProductForm = () => {
           </button>
         </div>
 
+        <div className={styles.item}>
+          <label className={styles.label}>Max Quantity</label>
+          <input
+            type="number"
+            placeholder="Max Quantity"
+            value={maxQuantity || ""}
+            onChange={(e) => setMaxQuantity(e.target.value)}
+          />
+        </div>
+
+        <div className={styles.item}>
+          <label className={styles.label}>Order Cooldown (in hours)</label>
+          <input
+            type="number"
+            placeholder="Cooldown time"
+            value={orderCooldown || ""}
+            onChange={(e) => setOrderCooldown(e.target.value)}
+          />
+        </div>
+
         <button type="submit" className={styles.submit}>
           Add Product
         </button>
@@ -264,4 +230,4 @@ const ProductForm = () => {
   );
 };
 
-export default ProductForm;
+export default ComboForm;

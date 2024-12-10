@@ -1,14 +1,30 @@
 import mongoose from "mongoose";
 
-const locationSchema = new mongoose.Schema(
+const LocationSchema = new mongoose.Schema(
   {
-    title: { type: String, required: true },
-    description: { type: String },
-    latitude: { type: Number, required: true },
-    longitude: { type: Number, required: true },
+    pickup: {
+      region: {
+        state: { type: String }, // State name
+        logistics: { type: Number }, // Logistics cost
+      },
+      location: {
+        type: String, // Optional for pickup locations
+      },
+    },
+    delivery: {
+      region: {
+        state: { type: String }, // State name
+        logistics: { type: Number }, // Logistics cost
+      },
+      deliveryAddress: {
+        type: String, // Optional for delivery locations
+      },
+    },
   },
-  { timestamps: true }
+  { timestamps: true } // Auto-add createdAt and updatedAt timestamps
 );
 
-export default mongoose.models.Location ||
-  mongoose.model("Location", locationSchema);
+const Location =
+  mongoose.models?.Location || mongoose.model("Location", LocationSchema);
+
+export default Location;

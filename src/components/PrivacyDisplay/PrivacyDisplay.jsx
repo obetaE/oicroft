@@ -11,7 +11,9 @@ const PrivacyDisplay = () => {
   useEffect(() => {
     const fetchTerms = async () => {
       try {
-        const response = await fetch("/api/privacydisplay");
+        const response = await fetch("/api/privacydisplay", {
+          next: { revalidate: 3600 },
+        });
         if (!response.ok) {
           throw new Error("Failed to fetch Privacy Policy.");
         }

@@ -19,46 +19,54 @@ const createOrder = async (orderData, dispatch) => {
     if (!response.ok) throw new Error("Failed to create order");
 
     const data = await response.json();
-    console.log("Order creation successful. Response data:", data);
+    console.log("Order created successfully:", data);
     dispatch(reset());
   } catch (err) {
-    console.error("Error creating order:", err.message);
+    console.error("Order creation error:", err.message);
   }
 };
 
 const handlePaystackCheckout = async (orderData, dispatch, user) => {
   if (!user || !user.email || !user.id) {
     alert("User details are missing. Please log in.");
-    console.log("Checkout halted: User details missing.");
+    console.error("Checkout halted: Missing user details.");
     return;
   }
 
-  console.log("Initializing Paystack checkout with orderData:", orderData);
-
   try {
+    console.log("Initializing Paystack checkout with:", orderData);
     const response = await axios.post("/api/paystack/initialize", {
-      amount: orderData.total * 100, // Convert to kobo
-      email: user.email, // Pass user email
+      amount: orderData.total * 100,
+      email: user.email,
       metadata: {
         userId: user.id,
         custom_fields: orderData.products.map((product) => ({
           display_name: product.title,
-          quantity: product.quantity,
-          unit: product.unit,
-          price: product.price,
+          quantity: product.quantity || product.minQuantity,
+          price: product.pricePerUnit || product.price,
           id: product._id || product.id,
         })),
       },
     });
 
-    console.log("Paystack initialization response:", response.data);
+    // Check if the Paystack initialization succeeded
+    if (
+      !response.data ||
+      !response.data.authorization_url ||
+      !response.data.reference
+    ) {
+      console.error("Failed to initialize Paystack payment:", response.data);
+      alert("Failed to initialize payment. Please try again.");
+      return;
+    }
 
     const { authorization_url, reference } = response.data;
-    await createOrder({ ...orderData, reference, userId: user.id }, dispatch);
+    console.log("Paystack initialized. Redirecting to:", authorization_url);
 
+    await createOrder({ ...orderData, reference, userId: user.id }, dispatch);
     window.location.href = authorization_url;
   } catch (err) {
-    console.error("Error initializing payment:", err.message);
+    console.error("Paystack checkout error:", err.message);
     alert(`Payment failed: ${err.message}`);
   }
 };
@@ -73,13 +81,13 @@ const CartContent = () => {
       try {
         console.log("Fetching user session...");
         const response = await fetch("/api/session");
-        if (!response.ok) throw new Error("Failed to fetch session data");
+        if (!response.ok) throw new Error("Session fetch failed");
 
         const data = await response.json();
-        console.log("User session fetched successfully:", data);
+        console.log("Session fetched successfully:", data);
         setUser(data.user || null);
       } catch (err) {
-        console.error("Error fetching session:", err.message);
+        console.error("Session fetch error:", err.message);
         setUser(null);
       }
     };
@@ -88,9 +96,8 @@ const CartContent = () => {
   }, []);
 
   const aggregatedProducts = useMemo(() => {
-    console.log("Aggregating products in the cart...");
     const productMap = cart.products.reduce((acc, product) => {
-      const key = `${product.title}-${product.unit}`;
+      const key = `${product.title}-${product.unit || "counter"}`;
       if (acc[key]) acc[key].quantity += product.quantity;
       else acc[key] = { ...product };
       return acc;
@@ -98,14 +105,10 @@ const CartContent = () => {
     return Object.values(productMap);
   }, [cart.products]);
 
-  console.log("Cart content rendered. Current user:", user);
-  console.log("Cart details:", cart);
-
   return (
     <div>
       <div className={styles.cartbg}>
         <div className={styles.section}>
-          {/* Cart Table */}
           <div className={styles.left}>
             <table className={styles.table}>
               <thead>
@@ -131,7 +134,7 @@ const CartContent = () => {
                       />
                     </td>
                     <td>{product.quantity}</td>
-                    <td>{product.unit}</td>
+                    <td>{product.unit || product.minQuantity}</td>
                     <td>₦{product.price}</td>
                     <td>₦{product.price * product.quantity}</td>
                   </tr>
@@ -139,8 +142,6 @@ const CartContent = () => {
               </tbody>
             </table>
           </div>
-
-          {/* Cart Total */}
           <div className={styles.right}>
             <div className={styles.wrapper}>
               <h2 className={styles.title}>CART TOTAL</h2>
@@ -150,10 +151,8 @@ const CartContent = () => {
               <button
                 onClick={() => {
                   if (!cart.total || !aggregatedProducts.length) {
-                    alert("Cart is empty or total is invalid.");
-                    console.log(
-                      "Checkout prevented: Empty cart or invalid total."
-                    );
+                    alert("Cart is empty or invalid.");
+                    console.error("Checkout prevented: Invalid cart.");
                     return;
                   }
 
@@ -162,16 +161,12 @@ const CartContent = () => {
                       productId: product._id || product.id,
                       title: product.title,
                       quantity: product.quantity,
-                      unit: product.unit,
-                      price: product.price,
+                      unit: product.unit || product.minQuantity,
+                      price: product.price || product.pricePerUnit,
                     })),
                     total: cart.total,
                   };
 
-                  console.log(
-                    "Proceeding to checkout with orderData:",
-                    orderData
-                  );
                   handlePaystackCheckout(orderData, dispatch, user);
                 }}
               >

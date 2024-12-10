@@ -44,12 +44,6 @@ export async function POST(request) {
     const { products, total, userId, reference } = requestData;
 
     if (!products || !total || !userId || !reference) {
-      console.warn("Missing required fields:", {
-        products,
-        total,
-        userId,
-        reference,
-      });
       return NextResponse.json(
         { message: "Missing required fields" },
         { status: 400 }
@@ -57,18 +51,14 @@ export async function POST(request) {
     }
 
     const deliveryDate = calculateDeliveryDate();
-    console.log("Calculated delivery date:", deliveryDate);
+    const updatedProducts = [];
 
     for (const product of products) {
-      console.log("Processing product:", product);
-
-      // Adjusted logic for finding the product
       const existingProduct = await Product.findOne({
         $or: [{ productId: product.productId }, { _id: product.productId }],
       });
 
       if (!existingProduct) {
-        console.error(`Product ${product.productId} not found.`);
         return NextResponse.json(
           { message: `Product ${product.productId} not found` },
           { status: 404 }
@@ -76,68 +66,57 @@ export async function POST(request) {
       }
 
       const selectedUnit = existingProduct.prices.find(
-        (item) => item.unit === product.unit
+        (item) => item.unit === product.unit || !item.unit
       );
 
-      if (!selectedUnit) {
-        console.error(
-          `Unit '${product.unit}' not found for product ${existingProduct.title}`
-        );
+      if (!selectedUnit || selectedUnit.stock < product.quantity) {
         return NextResponse.json(
           {
-            message: `Unit '${product.unit}' does not exist for ${existingProduct.title}`,
-          },
-          { status: 400 }
-        );
-      }
-
-      if (selectedUnit.stock < product.quantity) {
-        console.error(`Insufficient stock for ${existingProduct.title}:`, {
-          requested: product.quantity,
-          available: selectedUnit.stock,
-        });
-        return NextResponse.json(
-          {
-            message: `Insufficient stock for ${existingProduct.title} (${product.unit}). Available: ${selectedUnit.stock}`,
+            message: `Insufficient stock for ${existingProduct.title} (${
+              product.unit
+            }). Available: ${selectedUnit?.stock || 0}`,
           },
           { status: 400 }
         );
       }
 
       selectedUnit.stock -= product.quantity;
-      await existingProduct.save();
-      console.log(
-        `Updated stock for ${existingProduct.title}:`,
-        selectedUnit.stock
-      );
+      updatedProducts.push({ product: existingProduct, selectedUnit });
     }
 
-    console.log("Creating new order...");
-    const newOrder = await Order.create({
-      userId,
-      reference,
-      products: products.map((product) => ({
-        ...product,
-        totalPrice: product.quantity * product.price,
-      })),
-      total,
-      deliveryDate,
-      status: "Pending",
-      orderDate: new Date(),
-    });
+    try {
+      await Promise.all(updatedProducts.map(({ product }) => product.save()));
 
-    console.log("Order created successfully:", newOrder);
-    return NextResponse.json(
-      { message: "Order created successfully", order: newOrder },
-      { status: 201 }
-    );
+      const otpToken = Math.floor(1000 + Math.random() * 900000);
+      const newOrder = await Order.create({
+        userId,
+        reference,
+        products: products.map((product) => ({
+          ...product,
+          totalPrice: product.quantity * product.price,
+        })),
+        total,
+        deliveryDate,
+        otpToken,
+        status: "Pending",
+        orderDate: new Date(),
+      });
+
+      return NextResponse.json(
+        { message: "Order created successfully", order: newOrder },
+        { status: 201 }
+      );
+    } catch (error) {
+      for (const { product, selectedUnit } of updatedProducts) {
+        selectedUnit.stock += selectedUnit.stock;
+        await product.save();
+      }
+      throw error;
+    }
   } catch (error) {
-    console.error("Order creation error:", error);
     return NextResponse.json(
       { message: "Failed to create order", error: error.message },
       { status: 500 }
     );
   }
 }
-
-

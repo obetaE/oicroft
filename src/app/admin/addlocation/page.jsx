@@ -1,11 +1,13 @@
 import React from "react"
 import Navbar from "@/components/Navbar/Navbar"
-import LocationPicker from "@/components/LocationPicker/LocationPicker"
+import LocationForm from "@/components/LocationForm/LocationForm"
+import LocationManager from "@/components/LocationManager/LocationManager"
 
 export default function addlocation(){
     return(
         <div>
-            <LocationPicker/>
+            <LocationForm/>
+            <LocationManager/>
         </div>
     )
 }

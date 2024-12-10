@@ -11,7 +11,9 @@ const TermsDisplay = () => {
   useEffect(() => {
     const fetchTerms = async () => {
       try {
-        const response = await fetch("/api/tocdisplay");
+        const response = await fetch("/api/tocdisplay", {
+          next: { revalidate: 3600 },
+        });
         if (!response.ok) {
           throw new Error("Failed to fetch terms and conditions.");
         }

@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import styles from "./ProductForm.module.css";
 import axios from "axios";
 
-const ProductForm = () => {
+const AnimalForm = () => {
   const [prices, setPrices] = useState([]);
   const [title, setTitle] = useState("");
   const [desc, setDesc] = useState("");
@@ -96,19 +96,19 @@ const ProductForm = () => {
         },
       };
 
-      await axios.post("/api/order", productData);
+      await axios.post("/api/animal", productData);
 
-      alert("Product added successfully!");
+      alert("Animal byProduct added successfully!");
     } catch (error) {
       console.error(error);
-      alert("Failed to add product.");
+      alert("Failed to add Animal ByProduct.");
     }
   };
 
   return (
     <form onSubmit={handleSubmit} className={styles.container}>
       <div className={styles.wrapper}>
-        <h1>Add a New Product</h1>
+        <h1>Add a New Animal ByProduct</h1>
 
         {/* File upload */}
         <div className={styles.item}>
@@ -264,4 +264,4 @@ const ProductForm = () => {
   );
 };
 
-export default ProductForm;
+export default AnimalForm;

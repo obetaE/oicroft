@@ -6,7 +6,7 @@ import Link from "next/link";
 
 async function fetchProducts() {
   const res = await fetch("http://localhost:3000/api/order", {
-    cache: "no-store",
+    next: { revalidate: 900 },
   });
   if (!res.ok) {
     throw new Error("Failed to fetch products");

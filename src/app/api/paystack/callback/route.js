@@ -1,15 +1,19 @@
 import { NextResponse } from "next/server";
 
-export async function GET(request) {
-  const { searchParams } = new URL(request.url);
-  const reference = searchParams.get("reference");
-
-  if (!reference) {
-    return NextResponse.redirect("/checkout?error=missing_reference");
-  }
-
+export async function GET(req) {
+  console.log("Handling user callback...");
   try {
-    // Validate payment using Paystack API
+    const reference = req.nextUrl.searchParams.get("reference");
+
+    if (!reference) {
+      console.error("Callback failed: Missing reference.");
+      return NextResponse.redirect(
+        `${
+          process.env.BASE_URL || req.nextUrl.origin
+        }/checkout?error=missing_reference`
+      );
+    }
+
     const response = await fetch(
       `https://api.paystack.co/transaction/verify/${reference}`,
       {
@@ -20,15 +24,24 @@ export async function GET(request) {
     );
 
     const data = await response.json();
-    if (data.status === "success") {
-      // Redirect to success page
-      return NextResponse.redirect("/checkout/success");
+
+    if (response.ok && data.data?.status === "success") {
+      console.log("Callback successful. Redirecting to success page.");
+      return NextResponse.redirect(
+        `${process.env.BASE_URL || req.nextUrl.origin}/checkout/success`
+      );
     } else {
-      // Redirect to failure page
-      return NextResponse.redirect("/checkout/failure");
+      console.error("Callback verification failed:", data);
+      return NextResponse.redirect(
+        `${process.env.BASE_URL || req.nextUrl.origin}/checkout/failure`
+      );
     }
   } catch (error) {
-    console.error("Paystack callback error:", error);
-    return NextResponse.redirect("/checkout?error=callback_error");
+    console.error("Error in callback handler:", error.message);
+    return NextResponse.redirect(
+      `${
+        process.env.BASE_URL || req.nextUrl.origin
+      }/checkout?error=callback_failed`
+    );
   }
 }
