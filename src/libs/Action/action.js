@@ -5,11 +5,28 @@ import { ConnectDB } from "../config/db";
 import UserModel from "../models/UserModel";
 import argon2 from "argon2";
 import { Product } from "../models/Product";
+import {Animal} from "../models/Animal"
 import { revalidatePath } from "next/cache";
 import NotificationModel from "../models/Notification";
 import SupportModel from "../models/Support";
 import nodemailer from "nodemailer"
 
+
+
+//DELETING ANIMAL BYPRODUCT
+export const deleteByProduct = async (formData) => {
+  const {id} = Object.fromEntries(formData);
+
+  try{
+    ConnectDB();
+
+    await Animal.findByIdAndDelete(id);
+    console.log("Deleted from the Database")
+  }catch(err){
+    console.log(err);
+    return { error: "Failed to Delete ByProduct" };
+  }
+}
 
 
 //DELETING PRODUCT
@@ -26,115 +43,6 @@ export const deleteProduct = async (formData) => {
     return { error: "Failed to Delete Post" };
   }
 }
-
-//ACTION where you handle product or order submissions.
-export const addOrder = async (formData) => {
-  const { productId, quantity, unit, totalPrice, deliveryDate } =
-    Object.fromEntries(formData);
-
-  // Helper to determine order validity period
-  const getOrderPeriod = () => {
-    const now = new Date();
-    const currentDay = now.getDay();
-
-    // Determine this week's Thursday
-    const daysToThursday =
-      currentDay <= 4 ? 4 - currentDay : 4 + (7 - currentDay);
-    const thursday = new Date(now);
-    thursday.setDate(now.getDate() + daysToThursday);
-    thursday.setHours(0, 0, 0, 0);
-
-    // Determine next week's Wednesday
-    const wednesday = new Date(thursday);
-    wednesday.setDate(thursday.getDate() + 6);
-    wednesday.setHours(23, 59, 59, 999);
-
-    return { thursday, wednesday };
-  };
-
-  const { thursday, wednesday } = getOrderPeriod();
-  const orderDate = new Date();
-
-  // Validate the order date
-  if (orderDate < thursday || orderDate > wednesday) {
-    throw new Error(
-      "Orders can only be placed for the current Thursday-Wednesday period."
-    );
-  }
-
-  try {
-    ConnectDB();
-
-    // Find the product
-    const product = await Product.findById(productId);
-    if (!product) {
-      throw new Error("Product not found");
-    }
-
-    // Handle stock update for unit-based or counter-based products
-    if (unit) {
-      // Unit-based product logic
-      const selectedUnit = product.prices.find((item) => item.unit === unit);
-      if (!selectedUnit) {
-        throw new Error(`Unit '${unit}' not found for this product`);
-      }
-
-      if (selectedUnit.stock < quantity) {
-        throw new Error(
-          `Insufficient stock for unit '${unit}'. Available: ${selectedUnit.stock}`
-        );
-      }
-
-      // Deduct stock
-      selectedUnit.stock -= quantity;
-    } else {
-      // Counter-based product logic
-      if (!product.counter) {
-        throw new Error("Counter-based product not configured");
-      }
-
-      if (product.counter.stock < quantity) {
-        throw new Error(
-          `Insufficient stock. Available: ${product.counter.stock}`
-        );
-      }
-
-      if (
-        product.counter.minQuantity &&
-        quantity < product.counter.minQuantity
-      ) {
-        throw new Error(
-          `Minimum order quantity is ${product.counter.minQuantity}`
-        );
-      }
-
-      // Deduct stock
-      product.counter.stock -= quantity;
-    }
-
-    // Save updated product stock
-    await product.save();
-
-    // Create and save the order
-    const newOrder = new Order({
-      productId,
-      quantity,
-      unit,
-      totalPrice,
-      orderDate,
-      deliveryDate,
-    });
-
-    await newOrder.save();
-    console.log("Order successfully created");
-    return { success: true };
-  } catch (err) {
-    console.log(err);
-    return { error: "Failed to create order" };
-  }
-};
-
-
 
 
 //ACTION FOR ADDING A NOTICATION

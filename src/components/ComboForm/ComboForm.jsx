@@ -102,12 +102,13 @@ const ComboForm = () => {
 
         <div className={styles.item}>
           <label className={styles.label}>Choose an Image</label>
-          <input type="file" onChange={(e) => setFile(e.target.files[0])} />
+          <input className={styles.input} type="file" onChange={(e) => setFile(e.target.files[0])} />
         </div>
 
         <div className={styles.item}>
           <label className={styles.label}>Title</label>
           <input
+          className={styles.input}
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
@@ -117,6 +118,7 @@ const ComboForm = () => {
         <div className={styles.item}>
           <label className={styles.label}>Description</label>
           <textarea
+            className={styles.textarea}
             rows={4}
             value={desc}
             onChange={(e) => setDesc(e.target.value)}
@@ -128,6 +130,7 @@ const ComboForm = () => {
           {prices.map((price, index) => (
             <div key={index} className={styles.priceEntry}>
               <input
+              className={styles.input}
                 type="number"
                 placeholder="Min Quantity"
                 value={price.minQuantity}
@@ -136,6 +139,7 @@ const ComboForm = () => {
                 }
               />
               <input
+              className={styles.input}
                 type="number"
                 placeholder="Price per Unit"
                 value={price.pricePerUnit}
@@ -144,6 +148,7 @@ const ComboForm = () => {
                 }
               />
               <input
+              className={styles.input}
                 type="number"
                 placeholder="Stock"
                 value={price.stock}
@@ -166,6 +171,7 @@ const ComboForm = () => {
         <div className={styles.item}>
           <label className={styles.label}>Regular Discount (%)</label>
           <input
+            className={styles.input}
             type="number"
             value={regularDiscount}
             onChange={(e) => setRegularDiscount(e.target.value)}
@@ -177,6 +183,7 @@ const ComboForm = () => {
           {promoCodes.map((code, index) => (
             <div key={index} className={styles.promoEntry}>
               <input
+                className={styles.input}
                 type="text"
                 placeholder="Promo Code"
                 value={code.code}
@@ -185,6 +192,7 @@ const ComboForm = () => {
                 }
               />
               <input
+                className={styles.input}
                 type="number"
                 placeholder="Discount Value (%)"
                 value={code.discountValue}
@@ -205,6 +213,7 @@ const ComboForm = () => {
         <div className={styles.item}>
           <label className={styles.label}>Max Quantity</label>
           <input
+            className={styles.input}
             type="number"
             placeholder="Max Quantity"
             value={maxQuantity || ""}
@@ -215,6 +224,7 @@ const ComboForm = () => {
         <div className={styles.item}>
           <label className={styles.label}>Order Cooldown (in hours)</label>
           <input
+            className={styles.input}
             type="number"
             placeholder="Cooldown time"
             value={orderCooldown || ""}
@@ -222,9 +232,11 @@ const ComboForm = () => {
           />
         </div>
 
-        <button type="submit" className={styles.submit}>
-          Add Product
-        </button>
+        <div className={styles.buttoncontainer}>
+          <button type="submit" className={styles.submit}>
+            Add Combo
+          </button>
+        </div>
       </div>
     </form>
   );

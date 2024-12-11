@@ -113,13 +113,18 @@ const ProductForm = () => {
         {/* File upload */}
         <div className={styles.item}>
           <label className={styles.label}>Choose an Image</label>
-          <input type="file" onChange={(e) => setFile(e.target.files[0])} />
+          <input
+            className={styles.input}
+            type="file"
+            onChange={(e) => setFile(e.target.files[0])}
+          />
         </div>
 
         {/* Title input */}
         <div className={styles.item}>
           <label className={styles.label}>Title</label>
           <input
+            className={styles.input}
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
@@ -130,6 +135,7 @@ const ProductForm = () => {
         <div className={styles.item}>
           <label className={styles.label}>Description</label>
           <textarea
+            className={styles.textarea}
             rows={4}
             value={desc}
             onChange={(e) => setDesc(e.target.value)}
@@ -141,7 +147,7 @@ const ProductForm = () => {
           <label className={styles.label}>Pricing Options</label>
           {prices.map((price, index) => (
             <div key={index} className={styles.priceEntry}>
-              <select
+              <select className={styles.select}
                 value={price.type}
                 onChange={() => handleTypeToggle(index)}
               >
@@ -150,8 +156,9 @@ const ProductForm = () => {
               </select>
 
               {price.type === "unit" ? (
-                <>
+                <div className={styles.unit}>
                   <input
+                    className={styles.input}
                     type="text"
                     placeholder="Unit (e.g., kg, tuber)"
                     value={price.unit}
@@ -160,6 +167,7 @@ const ProductForm = () => {
                     }
                   />
                   <input
+                    className={styles.input}
                     type="number"
                     placeholder="Price"
                     value={price.price}
@@ -168,6 +176,7 @@ const ProductForm = () => {
                     }
                   />
                   <input
+                    className={styles.input}
                     type="number"
                     placeholder="Min Quantity (Optional)"
                     value={price.minQuantity}
@@ -175,10 +184,11 @@ const ProductForm = () => {
                       handlePriceChange(index, "minQuantity", e.target.value)
                     }
                   />
-                </>
+                </div>
               ) : (
-                <>
+                <div className={styles.unit}>
                   <input
+                    className={styles.input}
                     type="number"
                     placeholder="Min Quantity"
                     value={price.minQuantity}
@@ -187,6 +197,7 @@ const ProductForm = () => {
                     }
                   />
                   <input
+                    className={styles.input}
                     type="number"
                     placeholder="Price per Unit"
                     value={price.pricePerUnit}
@@ -194,10 +205,11 @@ const ProductForm = () => {
                       handlePriceChange(index, "pricePerUnit", e.target.value)
                     }
                   />
-                </>
+                </div>
               )}
 
               <input
+                className={styles.input}
                 type="number"
                 placeholder="Stock"
                 value={price.stock}
@@ -219,6 +231,7 @@ const ProductForm = () => {
         <div className={styles.item}>
           <label className={styles.label}>Regular Discount (%)</label>
           <input
+            className={styles.input}
             type="number"
             value={regularDiscount}
             onChange={(e) => setRegularDiscount(e.target.value)}
@@ -231,6 +244,7 @@ const ProductForm = () => {
           {promoCodes.map((code, index) => (
             <div key={index} className={styles.promoEntry}>
               <input
+                className={styles.input}
                 type="text"
                 placeholder="Promo Code"
                 value={code.code}
@@ -239,6 +253,7 @@ const ProductForm = () => {
                 }
               />
               <input
+                className={styles.input}
                 type="number"
                 placeholder="Discount Value (%)"
                 value={code.discountValue}
@@ -256,9 +271,11 @@ const ProductForm = () => {
           </button>
         </div>
 
-        <button type="submit" className={styles.submit}>
-          Add Product
-        </button>
+        <div className={styles.buttoncontainer}>
+          <button type="submit" className={styles.submit}>
+            Add Product
+          </button>
+        </div>
       </div>
     </form>
   );

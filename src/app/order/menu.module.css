@@ -15,6 +15,17 @@
   min-height: 100vh; /* Allow bg to expand with content */
   display: flex;
   flex-direction: column; /* Stack content vertically */
+  gap: 2.5rem;
+}
+
+.CarasoulTitleDiv{
+  position: relative;
+  height: 4.5rem;
+  width: 36rem;
+  display: flex;
+  justify-content: end;
+   margin: 1rem;
+    border-bottom: white solid 1px;
 }
 
 .backdrop {

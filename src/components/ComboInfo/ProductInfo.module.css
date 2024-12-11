@@ -110,7 +110,7 @@
    padding: 3px 5px;
     display: flex;
     justify-content: space-between;
-    min-width: 50%;
+    width: 50%;
     background-color: var(--bg);
     gap: 4px;
     border-radius: 5px;
@@ -119,7 +119,7 @@
 
 .size{
     width: 100%;
-    min-height: 2.5rem;
+    height: 2.5rem;
     cursor: pointer;
     background-color: var(--bg);
     display: flex;

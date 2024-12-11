@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 async function fetchProducts() {
-  const res = await fetch("http://localhost:3000/api/order", {
+  const res = await fetch("http://localhost:3000/api/combo", {
     next: { revalidate: 900 },
   });
   if (!res.ok) {
@@ -14,7 +14,7 @@ async function fetchProducts() {
   return res.json();
 }
 
-export default function MenuItems() {
+export default function ComboItems() {
   const [productList, setProductList] = useState([]);
   const [error, setError] = useState(null);
 
@@ -64,10 +64,11 @@ export default function MenuItems() {
           <div className={styles.textContainer}>
             <h1>{item.title}</h1>
             <p>{item.desc}</p>
-           <Link href={`/order/${"order"}/${item._id}`}>
-  <button>View Product</button>
-</Link>
-
+            <Link href={`/combo/${item._id}`}>
+              {" "}
+              {/* Use the actual MongoDB `_id` */}
+              <button>View Product</button>
+            </Link>
           </div>
         </div>
       ))}

@@ -38,6 +38,9 @@ const AdminPage = async () => {
               <Link href="/admin/productpage">Manage Products</Link>
             </div>
             <div className={styles.singleLink}>
+              <Link href="/admin/animalpage">Manage Animal ByProducts</Link>
+            </div>
+            <div className={styles.singleLink}>
               <Link href="/admin/supportpage">Manage Support</Link>
             </div>
             <div className={styles.singleLink}>

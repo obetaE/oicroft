@@ -59,7 +59,7 @@ export async function DELETE(req, { params }) {
 
 // PUT Request: Update a product by ID
 export async function PUT(req, { params }) {
-  const { id } = params;
+  const { id } = await params;
   const data = await req.json();
 
   try {

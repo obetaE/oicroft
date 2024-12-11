@@ -113,13 +113,15 @@ const AnimalForm = () => {
         {/* File upload */}
         <div className={styles.item}>
           <label className={styles.label}>Choose an Image</label>
-          <input type="file" onChange={(e) => setFile(e.target.files[0])} />
+          <input
+          className={styles.input} type="file" onChange={(e) => setFile(e.target.files[0])} />
         </div>
 
         {/* Title input */}
         <div className={styles.item}>
           <label className={styles.label}>Title</label>
           <input
+          className={styles.input}
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
@@ -130,6 +132,7 @@ const AnimalForm = () => {
         <div className={styles.item}>
           <label className={styles.label}>Description</label>
           <textarea
+           className={styles.textarea}
             rows={4}
             value={desc}
             onChange={(e) => setDesc(e.target.value)}
@@ -152,6 +155,7 @@ const AnimalForm = () => {
               {price.type === "unit" ? (
                 <>
                   <input
+                  className={styles.input}
                     type="text"
                     placeholder="Unit (e.g., kg, tuber)"
                     value={price.unit}
@@ -160,6 +164,7 @@ const AnimalForm = () => {
                     }
                   />
                   <input
+                  className={styles.input}
                     type="number"
                     placeholder="Price"
                     value={price.price}
@@ -168,6 +173,7 @@ const AnimalForm = () => {
                     }
                   />
                   <input
+                  className={styles.input}
                     type="number"
                     placeholder="Min Quantity (Optional)"
                     value={price.minQuantity}
@@ -179,6 +185,7 @@ const AnimalForm = () => {
               ) : (
                 <>
                   <input
+                  className={styles.input}
                     type="number"
                     placeholder="Min Quantity"
                     value={price.minQuantity}
@@ -187,6 +194,7 @@ const AnimalForm = () => {
                     }
                   />
                   <input
+                  className={styles.input}
                     type="number"
                     placeholder="Price per Unit"
                     value={price.pricePerUnit}
@@ -198,6 +206,7 @@ const AnimalForm = () => {
               )}
 
               <input
+              className={styles.input}
                 type="number"
                 placeholder="Stock"
                 value={price.stock}
@@ -219,6 +228,7 @@ const AnimalForm = () => {
         <div className={styles.item}>
           <label className={styles.label}>Regular Discount (%)</label>
           <input
+          className={styles.input}
             type="number"
             value={regularDiscount}
             onChange={(e) => setRegularDiscount(e.target.value)}
@@ -231,6 +241,7 @@ const AnimalForm = () => {
           {promoCodes.map((code, index) => (
             <div key={index} className={styles.promoEntry}>
               <input
+              className={styles.input}
                 type="text"
                 placeholder="Promo Code"
                 value={code.code}
@@ -239,6 +250,7 @@ const AnimalForm = () => {
                 }
               />
               <input
+              className={styles.input}
                 type="number"
                 placeholder="Discount Value (%)"
                 value={code.discountValue}
@@ -256,9 +268,11 @@ const AnimalForm = () => {
           </button>
         </div>
 
-        <button type="submit" className={styles.submit}>
-          Add Product
+        <div className={styles.buttoncontainer}>
+          <button type="submit" className={styles.submit}>
+          Add Animal ByProduct
         </button>
+        </div>
       </div>
     </form>
   );
