@@ -4,6 +4,7 @@ const initialState = {
   products: [],
   total: 0,
   quantity: 0, // Total number of items in the cart
+  distinctProducts: 0, // Number of distinct products in the cart
 };
 
 const cartSlice = createSlice({
@@ -30,6 +31,7 @@ const cartSlice = createSlice({
         console.log("Adding New Product to Cart:", action.payload); // Debugging
         state.products.push(action.payload);
         state.total += price * quantity;
+        state.distinctProducts = state.products.length; // Update distinct product count
       }
 
       state.quantity = state.products.reduce(
@@ -67,7 +69,11 @@ const cartSlice = createSlice({
           state.products[productIndex].price *
           state.products[productIndex].quantity;
         state.products.splice(productIndex, 1);
-        state.quantity -= 1;
+        state.quantity = state.products.reduce(
+          (acc, product) => acc + product.quantity,
+          0
+        );
+        state.distinctProducts = state.products.length; // Update distinct product count
       }
     },
 

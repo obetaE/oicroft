@@ -9,7 +9,9 @@ import Link from 'next/link';
 import {useSelector} from "react-redux";
 
 const ProductIdLinks = ({session, id}) => {
-    const quantity = useSelector(state=>state.cart.quantity)
+    const distinctProducts = useSelector(
+          (state) => state.cart.distinctProducts
+        );
 
     const [open, setOpen] = useState(false);  
 
@@ -23,9 +25,6 @@ const ProductIdLinks = ({session, id}) => {
          router.push("/support");
        };
 
-       const order = () => {
-         router.push("/order");
-       };
 
        const cart = () => {
          router.push("/cart");
@@ -43,7 +42,7 @@ const ProductIdLinks = ({session, id}) => {
           <button onClick={profile} className={styles.links}>
             <Image
               alt="Profile icon"
-              src="/Profile icon.png"
+              src="https://res.cloudinary.com/dudlxsoui/image/upload/v1733053568/Profile_icon_mcjw7m.png"
               className={styles.linkimage}
               width={50}
               height={50}
@@ -53,7 +52,7 @@ const ProductIdLinks = ({session, id}) => {
           <button onClick={support} className={styles.links}>
             <Image
               alt="Support icon"
-              src="/Support.png"
+              src="https://res.cloudinary.com/dudlxsoui/image/upload/v1733053569/Support_rtcrq2.png"
               className={styles.linkimage}
               width={75}
               height={75}
@@ -74,10 +73,10 @@ const ProductIdLinks = ({session, id}) => {
         </div>
         <div className={styles.left}>
           <button onClick={cart} className={styles.links}>
-            <h2>{quantity}</h2>
+            <h2>{distinctProducts}</h2>
             <Image
               alt="Order icon"
-              src="/Shop icon.png"
+              src="https://res.cloudinary.com/dudlxsoui/image/upload/v1733053568/Shop_icon_ulfhcd.png"
               className={styles.linkimage}
               width={50}
               height={50}
@@ -94,12 +93,12 @@ const ProductIdLinks = ({session, id}) => {
       {/* MOBILE VIEW */}
       <div className={styles.sidenavcontainer}>
         <div className={styles.header}>
-          <div className={styles.logocontainer}>
+          <div className={styles.logocontainers}>
             <Image
               alt="Oicroft Logo"
-              src="/Oicroft logo.png"
-              width={150}
-              height={150}
+              src="https://res.cloudinary.com/dudlxsoui/image/upload/v1733053570/Website_Page_piux2z.png"
+              width={50}
+              height={50}
             />
           </div>
           {!open ? (
@@ -108,7 +107,7 @@ const ProductIdLinks = ({session, id}) => {
                 <Image
                   className={styles.hamburger}
                   alt="hamburger icon"
-                  src="/hamburger.png"
+                  src="https://res.cloudinary.com/dudlxsoui/image/upload/v1733053568/hamburger_j7g5gz.png"
                   fill
                   objectFit="contain"
                   onClick={() => setOpen(true)}
@@ -120,8 +119,8 @@ const ProductIdLinks = ({session, id}) => {
               <div className={styles.imgcontainer2}>
                 <Image
                   className={styles.hamburger}
-                  alt="hamburger icon"
-                  src="/close.png"
+                  alt="close icon"
+                  src="https://res.cloudinary.com/dudlxsoui/image/upload/v1733053569/close_v01sqf.png"
                   fill
                   onClick={() => setOpen(false)}
                 />
@@ -131,45 +130,56 @@ const ProductIdLinks = ({session, id}) => {
         </div>
 
         {open && (
-          <div className={styles.navlinks}>
-            <Link href="/" onClick={() => setOpen(false)}>
-              HomePage
-            </Link>
-            {session ? (
-              session.user?.isAdmin && (
-                <Link href="/admin" onClick={() => setOpen(false)}>
-                  Admin
+          <div className={styles.navblur} onClick={() => setOpen(false)}>
+            <div
+              className={styles.navlinks}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {navItems.map((item) => (
+                <Link
+                  key={item.path}
+                  href={item.path}
+                  className={`${styles.link} ${
+                    pathName === item.path ? styles.active : ""
+                  }`}
+                  onClick={() => setOpen(false)}
+                >
+                  {item.title}
                 </Link>
-              )
-            ) : (
-              <div className="hidden"></div>
-            )}
-            <Link href="/support" onClick={() => setOpen(false)}>
-              Support
-            </Link>
-            <Link href="/menu" onClick={() => setOpen(false)}>
-              Order
-            </Link>
+              ))}
 
-            {!session ? (
-              <Link href="/login" onClick={() => setOpen(false)}>
-                Login
-              </Link>
-            ) : (
-              <div>
-                <Link href={`/profile/${id}`} onClick={() => setOpen(false)}>
-                  Profile
+              {!session ? (
+                <Link
+                  href="/login"
+                  className={styles.link}
+                  onClick={() => setOpen(false)}
+                >
+                  Login
                 </Link>
-
-                <Link href="/cart" onClick={() => setOpen(false)}>
-                  Cart ({quantity})
-                </Link>
-
-                <form action={handleLogout}>
-                  <button onClick={() => setOpen(false)}>LogOut</button>
-                </form>
-              </div>
-            )}
+              ) : (
+                <div>
+                  <div className={styles.column}>
+                    <Link
+                      href={`/profile/${id}`}
+                      className={styles.link}
+                      onClick={() => setOpen(false)}
+                    >
+                      Profile
+                    </Link>
+                    <Link
+                      href="/cart"
+                      className={styles.link}
+                      onClick={() => setOpen(false)}
+                    >
+                       Cart ({distinctProducts})
+                    </Link>
+                  </div>
+                  <form action={handleLogout}>
+                    <button className={styles.sidelogout}>LogOut</button>
+                  </form>
+                </div>
+              )}
+            </div>
           </div>
         )}
       </div>

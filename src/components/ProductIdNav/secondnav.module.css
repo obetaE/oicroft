@@ -81,41 +81,69 @@
 }
 
 
-.sidenavcontainer{
+ .sidenavcontainer{
     position: fixed;
-    z-index: 10000;
+    z-index: 1000;
     width: 100%;
     display: none;
 }
 
-.header{
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 1rem;
-    height: 6rem;
-    background-color: white;
-}
-
-.navlinks{
-    backdrop-filter: blur(15px);
-    color: white;
-    position: absolute;
-    left: 0;
-    top: 6rem;
-    height: calc(100vh);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 4rem;
-    width: 100%;
-    font-size: 1.5rem;
-    z-index: 9000;
-}
 
 .hamburger{
     cursor: pointer;
+}
+
+
+.navblur {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(10px);
+  z-index: 900;
+}
+
+.navlinks {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100vh;
+  width: 50%;
+  background-color: var(--bg);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  z-index: 1000;
+  border-radius: 8px 0 0 8px;
+}
+
+.link {
+  font-size: 1.5rem;
+  color: white;
+  font-weight: 600;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  transition: background 0.3s ease;
+}
+
+.link:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.active {
+  background: white;
+  color: var(--bg);
+}
+
+.hamburgerbg {
+  position: relative;
+  z-index: 1100;
 }
 
 .hamburgerbg{
@@ -127,6 +155,37 @@
     align-items: center;
     justify-content: center;
     
+}
+
+.active button{
+    background-color: white;
+    color: var(--bg);
+    font-weight: 700;
+}
+
+.sidelogout{
+    font-weight: bold;
+    background-color: white;
+    color: var(--bg);
+    border-radius: 1.5rem;
+    padding: 1rem 2rem;
+    margin: 0 0.8rem;
+}
+
+.header{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 1rem;
+    height: 5rem;
+    background-color: white;
+}
+
+.column{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
 .imgcontainer:nth-child(1){
