@@ -98,7 +98,7 @@ export async function POST(request) {
         total,
         deliveryDate,
         otpToken,
-        status: "Pending",
+        status: "Paid",
         orderDate: new Date(),
       });
 

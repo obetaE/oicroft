@@ -1,76 +1,69 @@
 "use client";
+
 import React, { useEffect, useState } from "react";
+import axios from "axios";
 import Image from "next/image";
-import styles from "./MenuSlider.module.css"
+import styles from "./MenuSlider.module.css";
+import PageLoader from "@/components/PageLoader/PageLoader";
 
 export default function MenuSlider() {
+  const [images, setImages] = useState([]);
   const [index, setIndex] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const images = [
-    { id: 1, image: "/Combo design .png" },
-    { id: 2, image: "/Slider2.png" },
-    { id: 3, image: "/Slider3.png" },
-    { id: 4, image: "/Slider4.png" },
-    { id: 5, image: "/Slider5.png" },
-  ];
-
-  // Automatically move to the next slide every 2 seconds
+  // Fetch slider images from the API
   useEffect(() => {
-    const interval = setInterval(() => {
-      setTimeout(() => {
-        setIndex((prevIndex) => (prevIndex + 1) % images.length);
-      }, 1000); // Pause for 1 second before moving to the next slide
-    }, 3000); // Change slide every 3 seconds
+    const fetchImages = async () => {
+      try {
+        const response = await axios.get("/api/slider");
+        setImages(response.data); // Extract image URLs
+      } catch (error) {
+        console.error("Error fetching slider images:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-    return () => clearInterval(interval);
+    fetchImages();
   }, []);
 
-  // Handle manual navigation
-  const handleArrow = (direction) => {
-    if (direction === "l") {
-      setIndex(index !== 0 ? index - 1 : images.length - 1);
+  // Automatically move to the next slide every 3 seconds
+  useEffect(() => {
+    if (images.length > 0) {
+      const interval = setInterval(() => {
+        setIndex((prevIndex) => (prevIndex + 1) % images.length);
+      }, 3000);
+
+      return () => clearInterval(interval); // Cleanup interval on unmount
     }
-    if (direction === "r") {
-      setIndex((index + 1) % images.length);
-    }
-  };
+  }, [images]);
+
+  if (isLoading) {
+    return (<PageLoader/>);
+  }
+
+  if (images.length === 0) {
+    return <p>No images available for the slider.</p>;
+  }
 
   return (
     <div className={styles.container}>
-      {/* Left arrow */}
-      {/* <div
-        className={styles.arrowContainer}
-        style={{ left: 0 }}
-        onClick={() => handleArrow("l")}
-      >
-        <Image src="/wright.png" alt="arrow button" fill objectFit="contain" />
-      </div> */}
-
       {/* Wrapper for images */}
       <div
         className={styles.wrapper}
         style={{ transform: `translateX(${-100 * index}vw)` }}
       >
-        {images.map((img, i) => (
-          <div className={styles.imgContainer} key={img.id}>
+        {images.map((image, i) => (
+          <div className={styles.imgContainer} key={i}>
             <Image
-              src={img.image}
-              alt="Slider image"
+              src={image.img || "/fallback-image.jpg"}
+              alt={`Slider image ${i + 1}`}
               fill
               objectFit="contain"
             />
           </div>
         ))}
       </div>
-
-      {/* Right arrow */}
-      {/* <div
-        className={styles.arrowContainer}
-        style={{ right: 0 }}
-        onClick={() => handleArrow("r")}
-      >
-        <Image src="/wleft.png" alt="arrow button" fill objectFit="contain" />
-      </div> */}
     </div>
   );
 }

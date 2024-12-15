@@ -1,20 +1,22 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import styles from "./ComboTable.module.css";
+import styles from "./ProductTable.module.css";
 import Image from "next/image";
+import { deleteCombo } from "@/libs/Action/action";
+import PageLoader from "@/components/PageLoader/PageLoader";
 
-async function fetchCombos() {
+async function fetchProducts() {
   const res = await fetch("http://localhost:3000/api/combo", {
-    cache: "no-store",
+    cache: "no-store", // Ensure fresh data every time
   });
   if (!res.ok) {
-    throw new Error("Failed to fetch combos");
+    throw new Error("Failed to fetch products");
   }
   return res.json();
 }
 
-async function updateCombo(id, updatedData) {
+async function updateProduct(id, updatedData) {
   const res = await fetch(`http://localhost:3000/api/combo/${id}`, {
     method: "PUT",
     headers: {
@@ -23,74 +25,58 @@ async function updateCombo(id, updatedData) {
     body: JSON.stringify(updatedData),
   });
   if (!res.ok) {
-    throw new Error("Failed to update combo");
-  }
-  return res.json();
-}
-
-async function deleteCombo(id) {
-  const res = await fetch(`http://localhost:3000/api/combo/${id}`, {
-    method: "DELETE",
-  });
-  if (!res.ok) {
-    throw new Error("Failed to delete combo");
+    throw new Error("Failed to update product");
   }
   return res.json();
 }
 
 export default function ComboTable() {
-  const [comboList, setComboList] = useState([]);
+  const [productList, setProductList] = useState([]);
   const [error, setError] = useState(null);
   const [editingId, setEditingId] = useState(null);
   const [editData, setEditData] = useState({});
 
   useEffect(() => {
-    async function getCombos() {
+    async function getProducts() {
       try {
-        const data = await fetchCombos();
-        setComboList(data);
+        const data = await fetchProducts();
+        setProductList(data);
+        sessionStorage.removeItem("reloadCount"); // Clear reload count on success
       } catch (err) {
-        setError(err.message);
+        const reloadCount = sessionStorage.getItem("reloadCount") || 0;
+        if (reloadCount < 5) {
+          sessionStorage.setItem("reloadCount", Number(reloadCount) + 1);
+          window.location.reload();
+        } else {
+          setError("Something went wrong. Please try again later.");
+        }
       }
     }
 
-    getCombos();
-  }, []);
+    getProducts(); // Fetch data on component mount
+  }, []); // Empty dependency array ensures this runs only once
 
-  const handleEditClick = (id, combo) => {
+  const handleEditClick = (id, product) => {
     setEditingId(id);
-    setEditData(combo);
+    setEditData(product);
   };
 
-  const handleInputChange = (field, value, index = null) => {
-    setEditData((prevData) => {
-      if (index !== null) {
-        const updatedPrices = [...prevData.prices];
-        updatedPrices[index] = { ...updatedPrices[index], [field]: value };
-        return { ...prevData, prices: updatedPrices };
-      }
-      return { ...prevData, [field]: value };
-    });
+  const handleInputChange = (field, value) => {
+    setEditData((prevData) => ({
+      ...prevData,
+      [field]: value,
+    }));
   };
 
   const handleSave = async () => {
     try {
-      const updatedCombo = await updateCombo(editingId, editData);
-      setComboList((prevList) =>
-        prevList.map((combo) =>
-          combo._id === editingId ? updatedCombo : combo
+      const updatedProduct = await updateProduct(editingId, editData);
+      setProductList((prevList) =>
+        prevList.map((product) =>
+          product._id === editingId ? updatedProduct : product
         )
       );
       setEditingId(null);
-    } catch (err) {
-      setError(err.message);
-    }
-  };
-
-  const handleDelete = async (id) => {
-    try {
-      await deleteCombo(id);
-      setComboList((prevList) => prevList.filter((combo) => combo._id !== id));
     } catch (err) {
       setError(err.message);
     }
@@ -102,43 +88,45 @@ export default function ComboTable() {
   };
 
   if (error) {
-    return <p>Error: {error}</p>;
+    return <p style={{ color: "red", textAlign: "center" }}>{error}</p>;
   }
 
-  if (comboList.length === 0) {
-    return <p>Loading combos...</p>;
+  if (productList.length === 0) {
+    return (<PageLoader/>) // Show loading message while data is fetched
   }
 
   return (
     <div className={styles.container}>
-      <h1>Combos</h1>
-      <table className={styles.table}>
-        <thead>
-          <tr>
-            <th>Image</th>
-            <th>Id</th>
-            <th>Title</th>
-            <th>Description</th>
-            <th>Prices</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {comboList.map((combo) => (
-            <React.Fragment key={combo._id}>
-              <tr>
-                <td rowSpan={combo.prices.length || 1}>
+      <div className={styles.item}>
+        <h1>Products</h1>
+        <table className={styles.table}>
+          <thead className={styles.thead}>
+            <tr className={styles.tr}>
+              <th>Image</th>
+              <th>Id</th>
+              <th>Title</th>
+              <th>Description</th>
+              <th>Price</th>
+              <th>Min Quantity</th>
+              <th>Max Quantity</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody className={styles.tbody}>
+            {productList.map((product) => (
+              <tr key={product._id} className={styles.tr}>
+                <td className={styles.td}>
                   <Image
-                    src={combo.img || "/placeholder.png"}
+                    src={product.img || "/placeholder.png"}
                     width={50}
                     height={50}
                     objectFit="cover"
-                    alt="Combo Image"
+                    alt="Product Image"
                   />
                 </td>
-                <td rowSpan={combo.prices.length || 1}>{combo._id}</td>
-                <td rowSpan={combo.prices.length || 1}>
-                  {editingId === combo._id ? (
+                <td className={styles.td}>{product._id.slice(0, 4)}...</td>
+                <td className={styles.td}>
+                  {editingId === product._id ? (
                     <input
                       type="text"
                       value={editData.title || ""}
@@ -147,11 +135,11 @@ export default function ComboTable() {
                       }
                     />
                   ) : (
-                    combo.title
+                    product.title
                   )}
                 </td>
-                <td rowSpan={combo.prices.length || 1}>
-                  {editingId === combo._id ? (
+                <td className={styles.td}>
+                  {editingId === product._id ? (
                     <textarea
                       value={editData.desc || ""}
                       onChange={(e) =>
@@ -159,108 +147,89 @@ export default function ComboTable() {
                       }
                     />
                   ) : (
-                    combo.desc
+                    product.desc
                   )}
                 </td>
-                {combo.prices && combo.prices.length > 0 ? (
-                  <>
-                    {editingId === combo._id ? (
-                      <td>
-                        {combo.prices.map((price, index) => (
-                          <div key={index}>
-                            <input
-                              type="text"
-                              placeholder="Pricing Type"
-                              value={
-                                editData.prices?.[index]?.pricingType || ""
-                              }
-                              onChange={(e) =>
-                                handleInputChange(
-                                  "pricingType",
-                                  e.target.value,
-                                  index
-                                )
-                              }
-                            />
-                            <input
-                              type="number"
-                              placeholder="Stock"
-                              value={editData.prices?.[index]?.stock || 0}
-                              onChange={(e) =>
-                                handleInputChange(
-                                  "stock",
-                                  e.target.value,
-                                  index
-                                )
-                              }
-                            />
-                            <input
-                              type="number"
-                              placeholder="Min Quantity"
-                              value={editData.prices?.[index]?.minQuantity || 0}
-                              onChange={(e) =>
-                                handleInputChange(
-                                  "minQuantity",
-                                  e.target.value,
-                                  index
-                                )
-                              }
-                            />
-                            <input
-                              type="number"
-                              placeholder="Price Per Unit"
-                              value={
-                                editData.prices?.[index]?.pricePerUnit || 0
-                              }
-                              onChange={(e) =>
-                                handleInputChange(
-                                  "pricePerUnit",
-                                  e.target.value,
-                                  index
-                                )
-                              }
-                            />
-                          </div>
-                        ))}
-                      </td>
-                    ) : (
-                      <td>
-                        {combo.prices.map((price, index) => (
-                          <div key={index}>
-                            <p>Type: {price.pricingType}</p>
-                            <p>Stock: {price.stock}</p>
-                            <p>Min Qty: {price.minQuantity}</p>
-                            <p>Price: {price.pricePerUnit}</p>
-                          </div>
-                        ))}
-                      </td>
-                    )}
-                  </>
-                ) : (
-                  <td>No pricing available</td>
-                )}
-                <td rowSpan={combo.prices.length || 1}>
-                  {editingId === combo._id ? (
-                    <>
-                      <button onClick={handleSave}>Save</button>
-                      <button onClick={handleCancel}>Cancel</button>
-                    </>
+                <td className={styles.td}>
+                  {editingId === product._id ? (
+                    <input
+                      type="number"
+                      value={editData.prices?.[0]?.pricePerUnit || ""}
+                      onChange={(e) =>
+                        handleInputChange("prices", [
+                          {
+                            ...editData.prices?.[0],
+                            pricePerUnit: e.target.value,
+                          },
+                        ])
+                      }
+                    />
                   ) : (
-                    <>
-                      <button onClick={() => handleEditClick(combo._id, combo)}>
+                    product.prices?.[0]?.pricePerUnit || "N/A"
+                  )}
+                </td>
+                <td className={styles.td}>
+                  {editingId === product._id ? (
+                    <input
+                      type="number"
+                      value={editData.prices?.[0]?.minQuantity || ""}
+                      onChange={(e) =>
+                        handleInputChange("prices", [
+                          {
+                            ...editData.prices?.[0],
+                            minQuantity: e.target.value,
+                          },
+                        ])
+                      }
+                    />
+                  ) : (
+                    product.prices?.[0]?.minQuantity || "N/A"
+                  )}
+                </td>
+
+                <td className={styles.td}>
+                  {editingId === product._id ? (
+                    <input
+                      type="number"
+                      value={editData.maxQuantity || ""}
+                      onChange={(e) =>
+                        handleInputChange("maxQuantity", e.target.value)
+                      }
+                    />
+                  ) : (
+                    product.maxQuantity
+                  )}
+                </td>
+                <td className={styles.td}>
+                  {editingId === product._id ? (
+                    <div className={styles.options}>
+                      <button className={styles.button} onClick={handleSave}>
+                        Save
+                      </button>
+                      <button className={styles.bbutton} onClick={handleCancel}>
+                        Cancel
+                      </button>
+                    </div>
+                  ) : (
+                    <div className={styles.options}>
+                      <button
+                        className={styles.button}
+                        onClick={() => handleEditClick(product._id, product)}
+                      >
                         Edit
                       </button>
-                      <button onClick={() => handleDelete(combo._id)}>
-                        Delete
-                      </button>
-                    </>
+                      <form action={deleteCombo}>
+                        <input type="hidden" name="id" value={product._id} />
+                        <button className={styles.bbutton}>Delete</button>
+                      </form>
+                    </div>
                   )}
                 </td>
               </tr>
-            </React.Fragment>
-          ))}
-        </tbody>
-      </table>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

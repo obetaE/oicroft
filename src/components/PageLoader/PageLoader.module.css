@@ -1,0 +1,34 @@
+/* PageLoader.module.css */
+.container {
+  position: fixed; /* Make the loader cover the entire screen */
+  top: 0;
+  left: 0;
+  width: 100vw; /* Full viewport width */
+  height: 100vh; /* Full viewport height */
+  display: flex; /* Center the child element */
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(8px); /* Apply blur to the background */
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent overlay for better visibility */
+  z-index: 9999; /* Ensure it's on top of other content */
+}
+
+.imgcontainer {
+  animation: pulse 2s infinite; /* Infinite grow-shrink animation */
+  background-color: white;
+  border-radius: 50%;
+  height: 80px;
+  width: 80px;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1); /* Initial size */
+  }
+  50% {
+    transform: scale(1.7); /* Grow to 120% of original size */
+  }
+  100% {
+    transform: scale(1); /* Return to original size */
+  }
+}

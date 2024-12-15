@@ -12,6 +12,7 @@ const notification = async () => {
       <div className={styles.notificationbg}>
         <Navbar />
         <div className={styles.section}>
+          <h1 className={styles.Title}> Notifications</h1>
           <NotificationDisplay initialNotifications={notifications} />
         </div>
       </div>

@@ -1,3 +1,4 @@
+// CartContent.jsx
 "use client";
 
 import React, { useMemo, useEffect, useState } from "react";
@@ -6,6 +7,7 @@ import Image from "next/image";
 import { useDispatch, useSelector } from "react-redux";
 import { reset } from "@/redux/cartSlice";
 import axios from "axios";
+import DeliveryChoiceForm from "@/components/DeliveryChoiceForm/DeliveryChoiceForm"; // Assume this component exists
 
 const createOrder = async (orderData, dispatch) => {
   try {
@@ -20,9 +22,13 @@ const createOrder = async (orderData, dispatch) => {
 
     const data = await response.json();
     console.log("Order created successfully:", data);
+
+    // Reset cart after successful order creation
     dispatch(reset());
+    return data; // Return order data for further processing if needed
   } catch (err) {
     console.error("Order creation error:", err.message);
+    throw err; // Re-throw error for upstream handling
   }
 };
 
@@ -49,7 +55,6 @@ const handlePaystackCheckout = async (orderData, dispatch, user) => {
       },
     });
 
-    // Check if the Paystack initialization succeeded
     if (
       !response.data ||
       !response.data.authorization_url ||
@@ -64,7 +69,7 @@ const handlePaystackCheckout = async (orderData, dispatch, user) => {
     console.log("Paystack initialized. Redirecting to:", authorization_url);
 
     await createOrder({ ...orderData, reference, userId: user.id }, dispatch);
-    window.location.href = authorization_url;
+    window.location.href = authorization_url; // Redirect to Paystack checkout
   } catch (err) {
     console.error("Paystack checkout error:", err.message);
     alert(`Payment failed: ${err.message}`);
@@ -75,6 +80,9 @@ const CartContent = () => {
   const dispatch = useDispatch();
   const cart = useSelector((state) => state.cart);
   const [user, setUser] = useState(null);
+  const [showCheckout, setShowCheckout] = useState(false);
+  const [showPickupChoice, setShowPickupChoice] = useState(false);
+  const [isCheckoutActive, setIsCheckoutActive] = useState(false);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -148,30 +156,77 @@ const CartContent = () => {
               <div className={styles.totalText}>
                 <b>₦{cart.total}</b>
               </div>
-              <button
-                onClick={() => {
-                  if (!cart.total || !aggregatedProducts.length) {
-                    alert("Cart is empty or invalid.");
-                    console.error("Checkout prevented: Invalid cart.");
-                    return;
-                  }
 
-                  const orderData = {
-                    products: aggregatedProducts.map((product) => ({
-                      productId: product._id || product.id,
-                      title: product.title,
-                      quantity: product.quantity,
-                      unit: product.unit || product.minQuantity,
-                      price: product.price || product.pricePerUnit,
-                    })),
-                    total: cart.total,
-                  };
+              {!showCheckout && (
+                <button onClick={() => setShowCheckout(true)}>PROCEED</button>
+              )}
 
-                  handlePaystackCheckout(orderData, dispatch, user);
-                }}
-              >
-                CHECKOUT NOW
-              </button>
+              {showCheckout && !showPickupChoice && (
+                <button onClick={() => setShowPickupChoice(true)}>
+                  PICKUP CHOICE
+                </button>
+              )}
+
+              {showPickupChoice && (
+                <DeliveryChoiceForm
+                  orderId={user?.currentOrderId || "mockOrderId"} // Pass the orderId
+                  userId={user?.id || ""}
+                  onChoiceSubmit={async (choice) => {
+                    try {
+                      const payload = {
+                        orderId: user.currentOrderId,
+                        userId: user.id,
+                        choice,
+                      };
+                      const response = await axios.post(
+                        "/api/delivery-choice",
+                        payload
+                      );
+
+                      if (response.data.success) {
+                        alert(response.data.message);
+                        setIsCheckoutActive(true);
+                      } else {
+                        alert("Failed to save delivery choice.");
+                      }
+                    } catch (err) {
+                      console.error(
+                        "Error submitting delivery choice:",
+                        err.message
+                      );
+                      alert("An error occurred. Please try again.");
+                    }
+                  }}
+                />
+              )}
+
+              {showCheckout && (
+                <button
+                  disabled={!isCheckoutActive}
+                  onClick={() => {
+                    if (!cart.total || !aggregatedProducts.length) {
+                      alert("Cart is empty or invalid.");
+                      console.error("Checkout prevented: Invalid cart.");
+                      return;
+                    }
+
+                    const orderData = {
+                      products: aggregatedProducts.map((product) => ({
+                        productId: product._id || product.id,
+                        title: product.title,
+                        quantity: product.quantity,
+                        unit: product.unit || product.minQuantity,
+                        price: product.price || product.pricePerUnit,
+                      })),
+                      total: cart.total,
+                    };
+
+                    handlePaystackCheckout(orderData, dispatch, user);
+                  }}
+                >
+                  CHECKOUT NOW
+                </button>
+              )}
             </div>
           </div>
         </div>

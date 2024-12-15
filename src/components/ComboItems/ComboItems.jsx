@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import styles from "./MenuItems.module.css";
 import Image from "next/image";
 import Link from "next/link";
+import PageLoader from "@/components/PageLoader/PageLoader";
 
 async function fetchProducts() {
   const res = await fetch("http://localhost:3000/api/combo", {
@@ -23,8 +24,15 @@ export default function ComboItems() {
       try {
         const data = await fetchProducts();
         setProductList(data); // This is safe here
+        sessionStorage.removeItem("reloadCount"); // Clear reload count on success
       } catch (err) {
-        setError(err.message);
+        const reloadCount = sessionStorage.getItem("reloadCount") || 0;
+        if (reloadCount < 5) {
+          sessionStorage.setItem("reloadCount", Number(reloadCount) + 1);
+          window.location.reload();
+        } else {
+          setError("Something went wrong. Please try again later.");
+        }
       }
     }
 
@@ -32,19 +40,11 @@ export default function ComboItems() {
   }, []); // Ensure the dependency array is empty
 
   if (error) {
-    return <p>Error: {error}</p>; // Show error message if fetching fails
+    return <p style={{ color: "red", textAlign: "center" }}>{error}</p>;
   }
 
   if (productList.length === 0) {
-    return (
-      <div className="load-btn-container">
-        <div className="loading-button"></div>
-        <div className="loading-button"></div>
-        <div className="loading-button"></div>
-        <div className="loading-button"></div>
-        <div className="loading-button"></div>
-      </div>
-    ); // Show loading state
+    return <PageLoader/> // Show loading state
   }
 
   return (

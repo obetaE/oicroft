@@ -7,7 +7,10 @@ export default async function Navbar() {
 
   return (
     <div>
-      <Links session={session} id={session?.user?.id || null} />
+      <Links
+        session={session}
+        id={session?.user?.id || null}
+      />
     </div>
   );
 }

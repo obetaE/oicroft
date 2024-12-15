@@ -1,7 +1,8 @@
 import React from "react"
 import styles from "./product.module.css";
-import ProductTable from "@/components/ProductTable/ProductTable"
+import SliderForm from "@/components/SliderForm/SliderForm"
 import Navbar from "@/components/Navbar/Navbar";
+import DisplaySliders from "@/components/DisplaySliders/DisplaySliders";
 
 export default function animalPage(){
   return(
@@ -9,7 +10,8 @@ export default function animalPage(){
       <div className={styles.adminbg}>
         <Navbar/>
         <div className={styles.section}>
-         <ProductTable/>
+         <SliderForm/>
+         <DisplaySliders/>
         </div>
       </div>
     </div>

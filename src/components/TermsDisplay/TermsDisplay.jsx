@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import styles from "./TermsDisplay.module.css"
+import PageLoader from "@/components/PageLoader/PageLoader";
 
 const TermsDisplay = () => {
   const [content, setContent] = useState("");
@@ -19,8 +20,15 @@ const TermsDisplay = () => {
         }
         const data = await response.json();
         setContent(data.content);
+        sessionStorage.removeItem("reloadCount"); // Clear reload count on success
       } catch (err) {
-        setError(err.message);
+        const reloadCount = sessionStorage.getItem("reloadCount") || 0;
+        if (reloadCount < 5) {
+          sessionStorage.setItem("reloadCount", Number(reloadCount) + 1);
+          window.location.reload();
+        } else {
+          setError("Something went wrong. Please try again later.");
+        }
       } finally {
         setLoading(false);
       }
@@ -31,18 +39,12 @@ const TermsDisplay = () => {
 
   if (loading) {
     return  (
-      <div className="load-btn-container">
-        <div className="loading-button"></div>
-        <div className="loading-button"></div>
-        <div className="loading-button"></div>
-        <div className="loading-button"></div>
-        <div className="loading-button"></div>
-      </div>
+      <PageLoader/>
     ); // Show loading state
   }
 
   if (error) {
-    return <p style={{ color: "red" }}>{error}</p>;
+   return <p style={{ color: "red", textAlign: "center" }}>{error}</p>;
   }
 
   return (

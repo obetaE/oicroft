@@ -15,7 +15,7 @@ const updateStock = async (combo, quantity) => {
 
 // GET Request: Fetch a combo by ID
 export async function GET(req, { params }) {
-  const { id } = params;
+  const { id } = await params;
 
   try {
     await ConnectDB();
@@ -37,7 +37,7 @@ export async function GET(req, { params }) {
 
 // DELETE Request: Delete a combo by ID
 export async function DELETE(req, { params }) {
-  const { id } = params;
+  const { id } = await params;
 
   try {
     await ConnectDB();
@@ -62,7 +62,7 @@ export async function DELETE(req, { params }) {
 
 // PUT Request: Update a combo by ID
 export async function PUT(req, { params }) {
-  const { id } = params;
+  const { id } = await params;
   const data = await req.json();
 
   try {

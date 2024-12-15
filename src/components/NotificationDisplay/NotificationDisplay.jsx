@@ -2,32 +2,34 @@
 
 import React, { useState } from "react";
 import styles from "./Display.module.css";
-import { markAsRead } from "@/libs/Action/data";
 import Link from "next/link";
 
 const NotificationDisplay = ({ initialNotifications }) => {
   const [notifications, setNotifications] = useState(initialNotifications);
-  const [error, setError] = useState(null); // For error feedback
+  const [error, setError] = useState(null);
 
-  const handleMarkAsRead = async (_id) => {
+  const API_BASE_URL =
+    process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+
+  const handleMarkAsRead = async (id) => {
     try {
-      const updatedNotification = await markAsRead(id); // Mark notification as read in the database
+      const response = await fetch(`${API_BASE_URL}/api/notifications/${id}`, {
+        method: "PATCH",
+      });
 
-      if (!updatedNotification || !updatedNotification.isRead) {
-        throw new Error(
-          "Failed to update notification status in the database."
-        );
+      if (!response.ok) {
+        throw new Error("Failed to update notification status.");
       }
 
-      // Update local state
+      const updatedNotification = await response.json();
+
       setNotifications((prevNotifications) =>
         prevNotifications.map((notification) =>
-          String(notification._id) === String(id) // Ensure IDs match
-            ? { ...notification, isRead: true }
-            : notification
+          notification._id === id ? updatedNotification : notification
         )
       );
-      setError(null); // Clear any existing errors
+
+      setError(null);
     } catch (err) {
       console.error("Error during markAsRead:", err.message || err);
       setError("Failed to update notification. Please try again.");
@@ -36,18 +38,19 @@ const NotificationDisplay = ({ initialNotifications }) => {
 
   return (
     <div className={styles.section}>
-      {error && <div className={styles.error}>{error}</div>}{" "}
-      {/* Display errors */}
+      {error && <div className={styles.error}>{error}</div>}
       {notifications.map((notification) => (
         <div
           key={notification._id}
           className={notification.isRead ? styles.read : styles.unread}
-          onClick={() => handleMarkAsRead(notification._id)} // Mark as read when clicked
         >
-          <h1>{notification.title}</h1>
+          <h1 onClick={() => handleMarkAsRead(notification._id)}>
+            {notification.title}
+          </h1>
           <Link
             className={styles.link}
             href={`/notifications/${notification._id}`}
+            onClick={() => handleMarkAsRead(notification._id)}
           >
             READ MORE
           </Link>

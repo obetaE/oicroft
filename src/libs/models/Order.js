@@ -20,7 +20,7 @@ const OrderSchema = new mongoose.Schema(
     total: { type: Number, required: true },
     deliveryDate: { type: Date, required: true },
     otpToken: { type: Number, required: true },
-    status: { type: String, default: "Pending" },
+    status: { type: String, default: "Paid" },
     orderDate: { type: Date, default: Date.now },
   },
   { timestamps: true }

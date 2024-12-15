@@ -1,20 +1,23 @@
 .container{
     min-height: calc(100vh - 4rem);
     background-color: var(--bg);
-    width: 200vw;
+    width: 150vw;
 }
 
 .adminbg{
    padding: 7rem 2rem;
   position: relative;
   min-height: 100vh; /*Full Viewport Height*/
-  /*width: 100vw;/*Full Viewport Width*/
+  width: 100%;/*Full Viewport Width*/
   background-image: url('/background.png');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   z-index: 1;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
 .section{

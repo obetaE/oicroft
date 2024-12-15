@@ -1,4 +1,3 @@
-import ProductForm from "@/components/ProductForm/ProductForm";
 import React from "react";
 import styles from "./home.module.css";
 import Navbar from "@/components/Navbar/Navbar";
@@ -15,7 +14,7 @@ export default async function Home() {
   return (
     <div className={styles.verified}>
       {session ? (
-        session.user?.isVerified && (<div className="hidden"></div>)
+        session.user?.isVerified && <div className="hidden"></div>
       ) : (
         <div className={styles.otp}>
           <Link href="/resendotp">Click Here to Verify Your Account</Link>
@@ -29,13 +28,14 @@ export default async function Home() {
         <div className={styles.HeroSection}>
           <div className={styles.herobackground}>
             <div className={styles.overlay}>
-              <Image
-                width={800}
-                height={800}
-                src="/overlay.png"
-                alt="overlay"
-                className={styles.overlayimg}
-              />
+              <div className={styles.overlayimgcontainer}>
+                <Image
+                  fill
+                  src="/overlay.png"
+                  alt="overlay"
+                  className={styles.overlayimg}
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -45,17 +45,7 @@ export default async function Home() {
         <div className={styles.CarasoulSection}>
           <div className={styles.Carasoulbackground}>
             <div className={styles.comboDiv}>
-              <div className={styles.CarasoulTitleDiv}>
-                <Image
-                  fill
-                  objectFit="contain"
-                  src="/Product.png"
-                  alt="See our Products"
-                  className={styles.CarasoulTitle}
-                />
-              </div>
-
-              <ComboSlider />
+            {/* <ComboSlider /> */}
             </div>
 
             <div className={styles.productDiv}>
@@ -63,8 +53,8 @@ export default async function Home() {
                 <Image
                   fill
                   objectFit="contain"
-                  src="/And our Top Quality Goods.png"
-                  alt="See our Products"
+                  src="https://res.cloudinary.com/dudlxsoui/image/upload/v1734233083/And_our_Top_Quality_Goods_jtwhrq.png"
+                  alt="Products"
                   className={styles.CarasoulTitle}
                 />
               </div>

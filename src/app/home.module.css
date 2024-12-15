@@ -45,6 +45,16 @@
     left: 15rem;
   }
 
+  .overlayimgcontainer{
+    position: relative;
+    width: 800px;
+    height: 800px;
+  }
+
+  .overlayimg{
+    object-fit: contain;
+  }
+
 .CarasoulSection{
   position: relative;
   height: 180vh;
@@ -125,7 +135,44 @@
     text-shadow: black;
   }
 
+@media (max-width: 768px) {
+   .overlayimgcontainer{
+    position: relative;
+    width: 500px;
+    height: 500px;
+  }
+  .comboDiv{
+  margin-bottom: 0;
+}
+    .overlay{
+    position: absolute;
+    top: 4rem;
+    left: -1rem;
+  }
+  .ProductTitleDiv{
+    width: 100%;
+  }
+  
+}
+@media (max-width: 640px) {
+  .overlayimgcontainer{
+    position: relative;
+    width: 500px;
+    height: 500px;
+  }
+  .comboDiv{
+  margin-bottom: 0;
+}
+    .overlay{
+    position: absolute;
+    top: 4rem;
+    left: -1rem;
+  }
+  .ProductTitleDiv{
+    width: 100%;
+  }
 
+}
 
 
 

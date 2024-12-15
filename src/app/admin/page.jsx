@@ -11,8 +11,8 @@ const AdminPage = async () => {
   return (
     <div className={styles.container}>
       <div className={styles.adminbg}>
-        <div className={styles.section}>
           <Navbar />
+        <div className={styles.section}>
           <h1 className={styles.adminTitle}>Admin Dashboard</h1>
           <div className={styles.links}>
             {session ? (
@@ -38,7 +38,7 @@ const AdminPage = async () => {
               <Link href="/admin/productpage">Manage Products</Link>
             </div>
             <div className={styles.singleLink}>
-              <Link href="/admin/animalpage">Manage Animal ByProducts</Link>
+              <Link href="/admin/sliderpage">Manage Slider Images</Link>
             </div>
             <div className={styles.singleLink}>
               <Link href="/admin/supportpage">Manage Support</Link>

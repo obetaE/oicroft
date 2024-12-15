@@ -1,31 +1,44 @@
 "use client";
+
 import React, { useEffect, useState } from "react";
-import styles from "./ComboSlider.module.css";
+import axios from "axios";
 import Image from "next/image";
+import styles from "./ComboSlider.module.css";
+import PageLoader from "@/components/PageLoader/PageLoader";
 
 const ComboSlider = () => {
+  const [images, setImages] = useState([]);
   const [index, setIndex] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const images = [
-    { id: 1, image: "/Combo design .png" },
-    { id: 2, image: "/Slider2.png" },
-    { id: 3, image: "/Slider3.png" },
-    { id: 4, image: "/Slider4.png" },
-    { id: 5, image: "/Slider5.png" },
-  ];
-
-  // Automatically move to the next slide every 2 seconds
+  // Fetch slider images from the API
   useEffect(() => {
-  const interval = setInterval(() => {
-    setTimeout(() => {
-      setIndex((prevIndex) => (prevIndex + 1) % images.length);
-    }, 1000); // Pause for 1 second before moving to the next slide
-  }, 3000); // Change slide every 3 seconds
+    const fetchImages = async () => {
+      try {
+        const response = await axios.get("/api/slider");
+        setImages(response.data); // Extract image URLs
+      } catch (error) {
+        console.error("Error fetching slider images:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  return () => clearInterval(interval);
-}, []);
+    fetchImages();
+  }, []);
 
-  // Handle manual navigation
+  // Automatically move to the next slide every 3 seconds
+  useEffect(() => {
+    if (images.length > 0) {
+      const interval = setInterval(() => {
+        setIndex((prevIndex) => (prevIndex + 1) % images.length);
+      }, 3000);
+
+      return () => clearInterval(interval); // Cleanup interval on unmount
+    }
+  }, [images]);
+
+  // Handle manual navigation with arrows
   const handleArrow = (direction) => {
     if (direction === "l") {
       setIndex(index !== 0 ? index - 1 : images.length - 1);
@@ -35,6 +48,14 @@ const ComboSlider = () => {
     }
   };
 
+  if (isLoading) {
+    return <PageLoader />;
+  }
+
+  if (images.length === 0) {
+    return <p>No images available for the slider.</p>;
+  }
+
   return (
     <div className={styles.container}>
       {/* Left arrow */}
@@ -43,7 +64,12 @@ const ComboSlider = () => {
         style={{ left: 0 }}
         onClick={() => handleArrow("l")}
       >
-        <Image src="/wright.png" alt="arrow button" fill objectFit="contain" />
+        <Image
+          src="/wright.png"
+          alt="left arrow button"
+          fill
+          objectFit="contain"
+        />
       </div>
 
       {/* Wrapper for images */}
@@ -51,11 +77,11 @@ const ComboSlider = () => {
         className={styles.wrapper}
         style={{ transform: `translateX(${-100 * index}vw)` }}
       >
-        {images.map((img, i) => (
-          <div className={styles.imgContainer} key={img.id}>
+        {images.map((image, i) => (
+          <div className={styles.imgContainer} key={i}>
             <Image
-              src={img.image}
-              alt="Slider image"
+              src={image.img || "/fallback-image.jpg"}
+              alt={`Combo slider image ${i + 1}`}
               fill
               objectFit="contain"
             />
@@ -69,7 +95,12 @@ const ComboSlider = () => {
         style={{ right: 0 }}
         onClick={() => handleArrow("r")}
       >
-        <Image src="/wleft.png" alt="arrow button" fill objectFit="contain" />
+        <Image
+          src="/wleft.png"
+          alt="right arrow button"
+          fill
+          objectFit="contain"
+        />
       </div>
     </div>
   );

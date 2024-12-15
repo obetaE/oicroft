@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import styles from "./ProductTable.module.css";
 import Image from "next/image";
 import { deleteProduct } from "@/libs/Action/action";
+import PageLoader from "@/components/PageLoader/PageLoader";
 
 async function fetchProducts() {
   const res = await fetch("http://localhost:3000/api/order", {
@@ -40,8 +41,15 @@ export default function ProductTable() {
       try {
         const data = await fetchProducts();
         setProductList(data);
+        sessionStorage.removeItem("reloadCount"); // Clear reload count on success
       } catch (err) {
-        setError(err.message);
+        const reloadCount = sessionStorage.getItem("reloadCount") || 0;
+        if (reloadCount < 5) {
+          sessionStorage.setItem("reloadCount", Number(reloadCount) + 1);
+          window.location.reload();
+        } else {
+          setError("Something went wrong. Please try again later.");
+        }
       }
     }
 
@@ -84,20 +92,20 @@ export default function ProductTable() {
   };
 
   if (error) {
-    return <p>Error: {error}</p>; // Display error message if fetch fails
+    return <p style={{ color: "red", textAlign: "center" }}>{error}</p>;
   }
 
   if (productList.length === 0) {
-    return <p>Loading products...</p>; // Show loading message while data is fetched
+    return (<PageLoader/>); // Show loading message while data is fetched
   }
 
   return (
-    <div className={styles}>
+    <div className={styles.container}>
       <div className={styles.item}>
         <h1>Products</h1>
         <table className={styles.table}>
-          <thead>
-            <tr>
+          <thead className={styles.thead}>
+            <tr className={styles.tr}>
               <th>Image</th>
               <th>Id</th>
               <th>Title</th>
@@ -109,11 +117,14 @@ export default function ProductTable() {
               <th>Action</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className={styles.tbody}>
             {productList.map((product) => (
               <React.Fragment key={product._id}>
-                <tr>
-                  <td rowSpan={product.prices.length || 1}>
+                <tr className={styles.tr}>
+                  <td
+                    className={styles.td}
+                    rowSpan={product.prices.length || 1}
+                  >
                     <Image
                       src={product.img || "/placeholder.png"}
                       width={50}
@@ -122,8 +133,16 @@ export default function ProductTable() {
                       alt="Product Image"
                     />
                   </td>
-                  <td rowSpan={product.prices.length || 1}>{product._id}</td>
-                  <td rowSpan={product.prices.length || 1}>
+                  <td
+                    className={styles.td}
+                    rowSpan={product.prices.length || 1}
+                  >
+                    {product._id.slice(0, 4)}...
+                  </td>
+                  <td
+                    className={styles.td}
+                    rowSpan={product.prices.length || 1}
+                  >
                     {editingId === product._id ? (
                       <input
                         type="text"
@@ -140,7 +159,7 @@ export default function ProductTable() {
                     <>
                       {editingId === product._id ? (
                         <>
-                          <td>
+                          <td className={styles.td}>
                             <input
                               type="number"
                               value={editData.prices?.[0]?.price || ""}
@@ -149,7 +168,7 @@ export default function ProductTable() {
                               }
                             />
                           </td>
-                          <td>
+                          <td className={styles.td}>
                             <input
                               type="text"
                               value={editData.prices?.[0]?.unit || ""}
@@ -158,7 +177,7 @@ export default function ProductTable() {
                               }
                             />
                           </td>
-                          <td>
+                          <td className={styles.td}>
                             <input
                               type="number"
                               value={editData.prices?.[0]?.stock || ""}
@@ -167,7 +186,7 @@ export default function ProductTable() {
                               }
                             />
                           </td>
-                          <td>
+                          <td className={styles.td}>
                             <input
                               type="number"
                               value={editData.prices?.[0]?.minQuantity || ""}
@@ -180,7 +199,7 @@ export default function ProductTable() {
                               }
                             />
                           </td>
-                          <td>
+                          <td className={styles.td}>
                             <input
                               type="number"
                               value={editData.prices?.[0]?.pricePerUnit || ""}
@@ -196,16 +215,28 @@ export default function ProductTable() {
                         </>
                       ) : (
                         <>
-                          <td>{product.prices[0].price || "N/A"}</td>
-                          <td>{product.prices[0].unit || "N/A"}</td>
-                          <td>{product.prices[0].stock || 0}</td>
-                          <td>{product.prices[0].minQuantity || "N/A"}</td>
-                          <td>{product.prices[0].pricePerUnit || "N/A"}</td>
+                          <td className={styles.td}>
+                            {product.prices[0].price || "N/A"}
+                          </td>
+                          <td className={styles.td}>
+                            {product.prices[0].unit || "N/A"}
+                          </td>
+                          <td className={styles.td}>
+                            {product.prices[0].stock || 0}
+                          </td>
+                          <td className={styles.td}>
+                            {product.prices[0].minQuantity || "N/A"}
+                          </td>
+                          <td className={styles.td}>
+                            {product.prices[0].pricePerUnit || "N/A"}
+                          </td>
                         </>
                       )}
-                      <td rowSpan={product.prices.length || 1}>
+                      <td
+                        rowSpan={product.prices.length || 1}
+                      >
                         {editingId === product._id ? (
-                          <>
+                          <div className={styles.options}>
                             <button
                               className={styles.button}
                               onClick={handleSave}
@@ -213,14 +244,14 @@ export default function ProductTable() {
                               Save
                             </button>
                             <button
-                              className={styles.button}
+                              className={styles.bbutton}
                               onClick={handleCancel}
                             >
                               Cancel
                             </button>
-                          </>
+                          </div>
                         ) : (
-                          <>
+                          <div className={styles.options}>
                             <button
                               className={styles.button}
                               onClick={() =>
@@ -235,16 +266,16 @@ export default function ProductTable() {
                                 name="id"
                                 value={product._id}
                               />
-                              <button className={styles.button}>Delete</button>
+                              <button className={styles.bbutton}>Delete</button>
                             </form>
-                          </>
+                          </div>
                         )}
                       </td>
                     </>
                   ) : (
                     <>
                       <td colSpan={5}>No pricing available</td>
-                      <td>
+                      <td className={styles.td}>
                         <button className={styles.button}>Edit</button>
                         <form action={deleteProduct}>
                           <input type="hidden" name="id" value={product._id} />
@@ -259,7 +290,7 @@ export default function ProductTable() {
                   <tr key={`${product._id}-price-${index}`}>
                     {editingId === product._id ? (
                       <>
-                        <td>
+                        <td className={styles.td}>
                           <input
                             type="number"
                             value={editData.prices?.[index + 1]?.price || ""}
@@ -272,7 +303,7 @@ export default function ProductTable() {
                             }
                           />
                         </td>
-                        <td>
+                        <td className={styles.td}>
                           <input
                             type="text"
                             value={editData.prices?.[index + 1]?.unit || ""}
@@ -285,7 +316,7 @@ export default function ProductTable() {
                             }
                           />
                         </td>
-                        <td>
+                        <td className={styles.td}>
                           <input
                             type="number"
                             value={editData.prices?.[index + 1]?.stock || ""}
@@ -298,7 +329,7 @@ export default function ProductTable() {
                             }
                           />
                         </td>
-                        <td>
+                        <td className={styles.td}>
                           <input
                             type="number"
                             value={
@@ -313,7 +344,7 @@ export default function ProductTable() {
                             }
                           />
                         </td>
-                        <td>
+                        <td className={styles.td}>
                           <input
                             type="number"
                             value={
@@ -331,11 +362,19 @@ export default function ProductTable() {
                       </>
                     ) : (
                       <>
-                        <td>{priceEntry.price || "N/A"}</td>
-                        <td>{priceEntry.unit || "N/A"}</td>
-                        <td>{priceEntry.stock || 0}</td>
-                        <td>{priceEntry.minQuantity || "N/A"}</td>
-                        <td>{priceEntry.pricePerUnit || "N/A"}</td>
+                        <td className={styles.td}>
+                          {priceEntry.price || "N/A"}
+                        </td>
+                        <td className={styles.td}>
+                          {priceEntry.unit || "N/A"}
+                        </td>
+                        <td className={styles.td}>{priceEntry.stock || 0}</td>
+                        <td className={styles.td}>
+                          {priceEntry.minQuantity || "N/A"}
+                        </td>
+                        <td className={styles.td}>
+                          {priceEntry.pricePerUnit || "N/A"}
+                        </td>
                       </>
                     )}
                   </tr>

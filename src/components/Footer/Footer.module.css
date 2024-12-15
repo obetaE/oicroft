@@ -42,3 +42,14 @@
 .linksimg{
     object-fit: contain;
 }
+
+@media (max-width: 768px) {
+    .text{
+        font-size: 8px;
+    }
+}
+@media (max-width: 640px) {
+    .text{
+        font-size: 8px;
+    }
+}

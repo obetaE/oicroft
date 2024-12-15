@@ -6,9 +6,19 @@ import { redirect, useRouter } from "next/navigation";
 import { handleLogout } from "@/libs/Action/action";
 import { useState } from "react";
 import Link from "next/link";
+import { usePathname } from 'next/navigation';
 
 const Links = ({ session , id }) => {
   const [open, setOpen] = useState(false);
+  const pathName = usePathname();
+
+const navItems = [
+  { path: "/", title: "HomePage" },
+  { path: "/cart", title: "Cart" },
+  { path: "/support", title: "Support" },
+  { path: "/order", title: "Order" },
+];
+
   const router = useRouter();
 
   const homepage = () => {
@@ -120,12 +130,12 @@ const Links = ({ session , id }) => {
       {/* MOBILE VIEW */}
       <div className={styles.sidenavcontainer}>
         <div className={styles.header}>
-          <div className={styles.logocontainer}>
+          <div className={styles.logocontainers}>
             <Image
               alt="Oicroft Logo"
               src="https://res.cloudinary.com/dudlxsoui/image/upload/v1733053570/Website_Page_piux2z.png"
-              width={150}
-              height={150}
+              width={50}
+              height={50}
             />
           </div>
           {!open ? (
@@ -146,7 +156,7 @@ const Links = ({ session , id }) => {
               <div className={styles.imgcontainer2}>
                 <Image
                   className={styles.hamburger}
-                  alt="hamburger icon"
+                  alt="close icon"
                   src="https://res.cloudinary.com/dudlxsoui/image/upload/v1733053569/close_v01sqf.png"
                   fill
                   onClick={() => setOpen(false)}
@@ -157,39 +167,56 @@ const Links = ({ session , id }) => {
         </div>
 
         {open && (
-          <div className={styles.navlinks}>
-            <Link href="/" onClick={() => setOpen(false)}>
-              HomePage
-            </Link>
-            <Link href="/admin" onClick={() => setOpen(false)}>
-              Admin
-            </Link>
-            <Link href="/support" onClick={() => setOpen(false)}>
-              Support
-            </Link>
-            <Link href="/menu" onClick={() => setOpen(false)}>
-              Order
-            </Link>
-
-            {!session ? (
-              <Link href="/login" onClick={() => setOpen(false)}>
-                Login
-              </Link>
-            ) : (
-              <div>
-                <Link href={`/profile/${id}`} onClick={() => setOpen(false)}>
-                  Profile
+          <div className={styles.navblur} onClick={() => setOpen(false)}>
+            <div
+              className={styles.navlinks}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {navItems.map((item) => (
+                <Link
+                  key={item.path}
+                  href={item.path}
+                  className={`${styles.link} ${
+                    pathName === item.path ? styles.active : ""
+                  }`}
+                  onClick={() => setOpen(false)}
+                >
+                  {item.title}
                 </Link>
+              ))}
 
-                <Link href="/cart" onClick={() => setOpen(false)}>
-                  Cart
+              {!session ? (
+                <Link
+                  href="/login"
+                  className={styles.link}
+                  onClick={() => setOpen(false)}
+                >
+                  Login
                 </Link>
-
-                <form action={handleLogout}>
-                  <button>LogOut</button>
-                </form>
-              </div>
-            )}
+              ) : (
+                <div>
+                  <div className={styles.column}>
+                    <Link
+                      href= {`/profile/${id}`}
+                      className={styles.link}
+                      onClick={() => setOpen(false)}
+                    >
+                      Profile
+                    </Link>
+                    <Link
+                      href="/cart"
+                      className={styles.link}
+                      onClick={() => setOpen(false)}
+                    >
+                      Cart
+                    </Link>
+                  </div>
+                  <form action={handleLogout}>
+                    <button className={styles.sidelogout}>LogOut</button>
+                  </form>
+                </div>
+              )}
+            </div>
           </div>
         )}
       </div>
