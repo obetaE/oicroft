@@ -7,28 +7,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { reset } from "@/redux/cartSlice";
 import axios from "axios";
 
-const verifyPayment = async (reference) => {
-  try {
-    console.log("Verifying payment for reference:", reference);
-    const response = await fetch(
-      `/api/paystack/verify?reference=${reference}`,
-      {
-        cache: "no-store",
-      }
-    );
-    if (!response.ok) throw new Error("Payment verification failed");
-
-    const data = await response.json();
-    console.log("Payment verification response:", data);
-
-    // Paystack returns "success" status for successful payments
-    return data.status === "success";
-  } catch (error) {
-    console.error("Payment verification error:", error.message);
-    return false;
-  }
-};
-
 const createOrder = async (orderData, dispatch) => {
   try {
     console.log("Creating order with data:", orderData);
@@ -42,13 +20,25 @@ const createOrder = async (orderData, dispatch) => {
 
     const data = await response.json();
     console.log("Order created successfully:", data);
-
-    // Reset the Redux cart state
-    dispatch(reset());
-    alert("Order created successfully!");
+    return data.order;
   } catch (err) {
     console.error("Order creation error:", err.message);
-    alert("Failed to create order. Please try again.");
+    throw err; // Rethrow to handle in the caller
+  }
+};
+
+const deleteOrder = async (orderId) => {
+  try {
+    console.log(`Attempting to delete order with ID: ${orderId}`);
+    const response = await fetch(`/api/trackorder/${orderId}`, {
+      method: "DELETE",
+    });
+
+    if (!response.ok) throw new Error("Failed to delete order");
+
+    console.log("Order deleted successfully");
+  } catch (err) {
+    console.error("Order deletion error:", err.message);
   }
 };
 
@@ -60,7 +50,10 @@ const handlePaystackCheckout = async (orderData, dispatch, user) => {
   }
 
   try {
-    console.log("Initializing Paystack checkout with:", orderData);
+    console.log("Creating order before payment...");
+    const createdOrder = await createOrder({ ...orderData, userId: user.id }, dispatch);
+
+    console.log("Initializing Paystack checkout with:", createdOrder);
     const response = await axios.post("/api/paystack/initialize", {
       amount: orderData.total * 100,
       email: user.email,
@@ -75,37 +68,15 @@ const handlePaystackCheckout = async (orderData, dispatch, user) => {
       },
     });
 
-    if (
-      !response.data ||
-      !response.data.authorization_url ||
-      !response.data.reference
-    ) {
+    if (!response.data || !response.data.authorization_url || !response.data.reference) {
       console.error("Failed to initialize Paystack payment:", response.data);
       alert("Failed to initialize payment. Please try again.");
+      await deleteOrder(createdOrder._id); // Delete the order if payment initialization fails
       return;
     }
 
-    const { authorization_url, reference } = response.data;
-    console.log("Paystack initialized. Redirecting to:", authorization_url);
-
-    // Redirect to Paystack for payment
-    window.location.href = authorization_url;
-
-    // Wait for webhook or callback to complete payment verification
-    setTimeout(async () => {
-      const isPaymentSuccessful = await verifyPayment(reference);
-
-      if (isPaymentSuccessful) {
-        console.log("Payment verified successfully. Creating order...");
-        await createOrder(
-          { ...orderData, reference, userId: user.id },
-          dispatch
-        );
-      } else {
-        console.error("Payment failed or not verified.");
-        alert("Payment failed. Order not created.");
-      }
-    }, 10000); // Wait 10 seconds before verifying payment
+    console.log("Paystack initialized. Redirecting to:", response.data.authorization_url);
+    window.location.href = response.data.authorization_url;
   } catch (err) {
     console.error("Paystack checkout error:", err.message);
     alert(`Payment failed: ${err.message}`);
@@ -121,7 +92,7 @@ const CartContent = () => {
     const fetchUser = async () => {
       try {
         console.log("Fetching user session...");
-        const response = await fetch("/api/session", { cache: "no-store" });
+        const response = await fetch("/api/session");
         if (!response.ok) throw new Error("Session fetch failed");
 
         const data = await response.json();
@@ -222,3 +193,4 @@ const CartContent = () => {
 };
 
 export default CartContent;
+

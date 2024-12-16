@@ -2,7 +2,9 @@
     min-width: 100vw;
 }
 
-
+.item h1{
+    color: var(--bg);
+}
 
 .item{
     min-width: 100vw;

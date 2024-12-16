@@ -1,3 +1,5 @@
+import mongoose from "mongoose"
+
 const DeliverySchema = new mongoose.Schema(
   {
     orderId: {
@@ -10,22 +12,27 @@ const DeliverySchema = new mongoose.Schema(
       required: true,
       ref: "User",
     },
-    type: { type: String, enum: ["Pickup", "Delivery"], required: true },
-    region: {
-      state: { type: String, required: true },
-      logistics: { type: Number, required: true },
-    },
-    pickupLocation: {
-      type: String,
-      required: function () {
-        return this.type === "Pickup";
+    pickup: {
+      region: {
+        state: { type: String }, // State name
+        logistics: { type: Number }, // Logistics cost
+      },
+      location: {
+        type: String, // Optional for pickup locations
       },
     },
-    deliveryAddress: {
-      type: String,
-      required: function () {
-        return this.type === "Delivery";
+    delivery: {
+      region: {
+        state: { type: String }, // State name
+        logistics: { type: Number }, // Logistics cost
       },
+      area: {
+        zone: { type: String }, // Zone name
+        cost: { type: Number }, // Logistics cost
+      },
+      deliveryAddress:{
+        string: { type: String}
+      }
     },
   },
   { timestamps: true }

@@ -1,6 +1,6 @@
 // src/app/api/session/route.js
 import { auth } from "@/auth";
-import Order from "@/libs/models/Order";
+import {Order} from "@/libs/models/Order";
 
 export async function GET() {
   try {

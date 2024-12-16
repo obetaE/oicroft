@@ -102,7 +102,9 @@ export default function ProductTable() {
   return (
     <div className={styles.container}>
       <div className={styles.item}>
-        <h1>Products</h1>
+        <h1 className="text-3xl text-center font-extrabold underline mb-4">
+          Products
+        </h1>
         <table className={styles.table}>
           <thead className={styles.thead}>
             <tr className={styles.tr}>
@@ -232,9 +234,7 @@ export default function ProductTable() {
                           </td>
                         </>
                       )}
-                      <td
-                        rowSpan={product.prices.length || 1}
-                      >
+                      <td rowSpan={product.prices.length || 1}>
                         {editingId === product._id ? (
                           <div className={styles.options}>
                             <button

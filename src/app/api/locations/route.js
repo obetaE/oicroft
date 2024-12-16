@@ -1,41 +1,15 @@
 import Location from "@/libs/models/Location";
 import { ConnectDB } from "@/libs/config/db";
 
-// POST Request: Create a new location
 export async function POST(req) {
   try {
     await ConnectDB();
     const body = await req.json();
 
-    const {
-      option,
-      state,
-      logistics,
-      location,
-      deliveryAddress,
-      userId,
-      orderId,
-    } = body;
+    // Log received body for debugging
+    console.log("Received Body:", body);
 
-    // Validation
-    if (!state || !logistics) {
-      return new Response(
-        JSON.stringify({ error: "State and logistics cost are required" }),
-        { status: 400, headers: { "Content-Type": "application/json" } }
-      );
-    }
-
-    const data = {
-      userId: userId || undefined,
-      orderId: orderId || undefined,
-      [option.toLowerCase()]: {
-        region: { state, logistics },
-        ...(option === "Pickup" && { location }),
-        ...(option === "Delivery" && { deliveryAddress }),
-      },
-    };
-
-    const locationEntry = new Location(data);
+    const locationEntry = new Location(body);
     await locationEntry.save();
 
     return new Response(
@@ -43,6 +17,7 @@ export async function POST(req) {
       { status: 201, headers: { "Content-Type": "application/json" } }
     );
   } catch (error) {
+    console.error("Error saving location:", error.message);
     return new Response(JSON.stringify({ error: error.message }), {
       status: 500,
       headers: { "Content-Type": "application/json" },

@@ -8,7 +8,8 @@ export default function LocationForm() {
     state: "",
     logistics: "",
     location: "",
-    deliveryAddress: "",
+    zone: "",
+    cost: "",
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -27,13 +28,38 @@ export default function LocationForm() {
     setIsSubmitting(true);
     setMessage("");
 
+    // Prepare the data structure to match the schema
+    const payload =
+      formData.option === "Pickup"
+        ? {
+            pickup: {
+              region: {
+                state: formData.state,
+                logistics: Number(formData.logistics),
+              },
+              location: formData.location,
+            },
+          }
+        : {
+            delivery: {
+              region: {
+                state: formData.state,
+                logistics: Number(formData.logistics),
+              },
+              area: {
+                zone: formData.zone,
+                cost: Number(formData.cost),
+              },
+            },
+          };
+
     try {
       const res = await fetch("/api/locations", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       });
 
       const data = await res.json();
@@ -44,7 +70,8 @@ export default function LocationForm() {
           state: "",
           logistics: "",
           location: "",
-          deliveryAddress: "",
+          zone: "",
+          cost: "",
         });
       } else {
         setMessage(`Error: ${data.error || "Something went wrong"}`);
@@ -53,6 +80,7 @@ export default function LocationForm() {
       setMessage(`Error: ${error.message}`);
     } finally {
       setIsSubmitting(false);
+      window.location.reload(); // Refresh the page after toggling
     }
   };
 
@@ -122,25 +150,38 @@ export default function LocationForm() {
       )}
 
       {formData.option === "Delivery" && (
-        <div>
-          <label
-            htmlFor="deliveryAddress"
-            className="block text-sm font-medium"
-          >
-            Delivery Address
-          </label>
-          <input
-            type="text"
-            id="deliveryAddress"
-            name="deliveryAddress"
-            value={formData.deliveryAddress}
-            onChange={handleChange}
-            className="w-full px-3 py-2 border rounded-md"
-          />
-        </div>
-      )}
+        <>
+          <div>
+            <label htmlFor="zone" className="block text-sm font-medium">
+              Delivery Zone
+            </label>
+            <input
+              type="text"
+              id="zone"
+              name="zone"
+              value={formData.zone}
+              onChange={handleChange}
+              required
+              className="w-full px-3 py-2 border rounded-md"
+            />
+          </div>
 
-    
+          <div>
+            <label htmlFor="cost" className="block text-sm font-medium">
+              Delivery Cost
+            </label>
+            <input
+              type="number"
+              id="cost"
+              name="cost"
+              value={formData.cost}
+              onChange={handleChange}
+              required
+              className="w-full px-3 py-2 border rounded-md"
+            />
+          </div>
+        </>
+      )}
 
       <button
         type="submit"

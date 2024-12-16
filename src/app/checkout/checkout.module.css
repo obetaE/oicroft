@@ -6,19 +6,20 @@
 }
 
 .checkoutbg {
-  padding-top: 6rem;
   background-image: url("/Oicroft wallpaper.png");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   min-height: 100vh; /* Allow bg to expand with content */
   display: flex;
-  flex-direction: column; /* Stack content vertically */
+  /* flex-direction: column; Stack content vertically */
 }
 
 .section {
+  margin-top: 8rem;
   width: 90%;
-  margin: 0 auto;
+  margin-left: auto;
+  margin-right: auto;
   background: white;
   opacity: 0.9;
   display: flex;

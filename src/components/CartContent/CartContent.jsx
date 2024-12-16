@@ -154,79 +154,82 @@ const CartContent = () => {
             <div className={styles.wrapper}>
               <h2 className={styles.title}>CART TOTAL</h2>
               <div className={styles.totalText}>
-                <b>₦{cart.total}</b>
+                <b>Total: ₦{cart.total}</b>
               </div>
 
-              {!showCheckout && (
-                <button onClick={() => setShowCheckout(true)}>PROCEED</button>
-              )}
+              <div className={styles.center}>
+                {!showCheckout && (
+                  <button className={styles.checkout} onClick={() => setShowCheckout(true)}>PROCEED</button>
+                )}
 
-              {showCheckout && !showPickupChoice && (
-                <button onClick={() => setShowPickupChoice(true)}>
-                  PICKUP CHOICE
-                </button>
-              )}
+                {showCheckout && !showPickupChoice && (
+                  <button className={styles.checkout} onClick={() => setShowPickupChoice(true)}>
+                    PICKUP CHOICE
+                  </button>
+                )}
 
-              {showPickupChoice && (
-                <DeliveryChoiceForm
-                  orderId={user?.currentOrderId || "mockOrderId"} // Pass the orderId
-                  userId={user?.id || ""}
-                  onChoiceSubmit={async (choice) => {
-                    try {
-                      const payload = {
-                        orderId: user.currentOrderId,
-                        userId: user.id,
-                        choice,
-                      };
-                      const response = await axios.post(
-                        "/api/delivery-choice",
-                        payload
-                      );
+                {showPickupChoice && (
+                  <DeliveryChoiceForm
+                    orderId={user?.currentOrderId || "mockOrderId"} // Pass the orderId
+                    userId={user?.id || ""}
+                    onChoiceSubmit={async (choice) => {
+                      try {
+                        const payload = {
+                          orderId: user.currentOrderId,
+                          userId: user.id,
+                          choice,
+                        };
+                        const response = await axios.post(
+                          "/api/delivery",
+                          payload
+                        );
 
-                      if (response.data.success) {
-                        alert(response.data.message);
-                        setIsCheckoutActive(true);
-                      } else {
-                        alert("Failed to save delivery choice.");
+                        if (response.data.success) {
+                          alert(response.data.message);
+                          setIsCheckoutActive(true);
+                        } else {
+                          alert("Failed to save delivery choice.");
+                        }
+                      } catch (err) {
+                        console.error(
+                          "Error submitting delivery choice:",
+                          err.message
+                        );
+                        alert("An error occurred. Please try again.");
                       }
-                    } catch (err) {
-                      console.error(
-                        "Error submitting delivery choice:",
-                        err.message
-                      );
-                      alert("An error occurred. Please try again.");
-                    }
-                  }}
-                />
-              )}
+                    }}
+                  />
+                )}
 
-              {showCheckout && (
-                <button
-                  disabled={!isCheckoutActive}
-                  onClick={() => {
-                    if (!cart.total || !aggregatedProducts.length) {
-                      alert("Cart is empty or invalid.");
-                      console.error("Checkout prevented: Invalid cart.");
-                      return;
-                    }
+                {showCheckout && (
+                  <button
+                  className={styles.checkout}
+                    disabled={!isCheckoutActive}
+                    onClick={() => {
+                      if (!cart.total || !aggregatedProducts.length) {
+                        alert("Cart is empty or invalid.");
+                        console.error("Checkout prevented: Invalid cart.");
+                        return;
+                      }
 
-                    const orderData = {
-                      products: aggregatedProducts.map((product) => ({
-                        productId: product._id || product.id,
-                        title: product.title,
-                        quantity: product.quantity,
-                        unit: product.unit || product.minQuantity,
-                        price: product.price || product.pricePerUnit,
-                      })),
-                      total: cart.total,
-                    };
+                      const orderData = {
+                        products: aggregatedProducts.map((product) => ({
+                          productId: product._id || product.id,
+                          title: product.title,
+                          quantity: product.quantity,
+                          unit: product.unit || product.minQuantity,
+                          price: product.price || product.pricePerUnit,
+                        })),
+                        total: cart.total,
+                      };
 
-                    handlePaystackCheckout(orderData, dispatch, user);
-                  }}
-                >
-                  CHECKOUT NOW
-                </button>
-              )}
+                      handlePaystackCheckout(orderData, dispatch, user);
+                    }}
+                  >
+                    CHECKOUT NOW
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </div>

@@ -7,11 +7,10 @@ export async function GET(request) {
   await ConnectDB();
   const { searchParams } = new URL(request.url);
   const userId = searchParams.get("userId");
-  await ConnectDB();
 
   try {
-    // Populate userId to retrieve user details
-    const query = userId ? { userId } : {}; // If userId is provided, filter by it
+    const query = userId ? { userId } : {};
+    // Populate the userId to retrieve username and email
     const orders = await Order.find(query).populate("userId", "username email");
     return NextResponse.json(orders, { status: 200 });
   } catch (error) {

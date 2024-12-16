@@ -8,6 +8,10 @@
     min-width: 100vw;
 }
 
+.item h1{
+    color: var(--bg);
+}
+
 .table{
     width: 100%;
     border-spacing: 70px;

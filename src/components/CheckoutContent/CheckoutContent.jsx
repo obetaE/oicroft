@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import styles from "./CheckoutContent.module.css"
 import axios from "axios";
 import PageLoader from "@/components/PageLoader/PageLoader"
+import Image from "next/image"
 
 
 export default function CheckoutContent(){
@@ -69,7 +70,7 @@ export default function CheckoutContent(){
     return <div className={styles.noOrder}>No active orders found.</div>;
   }
     return (
-      <div>
+      <div className={styles.container}>
         <div className={styles.left}>
           <div className={styles.row}>
             <table className={styles.table}>

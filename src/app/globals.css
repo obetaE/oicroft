@@ -5,6 +5,7 @@
 :root{
   --bg: #19831c;
   --bglight: #13bb19;
+    --text: black;
 }
 
 body {

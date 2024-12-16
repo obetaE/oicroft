@@ -8,8 +8,8 @@ const UsersPage = async () => {
   return (
     <div className={styles.Adminusercontainer}>
       <div className={styles.adminbg}>
-        <div className={styles.usersection}>
           <Navbar />
+        <div className={styles.usersection}>
           <h1 className={styles.userTitle} >User Management</h1>
           <div className={styles.row}>
             <div className={styles.col}>

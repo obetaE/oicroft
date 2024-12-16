@@ -28,29 +28,24 @@
 }
 
 .section{
-  margin-top: 2.5rem;
   width: 90%;
-  margin: 0 auto;
+  margin: 6rem auto;
   background: white;
   opacity: 0.9;
   display: flex;
   padding: 2rem;
-  margin-bottom: 8rem;
   border-radius: 15px;
   flex-direction: column;
 }
 
 .usersection{
-  margin-top: 2.5rem;
-  margin-bottom: 2.5rem;
   min-height: 80vh;
   width: 90%;
-  margin: 0 auto;
+  margin: 7rem auto;
   background: white;
   opacity: 0.9;
   display: flex;
-  padding: 2rem;
-  margin-bottom: 8rem;
+  padding: 3rem;
   border-radius: 15px;
   flex-direction: column;
 }
@@ -106,6 +101,14 @@
 .col  img {
   object-fit: cover;
   border-radius: 50%;
+}
+
+.coll {
+  flex: 1;
+}
+
+.coll  img {
+  object-fit: cover;
 }
 
 .line{

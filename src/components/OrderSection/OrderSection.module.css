@@ -1,0 +1,37 @@
+.groupHeader{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding: 5px 10px;
+    border-bottom: 1px solid rgb(36, 35, 35, 0.5);;
+}
+
+.groupHeader h2{
+    color: rgb(63, 61, 61);
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.nextStageButton {
+  display: block;
+  width: 20%;
+  padding: 6px;
+  color: black;
+  font-weight: bold;
+  background: rgb(151, 143, 143);
+  border: none;
+  border-radius: 1rem;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.nextStageButton:hover {
+  background-color: rgb(75, 71, 71);
+}
+
+.table{
+    width: 100%;
+    border-spacing: 20px;
+    text-align: left;
+}

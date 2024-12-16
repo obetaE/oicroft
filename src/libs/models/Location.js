@@ -16,10 +16,15 @@ const LocationSchema = new mongoose.Schema(
         state: { type: String }, // State name
         logistics: { type: Number }, // Logistics cost
       },
-      deliveryAddress: {
-        type: String, // Optional for delivery locations
+      area: {
+        zone: { type: String }, // Zone name
+        cost: { type: Number }, // Logistics cost
       },
     },
+    isdisabled: {
+      type: Boolean,
+      default: false,
+    }
   },
   { timestamps: true } // Auto-add createdAt and updatedAt timestamps
 );
