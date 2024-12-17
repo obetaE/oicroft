@@ -8,33 +8,47 @@ import Location from "@/libs/models/Location";
 const calculateDeliveryDate = () => {
   const now = new Date();
 
+  // Find the Thursday of the *current* week
   const currentThursday = new Date(now);
   currentThursday.setDate(now.getDate() + ((4 - now.getDay() + 7) % 7));
   currentThursday.setHours(0, 0, 0, 0);
 
-  const nextWednesday = new Date(currentThursday);
-  nextWednesday.setDate(currentThursday.getDate() + 6);
-  nextWednesday.setHours(23, 59, 59, 999);
+  // Find the Wednesday of the *current* week
+  const currentWednesday = new Date(currentThursday);
+  currentWednesday.setDate(currentThursday.getDate() + 6);
+  currentWednesday.setHours(23, 59, 59, 999);
 
-  const deliverySaturday = new Date(nextWednesday);
-  deliverySaturday.setDate(nextWednesday.getDate() + 3);
+  // Find the Saturday after the current Wednesday
+  const deliverySaturday = new Date(currentWednesday);
+  deliverySaturday.setDate(currentWednesday.getDate() + 3);
   deliverySaturday.setHours(12, 0, 0, 0);
 
-  if (now >= currentThursday && now <= nextWednesday) {
+  // Adjust for cases where today is before the current Thursday
+  if (now < currentThursday) {
+    // If today is before the current Thursday, consider the "previous week"
+    currentThursday.setDate(currentThursday.getDate() - 7);
+    currentWednesday.setDate(currentWednesday.getDate() - 7);
+  }
+
+  // Check if today is within the range of the current "week" (Thursday → Wednesday)
+  if (now >= currentThursday && now <= currentWednesday) {
     return deliverySaturday;
   }
 
-  const nextBatchThursday = new Date(currentThursday);
-  nextBatchThursday.setDate(currentThursday.getDate() + 7);
+  // Otherwise, calculate the next batch (next week's Thursday to Wednesday)
+  const nextThursday = new Date(currentThursday);
+  nextThursday.setDate(currentThursday.getDate() + 7);
 
-  const nextBatchWednesday = new Date(nextBatchThursday);
-  nextBatchWednesday.setDate(nextBatchThursday.getDate() + 6);
+  const nextWednesday = new Date(nextThursday);
+  nextWednesday.setDate(nextThursday.getDate() + 6);
 
-  const nextBatchSaturday = new Date(nextBatchWednesday);
-  nextBatchSaturday.setDate(nextBatchWednesday.getDate() + 3);
+  const nextDeliverySaturday = new Date(nextWednesday);
+  nextDeliverySaturday.setDate(nextWednesday.getDate() + 3);
+  nextDeliverySaturday.setHours(12, 0, 0, 0);
 
-  return nextBatchSaturday;
+  return nextDeliverySaturday;
 };
+
 
 export async function POST(request) {
   console.log("API called: /api/trackorder [POST]");
