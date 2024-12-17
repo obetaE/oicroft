@@ -1,0 +1,42 @@
+.links {
+  background-color: white;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  position: fixed; /* Position it at the bottom right */
+  bottom: 20px; /* Adjust the distance from the bottom */
+  left: 20px; /* Adjust the distance from the right */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease; /* Smooth hover effect */
+  z-index: 1000; /* Ensures it stays above other elements */
+}
+
+.links:hover {
+  transform: scale(1.05); /* Slightly enlarge on hover */
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
+}
+
+.linkimage {
+  display: block;
+}
+
+.unread {
+  filter: brightness(1.2); /* Highlight the button when there are unread notifications */
+}
+
+.badge {
+  position: absolute;
+  top: 8px; /* Adjust position relative to the button */
+  right: 8px; /* Adjust position relative to the button */
+  width: 12px;
+  height: 12px;
+  background-color: red; /* Red dot to indicate unread notifications */
+  border-radius: 50%;
+  border: 2px solid white; /* Add white border for a cleaner look */
+  box-shadow: 0 0 6px rgba(255, 0, 0, 0.7); /* Glow effect for the badge */
+}

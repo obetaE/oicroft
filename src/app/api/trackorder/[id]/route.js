@@ -3,7 +3,7 @@ import { ConnectDB } from "@/libs/config/db";
 import { Order } from "@/libs/models/Order";
 
 export async function GET(request, { params }) {
-  const { id } = params; // Extract dynamic ID
+  const { id } = await params; // Extract dynamic ID
   await ConnectDB();
 
   try {
@@ -21,7 +21,7 @@ export async function GET(request, { params }) {
 }
 
 export async function PUT(request, { params }) {
-  const { id } = params;
+  const { id } = await params;
   await ConnectDB();
 
   try {
@@ -32,6 +32,9 @@ export async function PUT(request, { params }) {
         new: true,
       }
     );
+    if (!updatedOrder) {
+      return NextResponse.json({ message: "Order not found" }, { status: 404 });
+    }
     return NextResponse.json(updatedOrder, { status: 200 });
   } catch (error) {
     return NextResponse.json(
@@ -42,11 +45,14 @@ export async function PUT(request, { params }) {
 }
 
 export async function DELETE(request, { params }) {
-  const { id } = params;
+  const { id } = await params;
   await ConnectDB();
 
   try {
-    await Order.findByIdAndDelete(id);
+    const deletedOrder = await Order.findByIdAndDelete(id);
+    if (!deletedOrder) {
+      return NextResponse.json({ message: "Order not found" }, { status: 404 });
+    }
     return NextResponse.json(
       { message: "Order deleted successfully" },
       { status: 200 }

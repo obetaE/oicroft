@@ -10,13 +10,24 @@ export async function GET(request) {
 
   try {
     const query = userId ? { userId } : {};
-    // Populate the userId to retrieve username and email
     const orders = await Order.find(query).populate("userId", "username email");
-    return NextResponse.json(orders, { status: 200 });
+
+    // Validate deliveryDate
+    const validatedOrders = orders.map((order) => {
+      if (!order.deliveryDate || isNaN(new Date(order.deliveryDate))) {
+        console.error(`Invalid deliveryDate for order: ${order._id}`);
+        throw new Error(`Invalid deliveryDate for order: ${order._id}`);
+      }
+      return order;
+    });
+
+    return NextResponse.json(validatedOrders, { status: 200 });
   } catch (error) {
+    console.error("Error fetching orders:", error.message);
     return NextResponse.json(
       { message: "Failed to fetch orders", error: error.message },
       { status: 500 }
     );
   }
 }
+

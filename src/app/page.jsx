@@ -45,7 +45,7 @@ export default async function Home() {
         <div className={styles.CarasoulSection}>
           <div className={styles.Carasoulbackground}>
             <div className={styles.comboDiv}>
-            {/* <ComboSlider /> */}
+            <ComboSlider /> 
             </div>
 
             <div className={styles.productDiv}>
@@ -65,11 +65,11 @@ export default async function Home() {
         </div>
         {/* Carasoul Section Ends */}
 
-        {/* About Us Section Begins */}
+        {/* About Us Section Begins
         <div className={styles.AboutusSection}>
           <div className={styles.Aboutusbackground}> </div>
-        </div>
-        {/* About Us Section Ends */}
+        </div> 
+         About Us Section Ends */}
       </div>
     </div>
   );

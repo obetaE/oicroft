@@ -1,4 +1,3 @@
-// CartContent.jsx
 "use client";
 
 import React, { useMemo, useEffect, useState } from "react";
@@ -7,7 +6,6 @@ import Image from "next/image";
 import { useDispatch, useSelector } from "react-redux";
 import { reset } from "@/redux/cartSlice";
 import axios from "axios";
-import DeliveryChoiceForm from "@/components/DeliveryChoiceForm/DeliveryChoiceForm"; // Assume this component exists
 
 const createOrder = async (orderData, dispatch) => {
   try {
@@ -23,19 +21,27 @@ const createOrder = async (orderData, dispatch) => {
     const data = await response.json();
     console.log("Order created successfully:", data);
 
-    // Reset cart after successful order creation
-    dispatch(reset());
-    return data; // Return order data for further processing if needed
+    dispatch(reset()); // Reset cart after successful order creation
+    return data;
   } catch (err) {
     console.error("Order creation error:", err.message);
-    throw err; // Re-throw error for upstream handling
+    throw err;
+  }
+};
+
+const deleteOrder = async (orderId) => {
+  try {
+    console.log("Deleting order with ID:", orderId);
+    await axios.delete(`/api/trackorder/${orderId}`);
+    console.log("Order deleted and stock reversed.");
+  } catch (err) {
+    console.error("Error deleting order:", err.message);
   }
 };
 
 const handlePaystackCheckout = async (orderData, dispatch, user) => {
   if (!user || !user.email || !user.id) {
     alert("User details are missing. Please log in.");
-    console.error("Checkout halted: Missing user details.");
     return;
   }
 
@@ -55,21 +61,22 @@ const handlePaystackCheckout = async (orderData, dispatch, user) => {
       },
     });
 
-    if (
-      !response.data ||
-      !response.data.authorization_url ||
-      !response.data.reference
-    ) {
-      console.error("Failed to initialize Paystack payment:", response.data);
+    if (!response.data || !response.data.authorization_url) {
       alert("Failed to initialize payment. Please try again.");
       return;
     }
 
     const { authorization_url, reference } = response.data;
-    console.log("Paystack initialized. Redirecting to:", authorization_url);
+    const order = await createOrder(
+      { ...orderData, reference, userId: user.id },
+      dispatch
+    );
 
-    await createOrder({ ...orderData, reference, userId: user.id }, dispatch);
-    window.location.href = authorization_url; // Redirect to Paystack checkout
+    window.location.href = authorization_url;
+
+    window.addEventListener("beforeunload", () => {
+      deleteOrder(order._id);
+    });
   } catch (err) {
     console.error("Paystack checkout error:", err.message);
     alert(`Payment failed: ${err.message}`);
@@ -81,26 +88,39 @@ const CartContent = () => {
   const cart = useSelector((state) => state.cart);
   const [user, setUser] = useState(null);
   const [showCheckout, setShowCheckout] = useState(false);
-  const [showPickupChoice, setShowPickupChoice] = useState(false);
-  const [isCheckoutActive, setIsCheckoutActive] = useState(false);
+  const [deliveryChosen, setDeliveryChosen] = useState(false);
+  const [type, setType] = useState(""); // Pickup or Delivery
+  const [locationId, setLocationId] = useState("");
+  const [locations, setLocations] = useState([]);
+  const [deliveryAddress, setDeliveryAddress] = useState("");
 
+  // Fetch user session
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        console.log("Fetching user session...");
         const response = await fetch("/api/session");
         if (!response.ok) throw new Error("Session fetch failed");
-
         const data = await response.json();
-        console.log("Session fetched successfully:", data);
         setUser(data.user || null);
       } catch (err) {
         console.error("Session fetch error:", err.message);
         setUser(null);
       }
     };
-
     fetchUser();
+  }, []);
+
+  // Fetch available locations
+  useEffect(() => {
+    const fetchLocations = async () => {
+      try {
+        const response = await axios.get("/api/locations");
+        setLocations(response.data);
+      } catch (error) {
+        console.error("Failed to fetch locations:", error.message);
+      }
+    };
+    fetchLocations();
   }, []);
 
   const aggregatedProducts = useMemo(() => {
@@ -112,6 +132,33 @@ const CartContent = () => {
     }, {});
     return Object.values(productMap);
   }, [cart.products]);
+
+  const handleDeliveryChoiceSubmit = (e) => {
+    e.preventDefault();
+    setDeliveryChosen(true);
+  };
+
+  const handleCheckout = () => {
+    const orderData = {
+      userId: user.id,
+      products: aggregatedProducts.map((product) => ({
+        productId: product.id, // Rename `id` to `productId`
+        title: product.title,
+        img: product.img,
+        price: product.price,
+        quantity: product.quantity,
+        unit: product.unit,
+      })),
+      total: cart.total,
+      deliveryOption: {
+        type,
+        locationId: locationId || null,
+        ...(type === "Delivery" && { deliveryAddress }),
+      },
+    };
+
+    handlePaystackCheckout(orderData, dispatch, user);
+  };
 
   return (
     <div>
@@ -151,86 +198,91 @@ const CartContent = () => {
             </table>
           </div>
           <div className={styles.right}>
-            <div className={styles.wrapper}>
-              <h2 className={styles.title}>CART TOTAL</h2>
-              <div className={styles.totalText}>
-                <b>Total: ₦{cart.total}</b>
-              </div>
-
-              <div className={styles.center}>
-                {!showCheckout && (
-                  <button className={styles.checkout} onClick={() => setShowCheckout(true)}>PROCEED</button>
-                )}
-
-                {showCheckout && !showPickupChoice && (
-                  <button className={styles.checkout} onClick={() => setShowPickupChoice(true)}>
-                    PICKUP CHOICE
-                  </button>
-                )}
-
-                {showPickupChoice && (
-                  <DeliveryChoiceForm
-                    orderId={user?.currentOrderId || "mockOrderId"} // Pass the orderId
-                    userId={user?.id || ""}
-                    onChoiceSubmit={async (choice) => {
-                      try {
-                        const payload = {
-                          orderId: user.currentOrderId,
-                          userId: user.id,
-                          choice,
-                        };
-                        const response = await axios.post(
-                          "/api/delivery",
-                          payload
-                        );
-
-                        if (response.data.success) {
-                          alert(response.data.message);
-                          setIsCheckoutActive(true);
-                        } else {
-                          alert("Failed to save delivery choice.");
-                        }
-                      } catch (err) {
-                        console.error(
-                          "Error submitting delivery choice:",
-                          err.message
-                        );
-                        alert("An error occurred. Please try again.");
-                      }
-                    }}
-                  />
-                )}
-
-                {showCheckout && (
-                  <button
-                  className={styles.checkout}
-                    disabled={!isCheckoutActive}
-                    onClick={() => {
-                      if (!cart.total || !aggregatedProducts.length) {
-                        alert("Cart is empty or invalid.");
-                        console.error("Checkout prevented: Invalid cart.");
-                        return;
-                      }
-
-                      const orderData = {
-                        products: aggregatedProducts.map((product) => ({
-                          productId: product._id || product.id,
-                          title: product.title,
-                          quantity: product.quantity,
-                          unit: product.unit || product.minQuantity,
-                          price: product.price || product.pricePerUnit,
-                        })),
-                        total: cart.total,
-                      };
-
-                      handlePaystackCheckout(orderData, dispatch, user);
-                    }}
-                  >
-                    CHECKOUT NOW
-                  </button>
-                )}
-              </div>
+            <h2 className={styles.title}>CART TOTAL</h2>
+            <div className={styles.totalText}>
+              <b>Total: ₦{cart.total}</b>
             </div>
+
+            {!showCheckout && (
+              <button
+                className={styles.checkout}
+                onClick={() => setShowCheckout(true)}
+              >
+                Proceed to Delivery Choice
+              </button>
+            )}
+
+            {showCheckout && !deliveryChosen && (
+              <form
+                className={styles.form}
+                onSubmit={handleDeliveryChoiceSubmit}
+              >
+                <h2 className={styles.title}>Choose Delivery Option</h2>
+                <div className={styles.radioGroup}>
+                  <label>
+                    <input
+                      type="radio"
+                      value="Pickup"
+                      checked={type === "Pickup"}
+                      onChange={(e) => setType(e.target.value)}
+                      required
+                    />
+                    Pickup
+                  </label>
+                  <label>
+                    <input
+                      type="radio"
+                      value="Delivery"
+                      checked={type === "Delivery"}
+                      onChange={(e) => setType(e.target.value)}
+                      required
+                    />
+                    Delivery
+                  </label>
+                </div>
+
+                <label>
+                  Select Region/Location:
+                  <select
+                    value={locationId}
+                    onChange={(e) => setLocationId(e.target.value)}
+                    required
+                  >
+                    <option value="">Select a location</option>
+                    {locations.map((loc) => (
+                      <option key={loc._id} value={loc._id}>
+                        {loc.pickup?.region?.state ||
+                          loc.delivery?.region?.state}{" "}
+                        -{" "}
+                        {loc.pickup?.location ||
+                          loc.delivery?.area?.zone ||
+                          "N/A"}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+
+                {type === "Delivery" && (
+                  <label>
+                    Delivery Address:
+                    <input
+                      type="text"
+                      value={deliveryAddress}
+                      onChange={(e) => setDeliveryAddress(e.target.value)}
+                      required
+                    />
+                  </label>
+                )}
+
+                <button type="submit">Submit Delivery Choice</button>
+              </form>
+            )}
+
+            {deliveryChosen && (
+              <button className={styles.checkout} onClick={handleCheckout}>
+                Proceed to Payment
+              </button>
+            )}
           </div>
         </div>
       </div>

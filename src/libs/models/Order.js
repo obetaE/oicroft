@@ -4,7 +4,7 @@ const OrderSchema = new mongoose.Schema(
   {
     userId: {
       type: mongoose.Schema.Types.ObjectId, // Reference to User model
-      ref: "User",
+      ref: "user",
       required: true,
     },
     reference: { type: String, required: true, unique: true },
@@ -26,6 +26,28 @@ const OrderSchema = new mongoose.Schema(
     otpToken: { type: Number, required: true },
     status: { type: String, default: "Paid" },
     orderDate: { type: Date, default: Date.now },
+    pickup: {
+      region: {
+        state: { type: String }, // State name
+        logistics: { type: Number }, // Logistics cost
+      },
+      location: {
+        type: String, // Optional for pickup locations
+      },
+    },
+    delivery: {
+      region: {
+        state: { type: String }, // State name
+        logistics: { type: Number }, // Logistics cost
+      },
+      area: {
+        zone: { type: String }, // Zone name
+        cost: { type: Number }, // Logistics cost
+      },
+      deliveryAddress: {
+        string: { type: String },
+      },
+    },
   },
   { timestamps: true }
 );

@@ -29,11 +29,6 @@ const navItems = [
     router.push("/support");
   };
 
-
-  const notification = () => {
-    router.push("/notifications");
-  };
-
   const order = () => {
     router.push("/order");
   };
@@ -109,15 +104,6 @@ const navItems = [
 
           {session ? (
             <div className="flex">
-              <button onClick={notification} className={styles.links}>
-                <Image
-                  alt="Notification Icon"
-                  src="https://res.cloudinary.com/dudlxsoui/image/upload/v1733053568/notification_sb8sqk.png"
-                  className={styles.linkimage}
-                  width={40}
-                  height={40}
-                />
-              </button>
               <form action={handleLogout}>
                 <button className={styles.logout}>Logout</button>
               </form>

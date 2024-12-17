@@ -63,9 +63,9 @@ const ProductSchema = new mongoose.Schema(
       },
     },
     productId: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId, // Use ObjectId type
       unique: true,
-      default: () => new mongoose.Types.ObjectId().toString(),
+      default: () => new mongoose.Types.ObjectId(), // Generates a valid ObjectId
     },
     discounts: {
       regularDiscount: { type: Number, default: 0 },

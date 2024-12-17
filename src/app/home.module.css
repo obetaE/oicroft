@@ -41,8 +41,8 @@
 
   .overlay{
     position: absolute;
-    top: -2rem;
-    left: 15rem;
+    top: -5rem;
+    left: 12.8rem;
   }
 
   .overlayimgcontainer{
@@ -57,7 +57,7 @@
 
 .CarasoulSection{
   position: relative;
-  height: 180vh;
+  height: 160vh;
   background-image: url('/Carasoul section.png');
   background-size: cover;
   background-position: center;
@@ -143,6 +143,13 @@
   }
   .comboDiv{
   margin-bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.CarasoulSection{
+  align-items: center;
 }
     .overlay{
     position: absolute;
@@ -162,6 +169,13 @@
   }
   .comboDiv{
   margin-bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.CarasoulSection{
+  align-items: center;
 }
     .overlay{
     position: absolute;
