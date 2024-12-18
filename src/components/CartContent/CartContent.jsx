@@ -33,7 +33,7 @@ const deleteOrder = async (orderId) => {
   try {
     console.log("Deleting order with ID:", orderId);
     await axios.delete(`/api/trackorder/${orderId}`);
-    console.log("Order deleted and stock reversed.");
+    console.log("Order deleted successfully.");
   } catch (err) {
     console.error("Error deleting order:", err.message);
   }
@@ -47,6 +47,8 @@ const handlePaystackCheckout = async (orderData, dispatch, user) => {
 
   try {
     console.log("Initializing Paystack checkout with:", orderData);
+
+    // Step 1: Initialize Paystack payment
     const response = await axios.post("/api/paystack/initialize", {
       amount: orderData.total * 100,
       email: user.email,
@@ -61,19 +63,26 @@ const handlePaystackCheckout = async (orderData, dispatch, user) => {
       },
     });
 
-    if (!response.data || !response.data.authorization_url) {
-      alert("Failed to initialize payment. Please try again.");
-      return;
+    if (
+      !response.data ||
+      !response.data.authorization_url ||
+      !response.data.reference
+    ) {
+      throw new Error("Failed to initialize payment. Please try again.");
     }
 
     const { authorization_url, reference } = response.data;
+
+    // Step 2: Create order with reference
     const order = await createOrder(
       { ...orderData, reference, userId: user.id },
       dispatch
     );
 
+    // Step 3: Redirect to Paystack checkout
     window.location.href = authorization_url;
 
+    // Optional: Cleanup order on page unload
     window.addEventListener("beforeunload", () => {
       deleteOrder(order._id);
     });
@@ -82,6 +91,7 @@ const handlePaystackCheckout = async (orderData, dispatch, user) => {
     alert(`Payment failed: ${err.message}`);
   }
 };
+
 
 const CartContent = () => {
   const dispatch = useDispatch();
@@ -94,7 +104,6 @@ const CartContent = () => {
   const [locations, setLocations] = useState([]);
   const [deliveryAddress, setDeliveryAddress] = useState("");
 
-  // Fetch user session
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -110,7 +119,6 @@ const CartContent = () => {
     fetchUser();
   }, []);
 
-  // Fetch available locations
   useEffect(() => {
     const fetchLocations = async () => {
       try {
@@ -142,7 +150,7 @@ const CartContent = () => {
     const orderData = {
       userId: user.id,
       products: aggregatedProducts.map((product) => ({
-        productId: product.id, // Rename `id` to `productId`
+        productId: product.id,
         title: product.title,
         img: product.img,
         price: product.price,
