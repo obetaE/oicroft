@@ -1,0 +1,31 @@
+.container{
+    min-height: calc(100vh - 4rem);
+    background-color: var(--bg);
+}
+
+.adminbg{
+   padding: 7rem 2rem;
+  position: relative;
+  min-height: 100vh; /*Full Viewport Height*/
+  /*width: 100vw;/*Full Viewport Width*/
+  background-image: url('/background.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: 1;
+  overflow: hidden;
+}
+
+
+.section{
+  width: 90%;
+  margin: 3rem auto;
+  background: white;
+  opacity: 0.9;
+  display: flex;
+  padding: 2rem;
+  border-radius: 15px;
+  flex-direction: column;
+}
+
+
