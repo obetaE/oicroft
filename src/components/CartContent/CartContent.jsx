@@ -92,7 +92,6 @@ const handlePaystackCheckout = async (orderData, dispatch, user) => {
   }
 };
 
-
 const CartContent = () => {
   const dispatch = useDispatch();
   const cart = useSelector((state) => state.cart);
@@ -131,26 +130,27 @@ const CartContent = () => {
     fetchLocations();
   }, []);
 
-  const aggregatedProducts = useMemo(() => {
-    const productMap = cart.products.reduce((acc, product) => {
-      const key = `${product.title}-${product.unit || "counter"}`;
-      if (acc[key]) acc[key].quantity += product.quantity;
-      else acc[key] = { ...product };
-      return acc;
-    }, {});
-    return Object.values(productMap);
-  }, [cart.products]);
+const aggregatedProducts = useMemo(() => {
+  const productMap = cart.products.reduce((acc, product) => {
+    const key = `${product.title}-${product.unit || "counter"}`;
+    if (acc[key]) acc[key].quantity += product.quantity;
+    else acc[key] = { ...product };
+    return acc;
+  }, {});
+  return Object.values(productMap);
+}, [cart.products]);
 
-  const handleDeliveryChoiceSubmit = (e) => {
-    e.preventDefault();
-    setDeliveryChosen(true);
-  };
+const handleDeliveryChoiceSubmit = (e) => {
+  e.preventDefault();
+  setDeliveryChosen(true);
+};
+
 
   const handleCheckout = () => {
     const orderData = {
       userId: user.id,
       products: aggregatedProducts.map((product) => ({
-        productId: product.id,
+        productId: product.id || product._id,
         title: product.title,
         img: product.img,
         price: product.price,
@@ -206,91 +206,93 @@ const CartContent = () => {
             </table>
           </div>
           <div className={styles.right}>
-            <h2 className={styles.title}>CART TOTAL</h2>
-            <div className={styles.totalText}>
-              <b>Total: ₦{cart.total}</b>
+            <div className={styles.wrapper}>
+              <h2 className={styles.title}>CART TOTAL</h2>
+              <div className={styles.totalText}>
+                <b>Total: ₦{cart.total}</b>
+              </div>
+
+              {!showCheckout && (
+                <button
+                  className={styles.checkout}
+                  onClick={() => setShowCheckout(true)}
+                >
+                  Proceed to Delivery Choice
+                </button>
+              )}
+
+              {showCheckout && !deliveryChosen && (
+                <form
+                  className={styles.form}
+                  onSubmit={handleDeliveryChoiceSubmit}
+                >
+                  <h2 className={styles.title}>Choose Delivery Option</h2>
+                  <div className={styles.radioGroup}>
+                    <label>
+                      <input
+                        type="radio"
+                        value="Pickup"
+                        checked={type === "Pickup"}
+                        onChange={(e) => setType(e.target.value)}
+                        required
+                      />
+                      Pickup
+                    </label>
+                    <label>
+                      <input
+                        type="radio"
+                        value="Delivery"
+                        checked={type === "Delivery"}
+                        onChange={(e) => setType(e.target.value)}
+                        required
+                      />
+                      Delivery
+                    </label>
+                  </div>
+
+                  <label>
+                    Select Region/Location:
+                    <select
+                      value={locationId}
+                      onChange={(e) => setLocationId(e.target.value)}
+                      required
+                    >
+                      <option value="">Select a location</option>
+                      {locations.map((loc) => (
+                        <option key={loc._id} value={loc._id}>
+                          {loc.pickup?.region?.state ||
+                            loc.delivery?.region?.state}{" "}
+                          -{" "}
+                          {loc.pickup?.location ||
+                            loc.delivery?.area?.zone ||
+                            "N/A"}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+
+                  {type === "Delivery" && (
+                    <label>
+                      Delivery Address:
+                      <input
+                        type="text"
+                        value={deliveryAddress}
+                        onChange={(e) => setDeliveryAddress(e.target.value)}
+                        required
+                      />
+                    </label>
+                  )}
+
+                  <button type="submit">Submit Delivery Choice</button>
+                </form>
+              )}
+
+              {deliveryChosen && (
+                <button className={styles.checkout} onClick={handleCheckout}>
+                  Proceed to Payment
+                </button>
+              )}
             </div>
-
-            {!showCheckout && (
-              <button
-                className={styles.checkout}
-                onClick={() => setShowCheckout(true)}
-              >
-                Proceed to Delivery Choice
-              </button>
-            )}
-
-            {showCheckout && !deliveryChosen && (
-              <form
-                className={styles.form}
-                onSubmit={handleDeliveryChoiceSubmit}
-              >
-                <h2 className={styles.title}>Choose Delivery Option</h2>
-                <div className={styles.radioGroup}>
-                  <label>
-                    <input
-                      type="radio"
-                      value="Pickup"
-                      checked={type === "Pickup"}
-                      onChange={(e) => setType(e.target.value)}
-                      required
-                    />
-                    Pickup
-                  </label>
-                  <label>
-                    <input
-                      type="radio"
-                      value="Delivery"
-                      checked={type === "Delivery"}
-                      onChange={(e) => setType(e.target.value)}
-                      required
-                    />
-                    Delivery
-                  </label>
-                </div>
-
-                <label>
-                  Select Region/Location:
-                  <select
-                    value={locationId}
-                    onChange={(e) => setLocationId(e.target.value)}
-                    required
-                  >
-                    <option value="">Select a location</option>
-                    {locations.map((loc) => (
-                      <option key={loc._id} value={loc._id}>
-                        {loc.pickup?.region?.state ||
-                          loc.delivery?.region?.state}{" "}
-                        -{" "}
-                        {loc.pickup?.location ||
-                          loc.delivery?.area?.zone ||
-                          "N/A"}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-
-                {type === "Delivery" && (
-                  <label>
-                    Delivery Address:
-                    <input
-                      type="text"
-                      value={deliveryAddress}
-                      onChange={(e) => setDeliveryAddress(e.target.value)}
-                      required
-                    />
-                  </label>
-                )}
-
-                <button type="submit">Submit Delivery Choice</button>
-              </form>
-            )}
-
-            {deliveryChosen && (
-              <button className={styles.checkout} onClick={handleCheckout}>
-                Proceed to Payment
-              </button>
-            )}
           </div>
         </div>
       </div>

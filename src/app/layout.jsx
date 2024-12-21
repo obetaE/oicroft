@@ -3,6 +3,7 @@ import "./globals.css";
 import Footer from "@/components/Footer/Footer";
 import ReduxProvider from "./ReduxProvider";
 import Notification from "@/components/Notification/Notification"
+import Transaction from "@/components/Transaction/Transaction";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -29,6 +30,7 @@ export default function RootLayout({ children }) {
       >
         <ReduxProvider>{children}</ReduxProvider>
         <Notification/>
+        <Transaction/>
         <Footer />
       </body>
     </html>

@@ -78,7 +78,7 @@ export default function CheckoutContent(){
                 <tr className={styles.tr}>
                   <th>Order ID</th>
                   <th>Customer</th>
-                  <th>Address</th>
+                  <th>OTP</th>
                   <th>Total</th>
                 </tr>
               </thead>
@@ -92,7 +92,7 @@ export default function CheckoutContent(){
                   </td>
                   <td>
                     <span className={styles.address}>
-                      12 Oaks Morris Street
+                      {order.otpToken}
                     </span>
                   </td>
                   <td>

@@ -1,8 +1,8 @@
 import crypto from "crypto";
+import nodemailer from "nodemailer";
 import { NextResponse } from "next/server";
 import { ConnectDB } from "@/libs/config/db";
 import { Order } from "@/libs/models/Order";
-import { Product } from "@/libs/models/Product";
 
 export async function POST(request) {
   await ConnectDB(); // Ensure database is connected
@@ -25,8 +25,8 @@ export async function POST(request) {
       console.log("Payment successful:", event.data);
       const { reference } = event.data;
 
-      // Update order status to "Paid"
-      const order = await Order.findOne({ reference });
+      // Update order status to "Paid" and isPaid to true
+      const order = await Order.findOne({ reference }).populate("userId"); // Populate user details
       if (!order) {
         console.error("Order not found for reference:", reference);
         return NextResponse.json(
@@ -35,51 +35,18 @@ export async function POST(request) {
         );
       }
 
-      order.status = "Paid";
-      await order.save();
-      console.log("Order updated successfully:", order);
-    } else if (event.event === "charge.failed") {
-      console.log("Payment failed:", event.data);
-      const { reference } = event.data;
-
-      // Reverse stock for the failed payment
-      const order = await Order.findOne({ reference });
-      if (!order) {
-        console.error("Order not found for reference:", reference);
-        return NextResponse.json(
-          { message: "Order not found" },
-          { status: 404 }
-        );
-      }
-
-      if (order.status === "Paid") {
-        console.log("Order already marked as paid; no stock reversal needed.");
+      if (order.isPaid) {
+        console.log("Order already marked as paid.");
         return NextResponse.json({ message: "Order already paid" });
       }
 
-      // Rollback stock for all products in the order
-      const rollbackPromises = order.products.map(async (product) => {
-        const dbProduct = await Product.findById(product.productId);
-        if (dbProduct) {
-          const selectedUnit = dbProduct.prices.find(
-            (item) => item.unit === product.unit
-          );
-          if (selectedUnit) {
-            selectedUnit.stock += product.quantity;
-            await dbProduct.save();
-            console.log(
-              `Stock reversed for ${dbProduct.title} (${product.unit}): New stock: ${selectedUnit.stock}`
-            );
-          }
-        }
-      });
-
-      await Promise.all(rollbackPromises);
-
-      // Update order status to "Failed"
-      order.status = "Failed";
+      order.status = "Paid";
+      order.isPaid = true; // Mark the order as paid
       await order.save();
-      console.log("Order marked as failed, and stock reversed.");
+      console.log("Order updated successfully:", order);
+
+      // Send email to the user
+      await sendOrderConfirmationEmail(order);
     }
 
     return NextResponse.json({ message: "Webhook processed successfully" });
@@ -89,5 +56,91 @@ export async function POST(request) {
       { error: "Failed to process webhook" },
       { status: 500 }
     );
+  }
+}
+
+// Function to send an email with order details
+async function sendOrderConfirmationEmail(order) {
+  try {
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER, // Your email
+        pass: process.env.EMAIL_PASS, // Your email password
+      },
+    });
+
+    const mailOptions = {
+      from: `"Oicroft" <${process.env.EMAIL_USER}>`,
+      to: order.userId.email, // Assumes userId is populated and contains email
+      subject: "Payment Confirmation - Order Recieved",
+      html: `
+        <div style="font-family: Arial, sans-serif;">
+      <!-- Header -->
+      <img src="cid:headerImage" alt="Oicroft Header" style="width: 100%; min-width: 600px;" />
+
+      <!-- Content -->
+      <div style="padding: 1rem;">
+       <h1>Thank You for Your Purchase!</h1>
+          <p>Hello ${order.userId.username || "Customer"},</p>
+          <p>We have received your order. Here are the details:</p>
+          <ul>
+            <li><strong>Reference:</strong> ${order.reference}</li>
+            <li><strong>Total:</strong> ${order.total}</li>
+            <li><strong>Delivery Date:</strong> ${order.deliveryDate.toDateString()}</li>
+            <li><strong>OTP:</strong> ${order.otpToken}</li>
+          </ul>
+          <p>Thank you for choosing Oicroft!</p>
+          <p>If you have any questions, feel free to contact us at oicroftco@gmail.com.</p>
+
+      <!-- Footer -->
+      <div style="
+        background-color: #19831c; 
+        color: white; 
+        text-align: center; 
+        padding: 1rem; 
+        margin-top: 1rem;
+      ">
+        <p>Follow us on social media:</p>
+        <a href="mailto:oicroftco@gmail.com"><img src="cid:Email" alt="Email" style="width: 32px; margin: 0 5px;" /></a>
+        <a href="https://www.facebook.com/profile.php?id=61558022143571"><img src="cid:Facebook" alt="Facebook" style="width: 32px; margin: 0 5px;" /></a>
+        <a href="https://x.com/Oicroft?t=xAfAW9Gz0kkdsk7pzjOcxQ&s=09"><img src="cid:Twitter" alt="Twitter" style="width: 32px; margin: 0 5px;" /></a>
+        <a href="https://www.instagram.com/oicroft?igsh=MWY5a3Z2emt3eXBuZQ=="><img src="cid:Instagram" alt="Instagram" style="width: 32px; margin: 0 5px;" /></a>
+      </div>
+    </div>
+  `,
+      attachments: [
+        {
+          filename: "Email Header.png",
+          path: "./public/Email Header.png",
+          cid: "headerImage", // Same CID for referencing in the HTML
+        },
+        {
+          filename: "Email.png",
+          path: "./public/Email.png",
+          cid: "Email", // Same CID for referencing in the HTML
+        },
+        {
+          filename: "Facebook.png",
+          path: "./public/Facebook.png",
+          cid: "Facebook", // Same CID for referencing in the HTML
+        },
+        {
+          filename: "Twitter.png",
+          path: "./public/Twitter.png",
+          cid: "Twitter", // Same CID for referencing in the HTML
+        },
+        {
+          filename: "Instagram.png",
+          path: "./public/Instagram.png",
+          cid: "Instagram", // Same CID for referencing in the HTML
+        },
+      ],
+    };
+
+    await transporter.sendMail(mailOptions);
+    console.log("Order confirmation email sent to:", order.userId.email);
+  } catch (error) {
+    console.error("Error sending order confirmation email:", error);
   }
 }

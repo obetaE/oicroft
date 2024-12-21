@@ -63,9 +63,9 @@ const AnimalSchema = new mongoose.Schema(
       },
     },
     productId: {
-      type: String,
-      unique: true,
-      default: () => new mongoose.Types.ObjectId().toString(),
+     type: mongoose.Schema.Types.ObjectId, // Use ObjectId type
+           unique: true,
+           default: () => new mongoose.Types.ObjectId(), // Generates a valid ObjectId
     },
     discounts: {
       regularDiscount: { type: Number, default: 0 },

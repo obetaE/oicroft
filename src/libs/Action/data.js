@@ -6,6 +6,7 @@ import SupportModel from '../models/Support';
 import mongoose from "mongoose"
 
 
+
 export const getUser = async (id) => {
   try {
     ConnectDB();
@@ -43,6 +44,7 @@ export const getUsers = async () =>{
         throw new Error("Failed to Fetch Users")
     }
 }
+
 
 
 export const getNotification = async (id) => {

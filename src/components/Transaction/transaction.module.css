@@ -1,0 +1,25 @@
+.links {
+  background-color: var(--bg);
+  width: 180px;
+  height: 40px;
+  border-radius: 1.7rem;
+  color: white;
+  font-weight: 600;
+  position: fixed; /* Position it at the bottom right */
+  bottom: 20px; /* Adjust the distance from the bottom */
+  right: 20px; /* Adjust the distance from the right */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease; /* Smooth hover effect */
+  z-index: 1000; /* Ensures it stays above other elements */
+}
+
+.links:hover {
+  transform: scale(1.05); /* Slightly enlarge on hover */
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
+}
+

@@ -2,53 +2,59 @@ import { NextResponse } from "next/server";
 import { ConnectDB } from "@/libs/config/db";
 import { Order } from "@/libs/models/Order";
 import { Product } from "@/libs/models/Product";
+import { Animal } from "@/libs/models/Animal";
+import { Combo } from "@/libs/models/Combo";
 import Location from "@/libs/models/Location";
 
 // Utility function to calculate the delivery date
 const calculateDeliveryDate = () => {
   const now = new Date();
-
-  // Find the Thursday of the *current* week
   const currentThursday = new Date(now);
   currentThursday.setDate(now.getDate() + ((4 - now.getDay() + 7) % 7));
   currentThursday.setHours(0, 0, 0, 0);
-
-  // Find the Wednesday of the *current* week
   const currentWednesday = new Date(currentThursday);
   currentWednesday.setDate(currentThursday.getDate() + 6);
   currentWednesday.setHours(23, 59, 59, 999);
-
-  // Find the Saturday after the current Wednesday
   const deliverySaturday = new Date(currentWednesday);
   deliverySaturday.setDate(currentWednesday.getDate() + 3);
   deliverySaturday.setHours(12, 0, 0, 0);
-
-  // Adjust for cases where today is before the current Thursday
   if (now < currentThursday) {
-    // If today is before the current Thursday, consider the "previous week"
     currentThursday.setDate(currentThursday.getDate() - 7);
     currentWednesday.setDate(currentWednesday.getDate() - 7);
   }
-
-  // Check if today is within the range of the current "week" (Thursday → Wednesday)
   if (now >= currentThursday && now <= currentWednesday) {
     return deliverySaturday;
   }
-
-  // Otherwise, calculate the next batch (next week's Thursday to Wednesday)
   const nextThursday = new Date(currentThursday);
   nextThursday.setDate(currentThursday.getDate() + 7);
-
   const nextWednesday = new Date(nextThursday);
   nextWednesday.setDate(nextThursday.getDate() + 6);
-
   const nextDeliverySaturday = new Date(nextWednesday);
   nextDeliverySaturday.setDate(nextWednesday.getDate() + 3);
   nextDeliverySaturday.setHours(12, 0, 0, 0);
-
   return nextDeliverySaturday;
 };
 
+// Utility function to find a product in all schemas
+const findProductInSchemas = async (productId) => {
+  console.log(`Looking for product with ID: ${productId}`);
+  const schemas = [
+    { schema: Product, type: "Product" },
+    { schema: Animal, type: "Animal" },
+    { schema: Combo, type: "Combo" },
+  ];
+
+  for (const { schema, type } of schemas) {
+    const product = await schema.findOne({ _id: productId });
+    if (product) {
+      console.log(`Product found in ${type} schema:`, product.title);
+      return { product, type };
+    }
+  }
+
+  console.log(`Product with ID: ${productId} not found in any schema`);
+  return null;
+};
 
 export async function POST(request) {
   console.log("API called: /api/trackorder [POST]");
@@ -66,7 +72,6 @@ export async function POST(request) {
       deliveryOption,
     });
 
-    // Check required fields
     if (!products || !total || !userId || !reference || !deliveryOption) {
       console.error("Missing required fields in request:", {
         products,
@@ -87,32 +92,27 @@ export async function POST(request) {
     const updatedProducts = [];
 
     for (const product of products) {
-      console.log("Checking product:", product);
+      console.log("Processing product:", product);
 
-      // Validate product quantity input
       if (typeof product.quantity !== "number" || isNaN(product.quantity)) {
-        console.error(`Invalid quantity for product: ${product.id}`);
+        console.error(`Invalid quantity for product: ${product.productId}`);
         return NextResponse.json(
-          { message: `Invalid quantity for product ${product.id}` },
+          { message: `Invalid quantity for product ${product.productId}` },
           { status: 400 }
         );
       }
 
-      // Find the product in the database
-      const existingProduct = await Product.findOne({
-        _id: product.productId,
-      });
+      const productData = await findProductInSchemas(product.productId);
 
-
-      if (!existingProduct) {
-        console.error("Product not found:", product.id);
+      if (!productData) {
+        console.error("Product not found:", product.productId);
         return NextResponse.json(
-          { message: `Product ${product.id} not found` },
+          { message: `Product ${product.productId} not found` },
           { status: 404 }
         );
       }
 
-      console.log("Found product in DB:", existingProduct.title);
+      const { product: existingProduct, type: productType } = productData;
 
       const selectedUnit = existingProduct.prices.find(
         (item) => item.unit === product.unit || (!product.unit && !item.unit)
@@ -128,7 +128,6 @@ export async function POST(request) {
         );
       }
 
-      // Validate stock
       if (typeof selectedUnit.stock !== "number" || isNaN(selectedUnit.stock)) {
         console.error(
           `Invalid stock value for ${existingProduct.title}, unit: ${product.unit}`
@@ -141,7 +140,6 @@ export async function POST(request) {
         );
       }
 
-      // Check stock sufficiency
       if (selectedUnit.stock < product.quantity) {
         console.error("Insufficient stock for:", {
           productTitle: existingProduct.title,
@@ -157,15 +155,15 @@ export async function POST(request) {
         );
       }
 
-      // Deduct stock
-      selectedUnit.stock = (selectedUnit.stock || 0) - product.quantity;
+      selectedUnit.stock -= product.quantity;
       updatedProducts.push({ product: existingProduct, selectedUnit });
       console.log(
         `Stock updated for ${existingProduct.title}: Remaining stock: ${selectedUnit.stock}`
       );
+
+      product.productType = productType; // Add product type to the order
     }
 
-    // Fetch location details for pickup or delivery
     let pickup = null;
     let delivery = null;
 
@@ -182,8 +180,8 @@ export async function POST(request) {
 
       pickup = {
         region: {
-          state: location.pickup?.region?.state, // Add "state" field explicitly
-          logistics: location.pickup?.region?.logistics || 0, // Ensure logistics is a number
+          state: location.pickup?.region?.state,
+          logistics: location.pickup?.region?.logistics || 0,
         },
         location: location.pickup?.location,
       };
@@ -237,7 +235,6 @@ export async function POST(request) {
       );
     } catch (error) {
       console.error("Error creating order, rolling back stock:", error.message);
-      // Rollback stock
       for (const { product, selectedUnit } of updatedProducts) {
         selectedUnit.stock += product.quantity;
         await product.save();

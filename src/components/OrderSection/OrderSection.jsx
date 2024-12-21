@@ -7,63 +7,56 @@ export default function OrderSection() {
   const [groupedOrders, setGroupedOrders] = useState([]);
   const [loading, setLoading] = useState(true);
 
- useEffect(() => {
-   const fetchOrders = async () => {
-     try {
-       const response = await fetch("/api/orders");
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const response = await fetch("/api/orders");
 
-       if (!response.ok) {
-         console.error(`Error: ${response.status} - ${response.statusText}`);
-         setLoading(false);
-         return;
-       }
+        if (!response.ok) {
+          console.error(`Error: ${response.status} - ${response.statusText}`);
+          setLoading(false);
+          return;
+        }
 
-       const data = await response.json();
+        const data = await response.json();
 
-       if (!Array.isArray(data)) {
-         console.error("API response is not an array:", data);
-         setLoading(false);
-         return;
-       }
+        if (!Array.isArray(data)) {
+          console.error("API response is not an array:", data);
+          setLoading(false);
+          return;
+        }
 
-       // Filter out orders with invalid deliveryDate
-       const validOrders = data.filter((order) => {
-         if (!order.deliveryDate || isNaN(new Date(order.deliveryDate))) {
-           console.warn(
-             `Skipping order with invalid deliveryDate: ${order._id}`
-           );
-           return false;
-         }
-         return true;
-       });
+        const validOrders = data.filter((order) => {
+          if (!order.deliveryDate || isNaN(new Date(order.deliveryDate))) {
+            console.warn(
+              `Skipping order with invalid deliveryDate: ${order._id}`
+            );
+            return false;
+          }
+          return true;
+        });
 
-       // Group orders by deliveryDate
-       const grouped = validOrders.reduce((acc, order) => {
-         const date = new Date(order.deliveryDate).toLocaleDateString();
-         if (!acc[date]) acc[date] = [];
-         acc[date].push(order);
-         return acc;
-       }, {});
+        const grouped = validOrders.reduce((acc, order) => {
+          const date = new Date(order.deliveryDate).toLocaleDateString();
+          if (!acc[date]) acc[date] = [];
+          acc[date].push(order);
+          return acc;
+        }, {});
 
-       const groupedArray = Object.entries(grouped).sort(
-         ([dateA], [dateB]) => new Date(dateB) - new Date(dateA)
-       );
+        const groupedArray = Object.entries(grouped).sort(
+          ([dateA], [dateB]) => new Date(dateB) - new Date(dateA)
+        );
 
-       setGroupedOrders(groupedArray);
+        setGroupedOrders(groupedArray);
+      } catch (error) {
+        console.error("Error fetching orders:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-       console.log("Orders fetched:", data);
-       console.log("Grouped orders:", groupedArray);
-
-     } catch (error) {
-       console.error("Error fetching orders:", error);
-     } finally {
-       setLoading(false);
-     }
-   };
-
-   fetchOrders();
- }, []);
-
+    fetchOrders();
+  }, []);
 
   const handleNextStage = async (deliveryDate) => {
     try {
@@ -79,21 +72,48 @@ export default function OrderSection() {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              status: getNextStatus(order.status), // Determine the next stage
+              status: getNextStatus(order.status),
             }),
           })
         )
       );
 
-      // Refresh data after update
+      refreshData();
+    } catch (error) {
+      console.error("Error updating order status:", error);
+    }
+  };
+
+  const handlePreviousStage = async (deliveryDate) => {
+    try {
+      const ordersToUpdate = groupedOrders.find(
+        ([date]) => date === deliveryDate
+      )?.[1];
+
+      if (!ordersToUpdate) return;
+
+      await Promise.all(
+        ordersToUpdate.map((order) =>
+          fetch(`/api/orders/${order._id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              status: getPreviousStatus(order.status),
+            }),
+          })
+        )
+      );
+
+      refreshData();
+    } catch (error) {
+      console.error("Error updating order status:", error);
+    }
+  };
+
+  const refreshData = async () => {
+    try {
       const updatedResponse = await fetch("/api/orders");
       const updatedData = await updatedResponse.json();
-
-      // Validate that updatedData is an array
-      if (!Array.isArray(updatedData)) {
-        console.error("API response is not an array:", updatedData);
-        return;
-      }
 
       const updatedGrouped = updatedData.reduce((acc, order) => {
         const date = new Date(order.deliveryDate).toLocaleDateString();
@@ -107,14 +127,20 @@ export default function OrderSection() {
         )
       );
     } catch (error) {
-      console.error("Error updating order status:", error);
+      console.error("Error refreshing data:", error);
     }
   };
 
   const getNextStatus = (currentStatus) => {
     const statuses = ["Paid", "Packaged", "Logistics", "Received"];
     const currentIndex = statuses.indexOf(currentStatus);
-    return statuses[currentIndex + 1] || currentStatus; // Default to last stage
+    return statuses[currentIndex + 1] || currentStatus;
+  };
+
+  const getPreviousStatus = (currentStatus) => {
+    const statuses = ["Paid", "Packaged", "Logistics", "Received"];
+    const currentIndex = statuses.indexOf(currentStatus);
+    return currentIndex > 0 ? statuses[currentIndex - 1] : currentStatus;
   };
 
   return (
@@ -130,6 +156,12 @@ export default function OrderSection() {
                 onClick={() => handleNextStage(deliveryDate)}
               >
                 Next Stage (All)
+              </button>
+              <button
+                className={styles.nextStageButton}
+                onClick={() => handlePreviousStage(deliveryDate)}
+              >
+                Previous Stage (All)
               </button>
               <h2>Delivery Date: {deliveryDate}</h2>
             </div>
@@ -152,7 +184,7 @@ export default function OrderSection() {
                     <td>{order.userId.username}</td>
                     <td>{order.userId.email}</td>
                     <td>{order.otpToken}</td>
-                    <td>${order.total.toFixed(2)}</td>
+                    <td>₦{order.total.toFixed(2)}</td>
                     <td>Delivery</td>
                     <td>{order.status}</td>
                   </tr>

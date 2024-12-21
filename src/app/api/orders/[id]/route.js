@@ -1,46 +1,120 @@
 import { NextResponse } from "next/server";
 import { ConnectDB } from "@/libs/config/db";
 import { Order } from "@/libs/models/Order";
+import nodemailer from "nodemailer";
 
-// Fetch a specific order by ID
-export async function GET(request, { params }) {
-  const { id } = await params;
+
+export async function PUT(request) {
   await ConnectDB();
+  const { searchParams } = new URL(request.url);
+  const orderId = searchParams.get("id");
+
+  console.log("Recieved PUT request for order update")
+  console.log("Order Id:", orderId)
 
   try {
-    const order = await Order.findById(id).populate("userId", "username email");
+    const { status } = await request.json();
+    console.log("Status to Update:", status)
+
+    const order = await Order.findById(orderId).populate("userId", "email");
+
     if (!order) {
-      return NextResponse.json({ message: "Order not found" }, { status: 404 });
-    }
-    return NextResponse.json(order, { status: 200 });
-  } catch (error) {
-    return NextResponse.json(
-      { message: "Failed to fetch order", error: error.message },
-      { status: 500 }
-    );
-  }
-}
-
-// Update a specific order by ID
-export async function PUT(request, { params }) {
-  const { id } = await params;
-  await ConnectDB();
-
-  try {
-    const updatedData = await request.json();
-    const updatedOrder = await Order.findByIdAndUpdate(id, updatedData, {
-      new: true,
-    }).populate("userId", "username email");
-
-    if (!updatedOrder) {
+      console.warn("Order not found for ID:", orderId)
       return NextResponse.json({ message: "Order not found" }, { status: 404 });
     }
 
-    return NextResponse.json(updatedOrder, { status: 200 });
+    console.log("Order Found:", order)
+    console.log("Current Order Status:", order.status)
+
+    order.status = status;
+    await order.save();
+
+    console.log("Order status updated to:", status)
+
+    if (status === "Logistics") {
+      try{
+        const transporter = nodemailer.createTransport({
+          service: "gmail",
+          auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS,
+          },
+        });
+
+        const mailOptions = {
+          from: `Oicroft <${process.env.EMAIL_USER}>`,
+          to: order.userId.email,
+          subject: "Your Order is Ready for Pickup or Delivery",
+          html: `
+          <div style="font-family: Arial, sans-serif;">
+      <!-- Header -->
+      <img src="cid:headerImage" alt="Oicroft Header" style="width: 100%; min-width: 600px;" />
+
+      <!-- Content -->
+      <div style="padding: 1rem;">
+       <h1>Your Order is Ready</h1>
+            <p>Your order has arrived at the branch location. You can pick it up or await delivery starting tomorrow.</p>
+            <p>Thank you for choosing Oicroft!</p>
+      <!-- Footer -->
+      <div style="
+        background-color: #19831c; 
+        color: white; 
+        text-align: center; 
+        padding: 1rem; 
+        margin-top: 1rem;
+      ">
+        <p>Follow us on social media:</p>
+        <a href="mailto:oicroftco@gmail.com"><img src="cid:Email" alt="Email" style="width: 32px; margin: 0 5px;" /></a>
+        <a href="https://www.facebook.com/profile.php?id=61558022143571"><img src="cid:Facebook" alt="Facebook" style="width: 32px; margin: 0 5px;" /></a>
+        <a href="https://x.com/Oicroft?t=xAfAW9Gz0kkdsk7pzjOcxQ&s=09"><img src="cid:Twitter" alt="Twitter" style="width: 32px; margin: 0 5px;" /></a>
+        <a href="https://www.instagram.com/oicroft?igsh=MWY5a3Z2emt3eXBuZQ=="><img src="cid:Instagram" alt="Instagram" style="width: 32px; margin: 0 5px;" /></a>
+      </div>
+    </div>
+  `,
+          attachments: [
+            {
+              filename: "Email Header.png",
+              path: "./public/Email Header.png",
+              cid: "headerImage", // Same CID for referencing in the HTML
+            },
+            {
+              filename: "Email.png",
+              path: "./public/Email.png",
+              cid: "Email", // Same CID for referencing in the HTML
+            },
+            {
+              filename: "Facebook.png",
+              path: "./public/Facebook.png",
+              cid: "Facebook", // Same CID for referencing in the HTML
+            },
+            {
+              filename: "Twitter.png",
+              path: "./public/Twitter.png",
+              cid: "Twitter", // Same CID for referencing in the HTML
+            },
+            {
+              filename: "Instagram.png",
+              path: "./public/Instagram.png",
+              cid: "Instagram", // Same CID for referencing in the HTML
+            },
+          ],
+        };
+
+        await transporter.sendMail(mailOptions);
+
+        console.log("Logistics email sent to:", order.userId.email);
+      }catch(emailError){
+        console.error("Error Sending Email:", emailError.message)
+      }
+    }
+
+    return NextResponse.json({ message: "Order updated successfully" });
   } catch (error) {
+    console.error("Error updating order:", error.message);
     return NextResponse.json(
       { message: "Failed to update order", error: error.message },
       { status: 500 }
     );
   }
 }
+

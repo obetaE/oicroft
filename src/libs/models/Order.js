@@ -12,9 +12,13 @@ const OrderSchema = new mongoose.Schema(
       type: [
         {
           productId: {
-            type: mongoose.Schema.Types.ObjectId, // Reference to Product model
-            ref: "Product",
+            type: mongoose.Schema.Types.ObjectId, // Reference to Product, Animal, or Combo
             required: true,
+          },
+          productType: {
+            type: String,
+            required: true,
+            enum: ["Product", "Animal", "Combo"], // Allowed product types
           },
           title: { type: String, required: true },
           quantity: { type: Number, required: true },
@@ -51,6 +55,10 @@ const OrderSchema = new mongoose.Schema(
       deliveryAddress: {
         string: { type: String },
       },
+    },
+    isPaid: {
+      type: Boolean,
+      default: false,
     },
   },
   { timestamps: true }
