@@ -37,9 +37,14 @@ export default function OrderSection() {
         });
 
         const grouped = validOrders.reduce((acc, order) => {
-          const date = new Date(order.deliveryDate).toLocaleDateString();
-          if (!acc[date]) acc[date] = [];
-          acc[date].push(order);
+          const formattedDate = new Date(
+            order.deliveryDate
+          ).toLocaleDateString();
+          if (!acc[formattedDate]) acc[formattedDate] = [];
+          acc[formattedDate].push({
+            ...order,
+            originalDate: order.deliveryDate,
+          }); // Include originalDate
           return acc;
         }, {});
 
@@ -58,51 +63,34 @@ export default function OrderSection() {
     fetchOrders();
   }, []);
 
-  const handleNextStage = async (deliveryDate) => {
+  const updateOrderStatus = async (deliveryDate, newStatus) => {
     try {
-      const ordersToUpdate = groupedOrders.find(
+      const originalDate = groupedOrders.find(
         ([date]) => date === deliveryDate
-      )?.[1];
+      )?.[1]?.[0]?.originalDate;
 
-      if (!ordersToUpdate) return;
+      if (!originalDate) {
+        console.error("Original delivery date not found for:", deliveryDate);
+        return;
+      }
 
-      await Promise.all(
-        ordersToUpdate.map((order) =>
-          fetch(`/api/orders/${order._id}`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              status: getNextStatus(order.status),
-            }),
-          })
-        )
-      );
+      const response = await fetch("/api/orders", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          deliveryDate: originalDate, // Use the original ISO date
+          status: newStatus,
+        }),
+      });
 
-      refreshData();
-    } catch (error) {
-      console.error("Error updating order status:", error);
-    }
-  };
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Error updating orders:", errorData.message);
+        return;
+      }
 
-  const handlePreviousStage = async (deliveryDate) => {
-    try {
-      const ordersToUpdate = groupedOrders.find(
-        ([date]) => date === deliveryDate
-      )?.[1];
-
-      if (!ordersToUpdate) return;
-
-      await Promise.all(
-        ordersToUpdate.map((order) =>
-          fetch(`/api/orders/${order._id}`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              status: getPreviousStatus(order.status),
-            }),
-          })
-        )
-      );
+      const { message, modifiedCount } = await response.json();
+      console.log(`${message}. Orders updated: ${modifiedCount}`);
 
       refreshData();
     } catch (error) {
@@ -116,11 +104,12 @@ export default function OrderSection() {
       const updatedData = await updatedResponse.json();
 
       const updatedGrouped = updatedData.reduce((acc, order) => {
-        const date = new Date(order.deliveryDate).toLocaleDateString();
-        if (!acc[date]) acc[date] = [];
-        acc[date].push(order);
+        const formattedDate = new Date(order.deliveryDate).toLocaleDateString();
+        if (!acc[formattedDate]) acc[formattedDate] = [];
+        acc[formattedDate].push({ ...order, originalDate: order.deliveryDate });
         return acc;
       }, {});
+
       setGroupedOrders(
         Object.entries(updatedGrouped).sort(
           ([dateA], [dateB]) => new Date(dateB) - new Date(dateA)
@@ -153,13 +142,23 @@ export default function OrderSection() {
             <div className={styles.groupHeader}>
               <button
                 className={styles.nextStageButton}
-                onClick={() => handleNextStage(deliveryDate)}
+                onClick={() =>
+                  updateOrderStatus(
+                    deliveryDate,
+                    getNextStatus(orders[0].status) // Assume all orders have the same status
+                  )
+                }
               >
                 Next Stage (All)
               </button>
               <button
                 className={styles.nextStageButton}
-                onClick={() => handlePreviousStage(deliveryDate)}
+                onClick={() =>
+                  updateOrderStatus(
+                    deliveryDate,
+                    getPreviousStatus(orders[0].status)
+                  )
+                }
               >
                 Previous Stage (All)
               </button>

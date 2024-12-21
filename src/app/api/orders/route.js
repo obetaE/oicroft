@@ -66,3 +66,53 @@ export async function GET(request) {
     );
   }
 }
+
+export async function PUT(request) {
+  await ConnectDB();
+
+  try {
+    const { deliveryDate, status } = await request.json();
+
+    if (!deliveryDate || !status) {
+      return NextResponse.json(
+        { message: "Delivery date and status are required" },
+        { status: 400 }
+      );
+    }
+
+    const parsedDate = new Date(deliveryDate);
+    if (isNaN(parsedDate)) {
+      return NextResponse.json(
+        { message: "Invalid delivery date provided" },
+        { status: 400 }
+      );
+    }
+
+    // Find and update orders
+    const result = await Order.updateMany(
+      { deliveryDate: parsedDate },
+      { $set: { status } }
+    );
+
+    if (result.modifiedCount === 0) {
+      return NextResponse.json(
+        { message: "No orders found with the given delivery date" },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json(
+      {
+        message: "Orders updated successfully",
+        modifiedCount: result.modifiedCount,
+      },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("Error updating orders:", error.message);
+    return NextResponse.json(
+      { message: "Failed to update orders", error: error.message },
+      { status: 500 }
+    );
+  }
+}
