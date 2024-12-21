@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { ConnectDB } from "@/libs/config/db";
 import { Order } from "@/libs/models/Order";
 import { Product } from "@/libs/models/Product";
+import nodemailer from "nodemailer";
 
 export async function GET(request) {
   await ConnectDB();
@@ -88,17 +89,98 @@ export async function PUT(request) {
       );
     }
 
-    // Find and update orders
+    // Find orders to update
+    const orders = await Order.find({ deliveryDate: parsedDate }).populate(
+      "userId",
+      "email username"
+    );
+
+    if (!orders.length) {
+      return NextResponse.json(
+        { message: "No orders found with the given delivery date" },
+        { status: 404 }
+      );
+    }
+
+    // Update the status of the orders
     const result = await Order.updateMany(
       { deliveryDate: parsedDate },
       { $set: { status } }
     );
 
-    if (result.modifiedCount === 0) {
-      return NextResponse.json(
-        { message: "No orders found with the given delivery date" },
-        { status: 404 }
-      );
+    if (status === "Logistics") {
+      for (const order of orders) {
+        try {
+          const transporter = nodemailer.createTransport({
+            service: "gmail",
+            auth: {
+              user: process.env.EMAIL_USER,
+              pass: process.env.EMAIL_PASS,
+            },
+          });
+
+          const mailOptions = {
+            from: `Oicroft <${process.env.EMAIL_USER}>`,
+            to: order.userId.email,
+            subject: "Your Order is Ready for Pickup or Delivery",
+            html: `
+              <div style="font-family: Arial, sans-serif;">
+                <img src="cid:headerImage" alt="Oicroft Header" style="width: 100%; min-width: 600px;" />
+
+                <div style="padding: 1rem;">
+                  <h1>Your Order is Ready</h1>
+                  <p>Your order has arrived at the branch location. You can pick it up or await delivery starting tomorrow.</p>
+                  <p>Thank you for choosing Oicroft!</p>
+                </div>
+
+                <div style="background-color: #19831c; color: white; text-align: center; padding: 1rem; margin-top: 1rem;">
+                  <p>Follow us on social media:</p>
+                  <a href="mailto:oicroftco@gmail.com"><img src="cid:Email" alt="Email" style="width: 32px; margin: 0 5px;" /></a>
+                  <a href="https://www.facebook.com/profile.php?id=61558022143571"><img src="cid:Facebook" alt="Facebook" style="width: 32px; margin: 0 5px;" /></a>
+                  <a href="https://x.com/Oicroft?t=xAfAW9Gz0kkdsk7pzjOcxQ&s=09"><img src="cid:Twitter" alt="Twitter" style="width: 32px; margin: 0 5px;" /></a>
+                  <a href="https://www.instagram.com/oicroft?igsh=MWY5a3Z2emt3eXBuZQ=="><img src="cid:Instagram" alt="Instagram" style="width: 32px; margin: 0 5px;" /></a>
+                </div>
+              </div>
+            `,
+            attachments: [
+              {
+                filename: "Email Header.png",
+                path: "./public/Email Header.png",
+                cid: "headerImage",
+              },
+              {
+                filename: "Email.png",
+                path: "./public/Email.png",
+                cid: "Email",
+              },
+              {
+                filename: "Facebook.png",
+                path: "./public/Facebook.png",
+                cid: "Facebook",
+              },
+              {
+                filename: "Twitter.png",
+                path: "./public/Twitter.png",
+                cid: "Twitter",
+              },
+              {
+                filename: "Instagram.png",
+                path: "./public/Instagram.png",
+                cid: "Instagram",
+              },
+            ],
+          };
+
+          await transporter.sendMail(mailOptions);
+          console.log("Logistics email sent to:", order.userId.email);
+        } catch (emailError) {
+          console.error(
+            "Error sending email for order:",
+            order._id,
+            emailError.message
+          );
+        }
+      }
     }
 
     return NextResponse.json(
